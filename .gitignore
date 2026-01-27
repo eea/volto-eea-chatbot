@@ -24,3 +24,18 @@ videos
 .env.test.local
 .env.production.local
 *~
+.gemini*
+
+.gemini/
+gha-creds-*.json
+
+# Python chatbot tests
+chatbot_tests/reports/
+chatbot_tests/__pycache__/
+chatbot_tests/**/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.env.chatbot_tests.local
+htmlcov/
+.coverage

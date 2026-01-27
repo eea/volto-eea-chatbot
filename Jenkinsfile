@@ -7,9 +7,9 @@ pipeline {
   }
 
   environment {
-    GIT_NAME = "volto-addon-template"
+    GIT_NAME = "volto-eea-chatbot"
     NAMESPACE = "@eeacms"
-    SONARQUBE_TAGS = "volto.eea.europa.eu"
+    SONARQUBE_TAGS = "volto.eea.europa.eu,demo-www.eea.europa.eu,water.europa.eu-freshwater,www.eea.europa.eu-en,land.copernicus.eu,water.europa.eu-marine,climate-adapt.eea.europa.eu,biodiversity.europa.eu,insitu.copernicus.eu,forest.eea.europa.eu,industry.eea.europa.eu,climate-advisory-board.europa.eu,ask.copernicus.eu,clmsdemo.devel6cph.eea.europa.eu"
     DEPENDENCIES = ""
     BACKEND_PROFILES = "eea.kitkat:testing"
     BACKEND_ADDONS = ""
@@ -413,4 +413,3 @@ pipeline {
     }
   }
 }
-

@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EmptyState renders nothing when no starter messages and no starter prompts 1`] = `
+<div
+  className="empty-state"
+>
+  <div
+    className="starter-messages-container"
+  />
+</div>
+`;
+
+exports[`EmptyState renders with enableStarterPrompts and starterPrompts 1`] = `
+<div
+  className="empty-state"
+>
+  <h4
+    className="starter-message-heading"
+  >
+    Starter Prompts
+  </h4>
+  <div
+    className="starter-messages-container"
+  >
+    <button
+      className="ui button starter-message"
+      onClick={[Function]}
+      onKeyDown={[Function]}
+    >
+      <span
+        className="starter-message-title"
+      >
+        Prompt 1
+      </span>
+      <div
+        className="starter-message-desc"
+      >
+        Prompt Desc 1
+      </div>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`EmptyState renders with showAssistantPrompts and persona starter messages 1`] = `
+<div
+  className="empty-state"
+>
+  <h4
+    className="starter-message-heading"
+  >
+    Starter Prompts
+  </h4>
+  <div
+    className="starter-messages-container"
+  >
+    <button
+      className="ui button starter-message"
+      onClick={[Function]}
+      onKeyDown={[Function]}
+    >
+      <span
+        className="starter-message-title"
+      >
+        Starter 1
+      </span>
+      <div
+        className="starter-message-desc"
+      >
+        Desc 1
+      </div>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`EmptyState renders without starterPromptsHeading 1`] = `
+<div
+  className="empty-state"
+>
+  <div
+    className="starter-messages-container"
+  >
+    <button
+      className="ui button starter-message"
+      onClick={[Function]}
+      onKeyDown={[Function]}
+    >
+      <span
+        className="starter-message-title"
+      >
+        Prompt X
+      </span>
+      <div
+        className="starter-message-desc"
+      >
+        Desc X
+      </div>
+    </button>
+  </div>
+</div>
+`;

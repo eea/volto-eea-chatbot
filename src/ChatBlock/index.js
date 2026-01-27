@@ -5,7 +5,7 @@ import { ChatBlockSchema } from './schema';
 
 export default function installChatBlock(config) {
   config.blocks.blocksConfig.eeaChatbot = {
-    id: 'eea_chatbot',
+    id: 'eeaChatbot',
     title: 'AI Chatbot',
     icon: codeSVG,
     group: 'common',

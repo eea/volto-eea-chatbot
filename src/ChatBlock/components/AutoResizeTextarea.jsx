@@ -40,6 +40,7 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
             setInput(input + '\n');
           }
         }}
+        disabled={isStreaming}
         {...rest}
         ref={ref}
       />
@@ -52,7 +53,7 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
           onKeyDown={(e) => {
             handleSubmit(e);
           }}
-          disabled={isStreaming}
+          disabled={isStreaming || input.trim() === ''}
           onClick={(e) => {
             handleSubmit(e);
           }}

@@ -166,30 +166,33 @@ export async function* handleStream(
 /**
  * Send a message and stream the response
  */
-export async function* sendMessage({
-  regenerate,
-  retrieval_options,
-  message,
-  fileDescriptors,
-  currentMessageFiles,
-  parentMessageId,
-  chatSessionId,
-  filters,
-  selectedDocumentIds,
-  queryOverride,
-  forceSearch,
-  modelProvider,
-  modelVersion,
-  temperature,
-  systemPromptOverride,
-  taskPromptOverride,
-  useExistingUserMessage,
-  alternateAssistantId,
-  signal,
-  useAgentSearch,
-  enabledToolIds,
-  forcedToolIds,
-}: SendMessageParams): AsyncGenerator<Packet[], void, unknown> {
+export async function* sendMessage(
+  {
+    regenerate,
+    retrieval_options,
+    message,
+    fileDescriptors,
+    currentMessageFiles,
+    parentMessageId,
+    chatSessionId,
+    filters,
+    selectedDocumentIds,
+    queryOverride,
+    forceSearch,
+    modelProvider,
+    modelVersion,
+    temperature,
+    systemPromptOverride,
+    taskPromptOverride,
+    useExistingUserMessage,
+    alternateAssistantId,
+    signal,
+    useAgentSearch,
+    enabledToolIds,
+    forcedToolIds,
+  }: SendMessageParams,
+  isRelatedQuestion: boolean = false,
+): AsyncGenerator<Packet[], void, unknown> {
   const documentsAreSelected =
     selectedDocumentIds && selectedDocumentIds.length > 0;
 
@@ -233,7 +236,8 @@ export async function* sendMessage({
 
   const body = JSON.stringify(payload);
 
-  const sendMessageResponse = await fetch('/_da/chat/send-message', {
+  const middleware = isRelatedQuestion ? '_rq' : '_da';
+  const sendMessageResponse = await fetch(`/${middleware}/chat/send-message`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

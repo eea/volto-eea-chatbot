@@ -46,6 +46,14 @@ export const MessageTextRenderer: MessageRenderer<ChatPacket> = ({
   const [displayedPacketCount, setDisplayedPacketCount] =
     useState(initialPacketCount);
 
+  useEffect(() => {
+    const audioCtx = new AudioContext();
+
+    return () => {
+      audioCtx.close();
+    };
+  }, []);
+
   // Animation effect - gradually increase displayed packets at controlled rate
   // Adaptive animation: ensures visible typing effect even for fast streams
   useEffect(() => {

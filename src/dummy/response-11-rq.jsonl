@@ -1,0 +1,321 @@
+{"user_message_id": 139082, "reserved_assistant_message_id": 139083}
+{"ind": 0, "obj": {"type": "reasoning_start"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "The"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " user"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " wants"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " to"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " generate"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " related"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " questions"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " based"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " on"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " provided"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " documents"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "."}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Need"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " max"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " "}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "5"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " related"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " questions"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ","}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " plain"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " text"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ","}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " each"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " on"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " own"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " line"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ","}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " no"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " pre"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "amble"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "."}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Must"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " be"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " about"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " environmental"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " science"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ","}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " not"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " security"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " policies"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ","}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " and"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " must"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " be"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " covered"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "/"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "answer"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "able"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " by"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " the"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " retrieved"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " documents"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "."}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " The"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " documents"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " are"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " about"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Cop"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "ern"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "icus"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " products"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " for"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " forest"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " fire"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " monitoring"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "."}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " So"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " related"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " questions"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " could"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " be"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " about"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " specific"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " products"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ","}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " usage"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ","}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " data"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " sources"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ","}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " etc"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ".\n\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "We"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " must"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " not"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " include"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " security"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " policy"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " questions"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "."}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Ensure"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " each"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " question"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " is"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " answer"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "able"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " by"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " the"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " given"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " text"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ".\n\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "Potential"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " questions"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ":\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "-"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " How"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " does"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " the"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " E"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "FF"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "IS"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " fire"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "-danger"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " forecast"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " generate"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " its"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " fire"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "-weather"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " index"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " maps"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "?\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "-"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " What"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " is"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " the"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " typical"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " turnaround"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " time"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " for"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " the"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " First"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Estimate"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Product"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " ("}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "F"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "EP"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ")"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " in"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " rapid"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " mapping"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "?\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "-"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Which"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Cop"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "ern"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "icus"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " service"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " provides"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " near"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "\u2011"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "real"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "\u2011"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "time"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " fire"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "\u2011"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "radi"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "ative"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "\u2011"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "power"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " observations"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "?\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "-"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " How"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " are"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " land"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "\u2011"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "cover"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " data"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " from"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " the"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Cop"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "ern"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "icus"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Land"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Monitoring"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Service"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " used"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " in"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " fire"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "\u2011"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "risk"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " assessments"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "?\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "-"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " What"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " types"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " of"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " impact"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " assessments"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " are"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " included"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " in"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " the"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Risk"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " &"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Recovery"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " Mapping"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " products"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "?\n\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "These"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " are"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " all"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " answer"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "able"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": ".\n\n"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "Return"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " as"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " plain"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": " lines"}}
+{"ind": 0, "obj": {"type": "reasoning_delta", "reasoning": "."}}
+{"ind": 1, "obj": {"type": "message_start", "final_documents": [], "content": ""}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "How"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " does"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " the"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " E"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "FF"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "IS"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " fire"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "danger"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " forecast"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " generate"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " its"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " fire"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "weather"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " index"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " maps"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "?"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "  \n"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "What"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " is"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " the"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " typical"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " turnaround"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " time"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " for"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " the"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " First"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Estimate"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Product"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " ("}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "F"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "EP"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": ")"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " in"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " rapid"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " mapping"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "?"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "  \n"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "Which"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Cop"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "ern"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "icus"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " service"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " provides"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " near"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "real"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "time"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " fire"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "radi"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "ative"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "power"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " ("}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "FR"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "P"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": ")"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " observations"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "?"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "  \n"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "How"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " are"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " land"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "cover"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " maps"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " from"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " the"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Cop"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "ern"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "icus"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Land"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Monitoring"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Service"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " used"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " in"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " fire"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "risk"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " assessments"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "?"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "  \n"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "What"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " impact"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u2011"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "assessment"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " components"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " are"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " included"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " in"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " the"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Cop"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "ern"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "icus"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Risk"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u202f"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "&"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "\u202f"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "Recovery"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " Mapping"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": " products"}}
+{"ind": 1, "obj": {"type": "message_delta", "content": "?"}}
+{"ind": 1, "obj": {"type": "section_end"}}
+{"ind": 2, "obj": {"type": "section_end"}}
+{"ind": 3, "obj": {"type": "stop"}}

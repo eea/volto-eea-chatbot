@@ -1,0 +1,381 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CustomToolRenderer handles delta without data 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Tool complete
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="custom-tool-renderer"
+    >
+      <div
+        className="tool-header"
+      >
+        <span
+          className="tool-icon"
+        >
+          🔧
+        </span>
+        <strong>
+          NoDataTool
+        </strong>
+      </div>
+      <div
+        className="tool-results"
+      >
+        <div
+          className="tool-result-item"
+        >
+          <div
+            className="response-type"
+          >
+            status
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CustomToolRenderer handles delta without response_type 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Tool complete
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="custom-tool-renderer"
+    >
+      <div
+        className="tool-header"
+      >
+        <span
+          className="tool-icon"
+        >
+          🔧
+        </span>
+        <strong>
+          SimpleTool
+        </strong>
+      </div>
+      <div
+        className="tool-results"
+      >
+        <div
+          className="tool-result-item"
+        >
+          <pre
+            className="tool-data"
+          >
+            {
+  "result": "done"
+}
+          </pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CustomToolRenderer handles empty packets array 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Running tool...
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="custom-tool-renderer"
+    >
+      <div
+        className="tool-header"
+      >
+        <span
+          className="tool-icon"
+        >
+          🔧
+        </span>
+        <strong>
+          Custom Tool
+        </strong>
+      </div>
+      <div
+        className="tool-results"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CustomToolRenderer renders complete state 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Tool complete
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="custom-tool-renderer"
+    >
+      <div
+        className="tool-header"
+      >
+        <span
+          className="tool-icon"
+        >
+          🔧
+        </span>
+        <strong>
+          Calculator
+        </strong>
+      </div>
+      <div
+        className="tool-results"
+      >
+        <div
+          className="tool-result-item"
+        >
+          <div
+            className="response-type"
+          >
+            calculation_result
+          </div>
+          <pre
+            className="tool-data"
+          >
+            {
+  "result": 42
+}
+          </pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CustomToolRenderer renders complex nested data correctly 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Tool complete
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="custom-tool-renderer"
+    >
+      <div
+        className="tool-header"
+      >
+        <span
+          className="tool-icon"
+        >
+          🔧
+        </span>
+        <strong>
+          DataTool
+        </strong>
+      </div>
+      <div
+        className="tool-results"
+      >
+        <div
+          className="tool-result-item"
+        >
+          <div
+            className="response-type"
+          >
+            complex
+          </div>
+          <pre
+            className="tool-data"
+          >
+            {
+  "nested": {
+    "array": [
+      1,
+      2,
+      3
+    ],
+    "object": {
+      "key": "value"
+    }
+  }
+}
+          </pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CustomToolRenderer renders running state when not complete 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Running tool...
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="custom-tool-renderer"
+    >
+      <div
+        className="tool-header"
+      >
+        <span
+          className="tool-icon"
+        >
+          🔧
+        </span>
+        <strong>
+          MyTool
+        </strong>
+      </div>
+      <div
+        className="tool-results"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CustomToolRenderer renders with multiple deltas 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Tool complete
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="custom-tool-renderer"
+    >
+      <div
+        className="tool-header"
+      >
+        <span
+          className="tool-icon"
+        >
+          🔧
+        </span>
+        <strong>
+          MultiStepTool
+        </strong>
+      </div>
+      <div
+        className="tool-results"
+      >
+        <div
+          className="tool-result-item"
+        >
+          <div
+            className="response-type"
+          >
+            step1
+          </div>
+          <pre
+            className="tool-data"
+          >
+            {
+  "step": 1,
+  "status": "processing"
+}
+          </pre>
+        </div>
+        <div
+          className="tool-result-item"
+        >
+          <div
+            className="response-type"
+          >
+            step2
+          </div>
+          <pre
+            className="tool-data"
+          >
+            {
+  "step": 2,
+  "status": "complete"
+}
+          </pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CustomToolRenderer uses default tool name when not provided 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Tool complete
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="custom-tool-renderer"
+    >
+      <div
+        className="tool-header"
+      >
+        <span
+          className="tool-icon"
+        >
+          🔧
+        </span>
+        <strong>
+          Custom Tool
+        </strong>
+      </div>
+      <div
+        className="tool-results"
+      />
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,711 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ClaimSegments filters out sources without matching snippets 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+      >
+        <span
+          title="Source 1"
+        >
+          Source 1
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="currentColor"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                web
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments handles empty segmentIds 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    />
+    <div
+      data-testid="tab-content"
+    />
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments handles missing segments in segments object 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+      >
+        <span
+          title="Source Document 1"
+        >
+          Source Document 1
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="currentColor"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source Document 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                web
+              </span>
+            </div>
+          </div>
+          <a
+            className="source-external-link"
+            href="https://example.com/1"
+            rel="noreferrer"
+            target="_blank"
+            title="Open source"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="16"
+              stroke="currentColor"
+              viewBox=""
+              width="16"
+              xmlns=""
+            />
+          </a>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments handles null segmentIds 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    />
+    <div
+      data-testid="tab-content"
+    />
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments renders source without link 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+      >
+        <span
+          title="Source 1"
+        >
+          Source 1
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="currentColor"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                file
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments renders with basic props 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+      >
+        <span
+          title="Source Document 1"
+        >
+          Source Document 1
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="currentColor"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source Document 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                web
+              </span>
+            </div>
+          </div>
+          <a
+            className="source-external-link"
+            href="https://example.com/1"
+            rel="noreferrer"
+            target="_blank"
+            title="Open source"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="16"
+              stroke="currentColor"
+              viewBox=""
+              width="16"
+              xmlns=""
+            />
+          </a>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              2
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments renders with file source type icon 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+      >
+        <span
+          title="Internal Document"
+        >
+          Internal Document
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="currentColor"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Internal Document
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                file
+              </span>
+            </div>
+          </div>
+          <a
+            className="source-external-link"
+            href="https://example.com/1"
+            rel="noreferrer"
+            target="_blank"
+            title="Open source"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="16"
+              stroke="currentColor"
+              viewBox=""
+              width="16"
+              xmlns=""
+            />
+          </a>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments renders with multiple sources 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+      >
+        <span
+          title="Source 1"
+        >
+          Source 1
+        </span>
+      </div>
+      <div
+        className=""
+        data-testid="menu-item-1"
+        onClick={[Function]}
+      >
+        <span
+          title="Source 2"
+        >
+          Source 2
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="currentColor"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                web
+              </span>
+            </div>
+          </div>
+          <a
+            className="source-external-link"
+            href="https://example.com/1"
+            rel="noreferrer"
+            target="_blank"
+            title="Open source"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="16"
+              stroke="currentColor"
+              viewBox=""
+              width="16"
+              xmlns=""
+            />
+          </a>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -8,7 +8,7 @@ export interface SendMessageParams {
   parentMessageId: number | null;
   chatSessionId: string;
   filters: Filters | null;
-  selectedDocumentIds: number[] | null;
+  selectedDocumentIds: number[] | string[] | null;
   queryOverride?: string;
   forceSearch?: boolean;
   modelProvider?: string;

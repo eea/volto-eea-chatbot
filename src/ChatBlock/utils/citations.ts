@@ -18,7 +18,7 @@ export function addCitations(text: string, message: Message): string {
   return text.replaceAll(CITATION_MATCH, (match) => {
     const number = match.match(/\d+/)?.[0];
     if (!number || !message.citations) {
-      return text;
+      return match;
     }
     return `[${match}](${message.citations[number]})`;
   });

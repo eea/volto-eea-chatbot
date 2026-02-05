@@ -1,0 +1,251 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ImageToolRenderer handles empty packets array 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Generating images...
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="image-tool-renderer"
+    >
+      <div
+        className="images-header"
+      >
+        <strong>
+          Generated Images
+        </strong>
+      </div>
+      <div
+        className="images-grid"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ImageToolRenderer handles image without revised_prompt 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Images generated
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="image-tool-renderer"
+    >
+      <div
+        className="images-header"
+      >
+        <strong>
+          Generated Images
+        </strong>
+      </div>
+      <div
+        className="images-grid"
+      >
+        <div
+          className="image-item"
+        >
+          <img
+            alt=""
+            className="image-shape-square"
+            src="https://example.com/image1.png"
+          />
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ImageToolRenderer handles image without shape (defaults to square) 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Images generated
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="image-tool-renderer"
+    >
+      <div
+        className="images-header"
+      >
+        <strong>
+          Generated Images
+        </strong>
+      </div>
+      <div
+        className="images-grid"
+      >
+        <div
+          className="image-item"
+        >
+          <img
+            alt="Test"
+            className="image-shape-square"
+            src="https://example.com/image1.png"
+          />
+          <div
+            className="image-prompt"
+          >
+            Test
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ImageToolRenderer renders complete state with images 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Images generated
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="image-tool-renderer"
+    >
+      <div
+        className="images-header"
+      >
+        <strong>
+          Generated Images
+        </strong>
+      </div>
+      <div
+        className="images-grid"
+      >
+        <div
+          className="image-item"
+        >
+          <img
+            alt="A beautiful landscape"
+            className="image-shape-landscape"
+            src="https://example.com/image1.png"
+          />
+          <div
+            className="image-prompt"
+          >
+            A beautiful landscape
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ImageToolRenderer renders generating state when not complete 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Generating images...
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="image-tool-renderer"
+    >
+      <div
+        className="images-header"
+      >
+        <strong>
+          Generated Images
+        </strong>
+      </div>
+      <div
+        className="images-grid"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ImageToolRenderer renders multiple images 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Images generated
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="image-tool-renderer"
+    >
+      <div
+        className="images-header"
+      >
+        <strong>
+          Generated Images
+        </strong>
+      </div>
+      <div
+        className="images-grid"
+      >
+        <div
+          className="image-item"
+        >
+          <img
+            alt="First image"
+            className="image-shape-square"
+            src="https://example.com/image1.png"
+          />
+          <div
+            className="image-prompt"
+          >
+            First image
+          </div>
+        </div>
+        <div
+          className="image-item"
+        >
+          <img
+            alt="Second image"
+            className="image-shape-portrait"
+            src="https://example.com/image2.png"
+          />
+          <div
+            className="image-prompt"
+          >
+            Second image
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

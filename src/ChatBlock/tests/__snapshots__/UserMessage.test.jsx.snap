@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserMessage renders user message with basic text 1`] = `
+<div
+  className="comment "
+>
+  <div
+    className="circle user"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={20}
+      stroke="white"
+      viewBox=""
+      width={20}
+      xmlns=""
+    />
+  </div>
+  <div>
+    <div>
+      Hello, this is my question
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UserMessage renders user message with custom className 1`] = `
+<div
+  className="comment most-recent"
+>
+  <div
+    className="circle user"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={20}
+      stroke="white"
+      viewBox=""
+      width={20}
+      xmlns=""
+    />
+  </div>
+  <div>
+    <div>
+      Another question
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UserMessage renders user message without className 1`] = `
+<div
+  className="comment "
+>
+  <div
+    className="circle user"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={20}
+      stroke="white"
+      viewBox=""
+      width={20}
+      xmlns=""
+    />
+  </div>
+  <div>
+    <div>
+      Test message
+    </div>
+  </div>
+</div>
+`;

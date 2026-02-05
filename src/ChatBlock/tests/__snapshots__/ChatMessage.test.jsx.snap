@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ChatMessage renders error message correctly 1`] = `
+<div
+  className="message-error"
+>
+  <div
+    className="ui red message error-message"
+  >
+    <div
+      className="error-title"
+    >
+      Error
+    </div>
+    <div
+      className="error-content"
+    >
+      Something went wrong
+    </div>
+  </div>
+</div>
+`;

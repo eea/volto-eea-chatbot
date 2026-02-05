@@ -1,0 +1,287 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RenderClaimView handles empty segments array 1`] = `
+<div
+  className="citation-text-container"
+>
+  <div
+    className="citation-text-content"
+  >
+    <span
+      className="citation-line"
+    >
+      Some text content
+    </span>
+  </div>
+</div>
+`;
+
+exports[`RenderClaimView handles segment ending with newline 1`] = `
+<div
+  className="citation-text-container"
+>
+  <div
+    className="citation-text-content"
+  >
+    <span
+      className="citation-segment "
+    >
+      <mark
+        className="citation-highlight"
+      >
+        Segment text
+        <sup
+          className="citation-ref"
+        >
+          1
+        </sup>
+      </mark>
+    </span>
+    <span
+      className="br"
+    />
+    <span
+      className="citation-line"
+    >
+      More text
+    </span>
+  </div>
+</div>
+`;
+
+exports[`RenderClaimView handles segments with sourceStartIndex offset 1`] = `
+<div
+  className="citation-text-container"
+>
+  <div
+    className="citation-text-content"
+  >
+    <span
+      className="citation-line"
+    >
+      text with 
+    </span>
+    <span
+      className="citation-segment "
+    >
+      <mark
+        className="citation-highlight"
+      >
+        segment
+        <sup
+          className="citation-ref"
+        >
+          1
+        </sup>
+      </mark>
+       
+    </span>
+    <span
+      className="citation-line"
+    >
+      .
+    </span>
+  </div>
+</div>
+`;
+
+exports[`RenderClaimView handles text with newlines 1`] = `
+<div
+  className="citation-text-container"
+>
+  <div
+    className="citation-text-content"
+  >
+    <span
+      className="citation-line"
+    >
+      Line one
+    </span>
+    <span
+      className="br"
+    />
+    <span
+      className="citation-line"
+    >
+      Line two
+    </span>
+    <span
+      className="br"
+    />
+    <span
+      className="citation-line"
+    >
+      Line three
+    </span>
+  </div>
+</div>
+`;
+
+exports[`RenderClaimView renders plain text without segments 1`] = `
+<div
+  className="citation-text-container"
+>
+  <div
+    className="citation-text-content"
+  >
+    <span
+      className="citation-line"
+    >
+      This is plain text without any segments.
+    </span>
+  </div>
+</div>
+`;
+
+exports[`RenderClaimView renders text with a single segment 1`] = `
+<div
+  className="citation-text-container"
+>
+  <div
+    className="citation-text-content"
+  >
+    <span
+      className="citation-line"
+    >
+      This is text with a 
+    </span>
+    <span
+      className="citation-segment "
+    >
+      <mark
+        className="citation-highlight"
+      >
+        segment
+        <sup
+          className="citation-ref"
+        >
+          1
+        </sup>
+      </mark>
+       
+    </span>
+    <span
+      className="citation-line"
+    >
+       here.
+    </span>
+  </div>
+</div>
+`;
+
+exports[`RenderClaimView renders text with multiple segments 1`] = `
+<div
+  className="citation-text-container"
+>
+  <div
+    className="citation-text-content"
+  >
+    <span
+      className="citation-segment "
+    >
+      <mark
+        className="citation-highlight"
+      >
+        First segment
+        <sup
+          className="citation-ref"
+        >
+          1
+        </sup>
+      </mark>
+       
+    </span>
+    <span
+      className="citation-line"
+    >
+       and 
+    </span>
+    <span
+      className="citation-segment "
+    >
+      <mark
+        className="citation-highlight"
+      >
+        second segment
+        <sup
+          className="citation-ref"
+        >
+          2
+        </sup>
+      </mark>
+       
+    </span>
+    <span
+      className="citation-line"
+    >
+       here.
+    </span>
+  </div>
+</div>
+`;
+
+exports[`RenderClaimView sorts segments by startOffset 1`] = `
+<div
+  className="citation-text-container"
+>
+  <div
+    className="citation-text-content"
+  >
+    <span
+      className="citation-segment "
+    >
+      <mark
+        className="citation-highlight"
+      >
+        AAAA
+        <sup
+          className="citation-ref"
+        >
+          1
+        </sup>
+      </mark>
+       
+    </span>
+    <span
+      className="citation-line"
+    >
+       
+    </span>
+    <span
+      className="citation-segment "
+    >
+      <mark
+        className="citation-highlight"
+      >
+        BBBB
+        <sup
+          className="citation-ref"
+        >
+          2
+        </sup>
+      </mark>
+       
+    </span>
+    <span
+      className="citation-line"
+    >
+       
+    </span>
+    <span
+      className="citation-segment "
+    >
+      <mark
+        className="citation-highlight"
+      >
+        CCCC
+        <sup
+          className="citation-ref"
+        >
+          3
+        </sup>
+      </mark>
+       
+    </span>
+  </div>
+</div>
+`;

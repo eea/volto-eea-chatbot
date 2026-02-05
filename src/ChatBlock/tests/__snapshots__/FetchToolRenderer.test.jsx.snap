@@ -1,0 +1,257 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FetchToolRenderer handles empty packets array 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Fetching...
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="fetch-tool-renderer"
+    >
+      <div
+        className="fetch-header"
+      >
+        <span
+          className="fetch-icon"
+        >
+          📥
+        </span>
+        <strong>
+          Fetching Documents
+        </strong>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`FetchToolRenderer handles empty queries and documents 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Fetching...
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="fetch-tool-renderer"
+    >
+      <div
+        className="fetch-header"
+      >
+        <span
+          className="fetch-icon"
+        >
+          📥
+        </span>
+        <strong>
+          Fetching Documents
+        </strong>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`FetchToolRenderer renders complete state 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Fetch complete
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="fetch-tool-renderer"
+    >
+      <div
+        className="fetch-header"
+      >
+        <span
+          className="fetch-icon"
+        >
+          📥
+        </span>
+        <strong>
+          Fetching Documents
+        </strong>
+      </div>
+      <div
+        className="fetch-queries"
+      >
+        <div
+          className="query-item"
+        >
+          search query
+        </div>
+      </div>
+      <div
+        className="fetch-results"
+      >
+        <div>
+          Fetched 
+          1
+           documents
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`FetchToolRenderer renders fetching state when not complete 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Fetching...
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="fetch-tool-renderer"
+    >
+      <div
+        className="fetch-header"
+      >
+        <span
+          className="fetch-icon"
+        >
+          📥
+        </span>
+        <strong>
+          Fetching Documents
+        </strong>
+      </div>
+      <div
+        className="fetch-queries"
+      >
+        <div
+          className="query-item"
+        >
+          search query
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`FetchToolRenderer renders with multiple documents 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Fetch complete
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="fetch-tool-renderer"
+    >
+      <div
+        className="fetch-header"
+      >
+        <span
+          className="fetch-icon"
+        >
+          📥
+        </span>
+        <strong>
+          Fetching Documents
+        </strong>
+      </div>
+      <div
+        className="fetch-queries"
+      >
+        <div
+          className="query-item"
+        >
+          query
+        </div>
+      </div>
+      <div
+        className="fetch-results"
+      >
+        <div>
+          Fetched 
+          3
+           documents
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`FetchToolRenderer renders with multiple queries 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Fetching...
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="fetch-tool-renderer"
+    >
+      <div
+        className="fetch-header"
+      >
+        <span
+          className="fetch-icon"
+        >
+          📥
+        </span>
+        <strong>
+          Fetching Documents
+        </strong>
+      </div>
+      <div
+        className="fetch-queries"
+      >
+        <div
+          className="query-item"
+        >
+          first query
+        </div>
+        <div
+          className="query-item"
+        >
+          second query
+        </div>
+        <div
+          className="query-item"
+        >
+          third query
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,1007 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ClaimModal handles claim with markdown formatting 1`] = `
+<div
+  className="claim-modal claim-green-400"
+  data-testid="modal"
+>
+  <div
+    data-testid="trigger"
+  >
+    <span
+      className="claim claim-green-400"
+    >
+      something important
+    </span>
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      data-testid="header"
+    >
+      <div
+        className="claim-modal-header"
+      >
+        <div
+          className="claim-header-top"
+        >
+          <div
+            className="circle assistant"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="white"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+          </div>
+          <span
+            className="claim-label"
+          >
+            Verified Claim
+          </span>
+        </div>
+        <blockquote
+          className="claim-quote"
+        >
+          “
+          <span
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "Bold claim with italic and <sup>1</sup>",
+              }
+            }
+          />
+          ”
+        </blockquote>
+      </div>
+    </div>
+    <div
+      data-testid="modal-content"
+    >
+      <div
+        className="claim-verification-card"
+      >
+        <div
+          className="score-badge-section"
+        >
+          <div
+            className="score-badge"
+          >
+            <span
+              className="score-percentage"
+            >
+              85.00%
+            </span>
+            <span
+              className="score-label"
+            >
+              Citation Support
+            </span>
+          </div>
+          <div
+            className="score-progress-bar"
+          >
+            <div
+              className="score-progress-fill"
+              style={
+                Object {
+                  "width": "85%",
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="rationale-section"
+        >
+          <h5
+            className="rationale-header"
+          >
+            Rationale
+          </h5>
+          <p
+            className="claim-rationale"
+          >
+            The claim is supported by multiple sources.
+          </p>
+        </div>
+      </div>
+      <div
+        data-testid="claim-segments"
+      >
+        ClaimSegments
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimModal handles empty text array 1`] = `
+<div
+  className="claim-modal claim-green-400"
+  data-testid="modal"
+>
+  <div
+    data-testid="trigger"
+  >
+    <span
+      className="claim claim-green-400"
+    />
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      data-testid="header"
+    >
+      <div
+        className="claim-modal-header"
+      >
+        <div
+          className="claim-header-top"
+        >
+          <div
+            className="circle assistant"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="white"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+          </div>
+          <span
+            className="claim-label"
+          >
+            Verified Claim
+          </span>
+        </div>
+        <blockquote
+          className="claim-quote"
+        >
+          “
+          <span
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "<b></b>This is a claim about something important.",
+              }
+            }
+          />
+          ”
+        </blockquote>
+      </div>
+    </div>
+    <div
+      data-testid="modal-content"
+    >
+      <div
+        className="claim-verification-card"
+      >
+        <div
+          className="score-badge-section"
+        >
+          <div
+            className="score-badge"
+          >
+            <span
+              className="score-percentage"
+            >
+              85.00%
+            </span>
+            <span
+              className="score-label"
+            >
+              Citation Support
+            </span>
+          </div>
+          <div
+            className="score-progress-bar"
+          >
+            <div
+              className="score-progress-fill"
+              style={
+                Object {
+                  "width": "85%",
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="rationale-section"
+        >
+          <h5
+            className="rationale-header"
+          >
+            Rationale
+          </h5>
+          <p
+            className="claim-rationale"
+          >
+            The claim is supported by multiple sources.
+          </p>
+        </div>
+      </div>
+      <div
+        data-testid="claim-segments"
+      >
+        ClaimSegments
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimModal handles perfect score 1`] = `
+<div
+  className="claim-modal claim-green-500"
+  data-testid="modal"
+>
+  <div
+    data-testid="trigger"
+  >
+    <span
+      className="claim claim-green-500"
+    >
+      something important
+    </span>
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      data-testid="header"
+    >
+      <div
+        className="claim-modal-header"
+      >
+        <div
+          className="claim-header-top"
+        >
+          <div
+            className="circle assistant"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="white"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+          </div>
+          <span
+            className="claim-label"
+          >
+            Verified Claim
+          </span>
+        </div>
+        <blockquote
+          className="claim-quote"
+        >
+          “
+          <span
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "This is a claim about <b>something important</b>.",
+              }
+            }
+          />
+          ”
+        </blockquote>
+      </div>
+    </div>
+    <div
+      data-testid="modal-content"
+    >
+      <div
+        className="claim-verification-card"
+      >
+        <div
+          className="score-badge-section"
+        >
+          <div
+            className="score-badge"
+          >
+            <span
+              className="score-percentage"
+            >
+              100.00%
+            </span>
+            <span
+              className="score-label"
+            >
+              Citation Support
+            </span>
+          </div>
+          <div
+            className="score-progress-bar"
+          >
+            <div
+              className="score-progress-fill"
+              style={
+                Object {
+                  "width": "100%",
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="rationale-section"
+        >
+          <h5
+            className="rationale-header"
+          >
+            Rationale
+          </h5>
+          <p
+            className="claim-rationale"
+          >
+            The claim is supported by multiple sources.
+          </p>
+        </div>
+      </div>
+      <div
+        data-testid="claim-segments"
+      >
+        ClaimSegments
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimModal handles zero score 1`] = `
+<div
+  className="claim-modal claim-red-500"
+  data-testid="modal"
+>
+  <div
+    data-testid="trigger"
+  >
+    <span
+      className="claim claim-red-500"
+    >
+      something important
+    </span>
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      data-testid="header"
+    >
+      <div
+        className="claim-modal-header"
+      >
+        <div
+          className="claim-header-top"
+        >
+          <div
+            className="circle assistant"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="white"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+          </div>
+          <span
+            className="claim-label"
+          >
+            Verified Claim
+          </span>
+        </div>
+        <blockquote
+          className="claim-quote"
+        >
+          “
+          <span
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "This is a claim about <b>something important</b>.",
+              }
+            }
+          />
+          ”
+        </blockquote>
+      </div>
+    </div>
+    <div
+      data-testid="modal-content"
+    >
+      <div
+        className="claim-verification-card"
+      >
+        <div
+          className="score-badge-section"
+        >
+          <div
+            className="score-badge"
+          >
+            <span
+              className="score-percentage"
+            >
+              0.00%
+            </span>
+            <span
+              className="score-label"
+            >
+              Citation Support
+            </span>
+          </div>
+          <div
+            className="score-progress-bar"
+          >
+            <div
+              className="score-progress-fill"
+              style={
+                Object {
+                  "width": "0%",
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="rationale-section"
+        >
+          <h5
+            className="rationale-header"
+          >
+            Rationale
+          </h5>
+          <p
+            className="claim-rationale"
+          >
+            The claim is supported by multiple sources.
+          </p>
+        </div>
+      </div>
+      <div
+        data-testid="claim-segments"
+      >
+        ClaimSegments
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimModal renders the claim modal with high score 1`] = `
+<div
+  className="claim-modal claim-green-400"
+  data-testid="modal"
+>
+  <div
+    data-testid="trigger"
+  >
+    <span
+      className="claim claim-green-400"
+    >
+      something important
+    </span>
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      data-testid="header"
+    >
+      <div
+        className="claim-modal-header"
+      >
+        <div
+          className="claim-header-top"
+        >
+          <div
+            className="circle assistant"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="white"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+          </div>
+          <span
+            className="claim-label"
+          >
+            Verified Claim
+          </span>
+        </div>
+        <blockquote
+          className="claim-quote"
+        >
+          “
+          <span
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "This is a claim about <b>something important</b>.",
+              }
+            }
+          />
+          ”
+        </blockquote>
+      </div>
+    </div>
+    <div
+      data-testid="modal-content"
+    >
+      <div
+        className="claim-verification-card"
+      >
+        <div
+          className="score-badge-section"
+        >
+          <div
+            className="score-badge"
+          >
+            <span
+              className="score-percentage"
+            >
+              85.00%
+            </span>
+            <span
+              className="score-label"
+            >
+              Citation Support
+            </span>
+          </div>
+          <div
+            className="score-progress-bar"
+          >
+            <div
+              className="score-progress-fill"
+              style={
+                Object {
+                  "width": "85%",
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="rationale-section"
+        >
+          <h5
+            className="rationale-header"
+          >
+            Rationale
+          </h5>
+          <p
+            className="claim-rationale"
+          >
+            The claim is supported by multiple sources.
+          </p>
+        </div>
+      </div>
+      <div
+        data-testid="claim-segments"
+      >
+        ClaimSegments
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimModal renders with empty markers 1`] = `
+<div
+  className="claim-modal claim-green-400"
+  data-testid="modal"
+>
+  <div
+    data-testid="trigger"
+  >
+    <span
+      className="claim claim-green-400"
+    >
+      something important
+    </span>
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      data-testid="header"
+    >
+      <div
+        className="claim-modal-header"
+      >
+        <div
+          className="claim-header-top"
+        >
+          <div
+            className="circle assistant"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="white"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+          </div>
+          <span
+            className="claim-label"
+          >
+            Verified Claim
+          </span>
+        </div>
+        <blockquote
+          className="claim-quote"
+        >
+          “
+          <span
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "This is a claim about <b>something important</b>.",
+              }
+            }
+          />
+          ”
+        </blockquote>
+      </div>
+    </div>
+    <div
+      data-testid="modal-content"
+    >
+      <div
+        className="claim-verification-card"
+      >
+        <div
+          className="score-badge-section"
+        >
+          <div
+            className="score-badge"
+          >
+            <span
+              className="score-percentage"
+            >
+              85.00%
+            </span>
+            <span
+              className="score-label"
+            >
+              Citation Support
+            </span>
+          </div>
+          <div
+            className="score-progress-bar"
+          >
+            <div
+              className="score-progress-fill"
+              style={
+                Object {
+                  "width": "85%",
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="rationale-section"
+        >
+          <h5
+            className="rationale-header"
+          >
+            Rationale
+          </h5>
+          <p
+            className="claim-rationale"
+          >
+            The claim is supported by multiple sources.
+          </p>
+        </div>
+      </div>
+      <div
+        data-testid="claim-segments"
+      >
+        ClaimSegments
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimModal renders with low score 1`] = `
+<div
+  className="claim-modal claim-red-300"
+  data-testid="modal"
+>
+  <div
+    data-testid="trigger"
+  >
+    <span
+      className="claim claim-red-300"
+    >
+      something important
+    </span>
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      data-testid="header"
+    >
+      <div
+        className="claim-modal-header"
+      >
+        <div
+          className="claim-header-top"
+        >
+          <div
+            className="circle assistant"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="white"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+          </div>
+          <span
+            className="claim-label"
+          >
+            Verified Claim
+          </span>
+        </div>
+        <blockquote
+          className="claim-quote"
+        >
+          “
+          <span
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "This is a claim about <b>something important</b>.",
+              }
+            }
+          />
+          ”
+        </blockquote>
+      </div>
+    </div>
+    <div
+      data-testid="modal-content"
+    >
+      <div
+        className="claim-verification-card"
+      >
+        <div
+          className="score-badge-section"
+        >
+          <div
+            className="score-badge"
+          >
+            <span
+              className="score-percentage"
+            >
+              30.00%
+            </span>
+            <span
+              className="score-label"
+            >
+              Citation Support
+            </span>
+          </div>
+          <div
+            className="score-progress-bar"
+          >
+            <div
+              className="score-progress-fill"
+              style={
+                Object {
+                  "width": "30%",
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="rationale-section"
+        >
+          <h5
+            className="rationale-header"
+          >
+            Rationale
+          </h5>
+          <p
+            className="claim-rationale"
+          >
+            The claim is supported by multiple sources.
+          </p>
+        </div>
+      </div>
+      <div
+        data-testid="claim-segments"
+      >
+        ClaimSegments
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimModal renders with medium score 1`] = `
+<div
+  className="claim-modal claim-green-200"
+  data-testid="modal"
+>
+  <div
+    data-testid="trigger"
+  >
+    <span
+      className="claim claim-green-200"
+    >
+      something important
+    </span>
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      data-testid="header"
+    >
+      <div
+        className="claim-modal-header"
+      >
+        <div
+          className="claim-header-top"
+        >
+          <div
+            className="circle assistant"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": undefined,
+                }
+              }
+              fill="currentColor"
+              height="20"
+              stroke="white"
+              viewBox=""
+              width="20"
+              xmlns=""
+            />
+          </div>
+          <span
+            className="claim-label"
+          >
+            Verified Claim
+          </span>
+        </div>
+        <blockquote
+          className="claim-quote"
+        >
+          “
+          <span
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "This is a claim about <b>something important</b>.",
+              }
+            }
+          />
+          ”
+        </blockquote>
+      </div>
+    </div>
+    <div
+      data-testid="modal-content"
+    >
+      <div
+        className="claim-verification-card"
+      >
+        <div
+          className="score-badge-section"
+        >
+          <div
+            className="score-badge"
+          >
+            <span
+              className="score-percentage"
+            >
+              60.00%
+            </span>
+            <span
+              className="score-label"
+            >
+              Citation Support
+            </span>
+          </div>
+          <div
+            className="score-progress-bar"
+          >
+            <div
+              className="score-progress-fill"
+              style={
+                Object {
+                  "width": "60%",
+                }
+              }
+            />
+          </div>
+        </div>
+        <div
+          className="rationale-section"
+        >
+          <h5
+            className="rationale-header"
+          >
+            Rationale
+          </h5>
+          <p
+            className="claim-rationale"
+          >
+            The claim is supported by multiple sources.
+          </p>
+        </div>
+      </div>
+      <div
+        data-testid="claim-segments"
+      >
+        ClaimSegments
+      </div>
+    </div>
+  </div>
+</div>
+`;

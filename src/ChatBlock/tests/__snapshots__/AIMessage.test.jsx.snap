@@ -33,7 +33,7 @@ exports[`AIMessage renders AI message with content 1`] = `
           className="ui fluid pointing secondary without-sources menu"
         >
           <a
-            className="active item"
+            className="active item answer-tab"
             onClick={[Function]}
           >
             Answer
@@ -89,7 +89,7 @@ exports[`AIMessage renders AI message with feedback options 1`] = `
           className="ui fluid pointing secondary without-sources menu"
         >
           <a
-            className="active item"
+            className="active item answer-tab"
             onClick={[Function]}
           >
             Answer
@@ -145,7 +145,7 @@ exports[`AIMessage renders AI message with sources 1`] = `
           className="ui fluid pointing secondary without-sources menu"
         >
           <a
-            className="active item"
+            className="active item answer-tab"
             onClick={[Function]}
           >
             Answer
@@ -201,7 +201,7 @@ exports[`AIMessage renders empty AI message 1`] = `
           className="ui fluid pointing secondary without-sources menu"
         >
           <a
-            className="active item"
+            className="active item answer-tab"
             onClick={[Function]}
           >
             Answer

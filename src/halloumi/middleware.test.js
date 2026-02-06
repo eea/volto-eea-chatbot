@@ -1,5 +1,4 @@
 import middleware from './middleware';
-import * as generative from './generative';
 
 jest.mock('./generative');
 

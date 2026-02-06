@@ -39,7 +39,7 @@ describe('useChatStreaming', () => {
     const onMessageUpdate = jest.fn();
     const onComplete = jest.fn();
 
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useChatStreaming({ onMessageUpdate, onComplete }),
     );
 
@@ -64,6 +64,7 @@ describe('useChatStreaming', () => {
 
   it('handles streaming error', async () => {
     sendMessage.mockImplementation(async function* () {
+      yield '';
       throw new Error('Stream failed');
     });
 
@@ -132,6 +133,7 @@ describe('useChatStreaming', () => {
 
   it('does not call onError for AbortError', async () => {
     sendMessage.mockImplementation(async function* () {
+      yield '';
       const error = new Error('Aborted');
       error.name = 'AbortError';
       throw error;

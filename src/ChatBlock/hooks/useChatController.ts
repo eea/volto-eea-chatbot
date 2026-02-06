@@ -18,6 +18,10 @@ interface RelatedQuestion {
 
 // Extract JSON array from related questions response
 function extractRelatedQuestions(str: string): RelatedQuestion[] {
+  if (str.toLowerCase().includes('no_response')) {
+    throw new Error('Related questions were not generated properly');
+  }
+
   const regex = /\[[\s\S]*?\]/;
   const match = str.match(regex);
 

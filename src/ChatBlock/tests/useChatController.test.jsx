@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import { PacketType } from '../types/streamingModels';
 
 import { useChatController } from '../hooks/useChatController';
-import { createChatSession, sendMessage } from '../services/streamingService';
+import { createChatSession } from '../services/streamingService';
 
 // Mock the streaming service with configurable sendMessage behavior
 const mockSendMessage = jest.fn(async function* () {

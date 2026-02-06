@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import withOnyxData from '../hocs/withOnyxData';
@@ -61,9 +60,7 @@ describe('withOnyxData', () => {
 
   it('refetches when depKey changes', async () => {
     const TestComponent = ({ testData }) => <div>Data: {testData}</div>;
-    let fetchCount = 0;
     const callback = (props) => {
-      fetchCount++;
       const mockFetcher = Promise.resolve({ body: `value-${props.depKey}` });
       return ['testData', mockFetcher, props.depKey];
     };

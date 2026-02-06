@@ -36,7 +36,7 @@ describe('useMarked', () => {
     const libs = createMockLibs();
     const { result } = renderHook(() => useMarked(libs));
 
-    const output = await result.current.parser('Hello world');
+    await result.current.parser('Hello world');
     expect(libs.marked.marked.parse).toHaveBeenCalledWith('Hello world');
   });
 

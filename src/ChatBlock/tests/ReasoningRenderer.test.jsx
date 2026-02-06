@@ -136,7 +136,10 @@ describe('ReasoningRenderer', () => {
   it('concatenates multiple reasoning deltas', () => {
     const packets = [
       { ind: 1, obj: { type: PacketType.REASONING_START } },
-      { ind: 1, obj: { type: PacketType.REASONING_DELTA, reasoning: 'First ' } },
+      {
+        ind: 1,
+        obj: { type: PacketType.REASONING_DELTA, reasoning: 'First ' },
+      },
       {
         ind: 1,
         obj: { type: PacketType.REASONING_DELTA, reasoning: 'second' },

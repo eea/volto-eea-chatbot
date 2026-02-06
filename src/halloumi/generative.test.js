@@ -1,5 +1,3 @@
-jest.mock('node-fetch');
-
 import {
   halloumiGenerativeAPI,
   convertGenerativesClaimToVerifyClaimResponse,
@@ -7,6 +5,8 @@ import {
   getVerifyClaimResponse,
 } from './generative';
 import path from 'path';
+
+jest.mock('node-fetch');
 
 describe('halloumiGenerativeAPI reads from mock file', () => {
   const originalEnv = process.env;
@@ -245,7 +245,11 @@ describe('halloumiGenerativeAPI via real fetch', () => {
     });
 
     const model = { name: 'test-model', apiUrl: 'http://test.com/api' };
-    const prompt = { prompt: 'test', contextOffsets: new Map(), responseOffsets: new Map() };
+    const prompt = {
+      prompt: 'test',
+      contextOffsets: new Map(),
+      responseOffsets: new Map(),
+    };
 
     await halloumiGenerativeAPI(model, prompt);
 
@@ -280,7 +284,11 @@ describe('halloumiGenerativeAPI via real fetch', () => {
     });
 
     const model = { name: 'test-model', apiUrl: 'http://test.com' };
-    const prompt = { prompt: 'test', contextOffsets: new Map(), responseOffsets: new Map() };
+    const prompt = {
+      prompt: 'test',
+      contextOffsets: new Map(),
+      responseOffsets: new Map(),
+    };
 
     await expect(halloumiGenerativeAPI(model, prompt)).rejects.toThrow(
       'Token probabilities and claims do not match',

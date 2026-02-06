@@ -4,7 +4,7 @@ describe('addCitations', () => {
   it('transforms single citation marker into markdown link', () => {
     const message = {
       citations: {
-        '1': 'https://example.com/doc1',
+        1: 'https://example.com/doc1',
       },
     };
     const text = 'This is a fact [1].';
@@ -15,9 +15,9 @@ describe('addCitations', () => {
   it('transforms multiple citation markers', () => {
     const message = {
       citations: {
-        '1': 'https://example.com/doc1',
-        '2': 'https://example.com/doc2',
-        '3': 'https://example.com/doc3',
+        1: 'https://example.com/doc1',
+        2: 'https://example.com/doc2',
+        3: 'https://example.com/doc3',
       },
     };
     const text = 'Fact one [1], fact two [2], and fact three [3].';
@@ -30,7 +30,7 @@ describe('addCitations', () => {
   it('does not transform already formatted citations [1](url)', () => {
     const message = {
       citations: {
-        '1': 'https://example.com/doc1',
+        1: 'https://example.com/doc1',
       },
     };
     const text = 'Already formatted [[1]](https://example.com/doc1).';
@@ -41,7 +41,7 @@ describe('addCitations', () => {
   it('does not transform citations in brackets like [1][', () => {
     const message = {
       citations: {
-        '1': 'https://example.com/doc1',
+        1: 'https://example.com/doc1',
       },
     };
     const text = 'Text with [1][';
@@ -52,7 +52,7 @@ describe('addCitations', () => {
   it('does not transform citations followed by ]', () => {
     const message = {
       citations: {
-        '1': 'https://example.com/doc1',
+        1: 'https://example.com/doc1',
       },
     };
     const text = 'Text with [1]]';
@@ -77,7 +77,7 @@ describe('addCitations', () => {
   it('handles text with no citation markers', () => {
     const message = {
       citations: {
-        '1': 'https://example.com/doc1',
+        1: 'https://example.com/doc1',
       },
     };
     const text = 'This is plain text without citations.';
@@ -88,8 +88,8 @@ describe('addCitations', () => {
   it('handles double-digit citation numbers', () => {
     const message = {
       citations: {
-        '10': 'https://example.com/doc10',
-        '11': 'https://example.com/doc11',
+        10: 'https://example.com/doc10',
+        11: 'https://example.com/doc11',
       },
     };
     const text = 'References [10] and [11].';
@@ -102,7 +102,7 @@ describe('addCitations', () => {
   it('handles citation number not in citations object', () => {
     const message = {
       citations: {
-        '1': 'https://example.com/doc1',
+        1: 'https://example.com/doc1',
       },
     };
     const text = 'Citation [2] not found.';

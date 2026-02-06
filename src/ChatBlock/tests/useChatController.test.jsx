@@ -1,6 +1,9 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { PacketType } from '../types/streamingModels';
 
+import { useChatController } from '../hooks/useChatController';
+import { createChatSession, sendMessage } from '../services/streamingService';
+
 // Mock the streaming service with configurable sendMessage behavior
 const mockSendMessage = jest.fn(async function* () {
   yield [];
@@ -11,12 +14,6 @@ jest.mock('../services/streamingService', () => ({
   createChatSession: jest.fn().mockResolvedValue('session-123'),
 }));
 
-import { useChatController } from '../hooks/useChatController';
-import {
-  createChatSession,
-  sendMessage,
-} from '../services/streamingService';
-
 describe('useChatController', () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -26,9 +23,7 @@ describe('useChatController', () => {
   });
 
   it('initializes with correct default state', () => {
-    const { result } = renderHook(() =>
-      useChatController({ personaId: 1 }),
-    );
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
     expect(result.current.messages).toEqual([]);
     expect(result.current.isStreaming).toBe(false);
@@ -65,9 +60,7 @@ describe('useChatController', () => {
   it('creates a chat session on first submit', async () => {
     createChatSession.mockResolvedValue('session-123');
 
-    const { result } = renderHook(() =>
-      useChatController({ personaId: 1 }),
-    );
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
     await act(async () => {
       await result.current.onSubmit({ message: 'Hello' });
@@ -81,9 +74,7 @@ describe('useChatController', () => {
   });
 
   it('does not submit empty messages', async () => {
-    const { result } = renderHook(() =>
-      useChatController({ personaId: 1 }),
-    );
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
     await act(async () => {
       await result.current.onSubmit({ message: '   ' });
@@ -96,9 +87,7 @@ describe('useChatController', () => {
   it('clearChat resets all state', async () => {
     createChatSession.mockResolvedValue('session-123');
 
-    const { result } = renderHook(() =>
-      useChatController({ personaId: 1 }),
-    );
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
     await act(async () => {
       await result.current.onSubmit({ message: 'Hello' });
@@ -115,9 +104,7 @@ describe('useChatController', () => {
   });
 
   it('cancelStreaming sets isCancelled to true', () => {
-    const { result } = renderHook(() =>
-      useChatController({ personaId: 1 }),
-    );
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
     act(() => {
       result.current.cancelStreaming();
@@ -147,9 +134,7 @@ describe('useChatController', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    const { result } = renderHook(() =>
-      useChatController({ personaId: 1 }),
-    );
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
     await act(async () => {
       await result.current.onSubmit({ message: 'Hello' });
@@ -177,9 +162,7 @@ describe('useChatController', () => {
       ];
     });
 
-    const { result } = renderHook(() =>
-      useChatController({ personaId: 1 }),
-    );
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
     await act(async () => {
       await result.current.onSubmit({ message: 'First' });
@@ -278,9 +261,7 @@ describe('useChatController', () => {
   });
 
   it('exposes isFetchingRelatedQuestions state', () => {
-    const { result } = renderHook(() =>
-      useChatController({ personaId: 1 }),
-    );
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
     expect(result.current.isFetchingRelatedQuestions).toBe(false);
   });

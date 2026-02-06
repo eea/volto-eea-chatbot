@@ -1,5 +1,7 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 
+import { useQualityMarkers } from '../hooks/useQualityMarkers';
+
 // Mock loadable before importing the hook
 jest.mock('@loadable/component', () => {
   const loadable = () => {
@@ -14,8 +16,6 @@ jest.mock('@loadable/component', () => {
   };
   return { __esModule: true, default: loadable };
 });
-
-import { useQualityMarkers } from '../hooks/useQualityMarkers';
 
 describe('useQualityMarkers', () => {
   beforeEach(() => {
@@ -143,9 +143,7 @@ describe('useQualityMarkers', () => {
   });
 
   it('provides retryHalloumi callback', () => {
-    const { result } = renderHook(() =>
-      useQualityMarkers(false, 'test', []),
-    );
+    const { result } = renderHook(() => useQualityMarkers(false, 'test', []));
 
     expect(typeof result.current.retryHalloumi).toBe('function');
   });

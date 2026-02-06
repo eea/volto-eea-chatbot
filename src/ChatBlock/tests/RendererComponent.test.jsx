@@ -6,7 +6,9 @@ import { PacketType } from '../types/streamingModels';
 // Mock loadable
 jest.mock('@loadable/component', () => {
   const loadable = (loader) => {
-    const MockComponent = (props) => <div data-testid="loadable">{props.children}</div>;
+    const MockComponent = (props) => (
+      <div data-testid="loadable">{props.children}</div>
+    );
     return MockComponent;
   };
   loadable.lib = () => {

@@ -6,7 +6,9 @@ describe('useMarked', () => {
     highlightJs: {
       default: {
         getLanguage: jest.fn((lang) => (lang === 'javascript' ? true : false)),
-        highlight: jest.fn((lang, code) => ({ value: `<highlighted>${code}</highlighted>` })),
+        highlight: jest.fn((lang, code) => ({
+          value: `<highlighted>${code}</highlighted>`,
+        })),
       },
     },
     marked: {

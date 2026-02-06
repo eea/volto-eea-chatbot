@@ -1,4 +1,6 @@
 // Mock superagent
+import middleware from './middleware';
+
 jest.mock('superagent', () => ({
   post: jest.fn().mockReturnValue({
     type: jest.fn().mockReturnValue({
@@ -38,8 +40,6 @@ jest.mock('fs', () => {
     readFileSync: jest.fn(),
   };
 });
-
-import middleware from './middleware';
 
 describe('src/middleware', () => {
   let req, res, next, nodeFetch;
@@ -182,10 +182,7 @@ describe('src/middleware', () => {
     await middlewarePromise.catch(() => {});
 
     expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'text/plain');
-    expect(res.setHeader).toHaveBeenCalledWith(
-      'Transfer-Encoding',
-      'chunked',
-    );
+    expect(res.setHeader).toHaveBeenCalledWith('Transfer-Encoding', 'chunked');
   });
 
   it('uses mock send-message with stream when MOCK_LLM_FILE_PATH is set', async () => {

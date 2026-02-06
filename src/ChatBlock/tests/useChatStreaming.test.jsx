@@ -1,14 +1,14 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 
+import { useChatStreaming } from '../hooks/useChatStreaming';
+import { sendMessage } from '../services/streamingService';
+import { PacketType } from '../types/streamingModels';
+
 // Mock the streaming service
 jest.mock('../services/streamingService', () => ({
   sendMessage: jest.fn(),
   createChatSession: jest.fn(),
 }));
-
-import { useChatStreaming } from '../hooks/useChatStreaming';
-import { sendMessage } from '../services/streamingService';
-import { PacketType } from '../types/streamingModels';
 
 describe('useChatStreaming', () => {
   afterEach(() => {
@@ -87,10 +87,7 @@ describe('useChatStreaming', () => {
     });
 
     expect(result.current.isStreaming).toBe(false);
-    expect(onError).toHaveBeenCalledWith(
-      expect.any(Error),
-      expect.anything(),
-    );
+    expect(onError).toHaveBeenCalledWith(expect.any(Error), expect.anything());
   });
 
   it('cancelStreaming aborts the stream', async () => {

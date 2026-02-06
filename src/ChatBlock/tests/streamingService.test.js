@@ -1,8 +1,5 @@
 import { TextEncoder, TextDecoder } from 'util';
 
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
-
 import {
   processRawChunkString,
   handleStream,
@@ -11,6 +8,9 @@ import {
   regenerateMessage,
 } from '../services/streamingService';
 import { PacketType } from '../types/streamingModels';
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 // ── processRawChunkString ──────────────────────────────────────────────
 

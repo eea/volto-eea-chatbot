@@ -4,7 +4,7 @@ import { ClaimSegments } from '../components/markdown/ClaimSegments';
 
 // Mock semantic-ui-react
 jest.mock('semantic-ui-react', () => ({
-  Tab: ({ panes, activeIndex, menu }) => (
+  Tab: ({ panes, activeIndex }) => (
     <div data-testid="tab">
       <div data-testid="tab-menu">
         {panes.map((pane, i) => (
@@ -13,6 +13,11 @@ jest.mock('semantic-ui-react', () => ({
             data-testid={`menu-item-${i}`}
             className={pane.menuItem.className}
             onClick={pane.menuItem.onClick}
+            onKeydown={() => {}}
+            role="tab"
+            tabIndex={i === activeIndex ? 0 : -1}
+            aria-selected={i === activeIndex}
+            aria-controls={`tab-pane-${i}`}
           >
             {pane.menuItem.content}
           </div>

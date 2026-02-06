@@ -186,7 +186,7 @@ describe('utils', () => {
         json: () => Promise.resolve(mockResponse),
       });
 
-      const result = await createChatMessageFeedback({
+      await createChatMessageFeedback({
         chat_message_id: '123',
         is_positive: true,
         feedback_text: 'Great response!',

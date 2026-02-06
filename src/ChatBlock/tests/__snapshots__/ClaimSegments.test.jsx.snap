@@ -11,9 +11,14 @@ exports[`ClaimSegments filters out sources without matching snippets 1`] = `
       data-testid="tab-menu"
     >
       <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
+        onKeydown={[Function]}
+        role="tab"
+        tabIndex={0}
       >
         <span
           title="Source 1"
@@ -123,9 +128,14 @@ exports[`ClaimSegments handles missing segments in segments object 1`] = `
       data-testid="tab-menu"
     >
       <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
+        onKeydown={[Function]}
+        role="tab"
+        tabIndex={0}
       >
         <span
           title="Source Document 1"
@@ -257,9 +267,14 @@ exports[`ClaimSegments renders source without link 1`] = `
       data-testid="tab-menu"
     >
       <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
+        onKeydown={[Function]}
+        role="tab"
+        tabIndex={0}
       >
         <span
           title="Source 1"
@@ -352,9 +367,14 @@ exports[`ClaimSegments renders with basic props 1`] = `
       data-testid="tab-menu"
     >
       <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
+        onKeydown={[Function]}
+        role="tab"
+        tabIndex={0}
       >
         <span
           title="Source Document 1"
@@ -476,9 +496,14 @@ exports[`ClaimSegments renders with file source type icon 1`] = `
       data-testid="tab-menu"
     >
       <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
+        onKeydown={[Function]}
+        role="tab"
+        tabIndex={0}
       >
         <span
           title="Internal Document"
@@ -593,9 +618,14 @@ exports[`ClaimSegments renders with multiple sources 1`] = `
       data-testid="tab-menu"
     >
       <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
+        onKeydown={[Function]}
+        role="tab"
+        tabIndex={0}
       >
         <span
           title="Source 1"
@@ -604,9 +634,14 @@ exports[`ClaimSegments renders with multiple sources 1`] = `
         </span>
       </div>
       <div
+        aria-controls="tab-pane-1"
+        aria-selected={false}
         className=""
         data-testid="menu-item-1"
         onClick={[Function]}
+        onKeydown={[Function]}
+        role="tab"
+        tabIndex={-1}
       >
         <span
           title="Source 2"

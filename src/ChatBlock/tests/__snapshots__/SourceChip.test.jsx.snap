@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SourceChip renders with icon 1`] = `
+<button
+  className="source-chip "
+>
+  <div
+    className="source-chip-icon"
+  >
+    <span
+      data-testid="mock-icon"
+    >
+      Icon
+    </span>
+  </div>
+  <span>
+    Test Source
+  </span>
+</button>
+`;
+
+exports[`SourceChip renders with remove button when onRemove is provided 1`] = `
+<button
+  className="source-chip "
+>
+  <span>
+    Test Source
+  </span>
+  <span
+    aria-label="Remove Test Source"
+    className="source-chip-remove"
+    onClick={[Function]}
+    onKeyDown={[Function]}
+    role="button"
+    tabIndex={0}
+    title="Remove Test Source"
+  >
+    ✕
+  </span>
+</button>
+`;
+
+exports[`SourceChip renders with title only 1`] = `
+<button
+  className="source-chip "
+>
+  <span>
+    Test Source
+  </span>
+</button>
+`;

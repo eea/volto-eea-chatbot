@@ -79,6 +79,7 @@ async function getLLMResponse(model, prompt) {
     const filePath = process.env.MOCK_HALLOUMI_FILE_PATH;
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     jsonData = JSON.parse(fileContent);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     return jsonData;
   }
 

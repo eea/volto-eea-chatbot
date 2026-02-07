@@ -77,11 +77,14 @@ function mock_create_chat(res) {
   res.end();
 }
 
-function mock_send_message(res) {
-  const filePath = process.env.MOCK_LLM_FILE_PATH;
+function mock_send_message(res, is_related_question) {
+  const env_name = is_related_question
+    ? 'MOCK_LLM_FILE_PATH_RQ'
+    : 'MOCK_LLM_FILE_PATH';
+  const filePath = process.env[env_name];
   if (!filePath) {
-    log('MOCK_LLM_FILE_PATH is not set. Cannot mock send message.');
-    res.status(500).send('Internal Server Error: MOCK_LLM_FILE_PATH not set.');
+    log(`${env_name} is not set. Cannot mock send message.`);
+    res.status(500).send(`Internal Server Error: ${env_name} not set.`);
     return;
   }
   const readStream = fs.createReadStream(filePath, { encoding: 'utf8' });
@@ -146,7 +149,7 @@ function mock_send_message(res) {
 async function send_onyx_request(
   req,
   res,
-  { username, password, api_key, url },
+  { username, password, api_key, url, is_related_question },
 ) {
   let headers = {};
   if (!api_key) {
@@ -180,19 +183,22 @@ async function send_onyx_request(
     options.body = JSON.stringify(req.body);
   }
 
-  if (process.env.MOCK_LLM_FILE_PATH && req.url.endsWith('send-message')) {
+  const mock_file = is_related_question
+    ? process.env.MOCK_LLM_FILE_PATH_RQ
+    : process.env.MOCK_LLM_FILE_PATH;
+
+  if (mock_file && req.url.endsWith('send-message')) {
     try {
-      mock_send_message(res);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      mock_send_message(res, is_related_question);
     } catch (e) {
       log(e);
     }
     return;
   }
 
-  if (
-    process.env.MOCK_LLM_FILE_PATH &&
-    req.url.endsWith('create-chat-session')
-  ) {
+  if (mock_file && req.url.endsWith('create-chat-session')) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     mock_create_chat(res);
     return;
   }
@@ -201,7 +207,7 @@ async function send_onyx_request(
     log(`Fetching ${url}`);
     const response = await fetch(url, options, req.body);
 
-    if (process.env.DUMP_LLM_FILE_PATH) {
+    if (process.env.DUMP_LLM_FILE_PATH && !is_related_question) {
       const filePath = process.env.DUMP_LLM_FILE_PATH;
       const writer = fs.createWriteStream(filePath);
       response.body.pipe(writer);
@@ -224,7 +230,8 @@ async function send_onyx_request(
 }
 
 export default async function middleware(req, res, next) {
-  const path = req.url.replace('/_da/', '/');
+  const is_related_question = req.url.includes('/_rq/');
+  const path = req.url.replace('/_da/', '/').replace('/_rq/', '/');
 
   const reqUrl = `${process.env.ONYX_URL || ''}/api${path}`;
 
@@ -240,6 +247,7 @@ export default async function middleware(req, res, next) {
     await send_onyx_request(req, res, {
       url: reqUrl,
       api_key: api_key,
+      is_related_question,
     });
   } catch (error) {
     // eslint-disable-next-line

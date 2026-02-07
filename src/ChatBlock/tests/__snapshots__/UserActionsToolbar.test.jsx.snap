@@ -1,0 +1,183 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserActionsToolbar handles empty message gracefully 1`] = `
+<div
+  className="message-actions"
+>
+  <button
+    aria-label="Copy"
+    className="ui basic button"
+    onClick={[Function]}
+    title="Copy"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={25}
+      stroke="currentColor"
+      viewBox=""
+      width={25}
+      xmlns=""
+    />
+  </button>
+</div>
+`;
+
+exports[`UserActionsToolbar handles undefined message gracefully 1`] = `
+<div
+  className="message-actions"
+>
+  <button
+    aria-label="Copy"
+    className="ui basic button"
+    onClick={[Function]}
+    title="Copy"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={25}
+      stroke="currentColor"
+      viewBox=""
+      width={25}
+      xmlns=""
+    />
+  </button>
+</div>
+`;
+
+exports[`UserActionsToolbar renders toolbar with copy button 1`] = `
+<div
+  className="message-actions"
+>
+  <button
+    aria-label="Copy"
+    className="ui basic button"
+    onClick={[Function]}
+    title="Copy"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={25}
+      stroke="currentColor"
+      viewBox=""
+      width={25}
+      xmlns=""
+    />
+  </button>
+</div>
+`;
+
+exports[`UserActionsToolbar renders toolbar with feedback when enabled 1`] = `
+<div
+  className="message-actions"
+>
+  <button
+    aria-label="Copy"
+    className="ui basic button"
+    onClick={[Function]}
+    title="Copy"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={25}
+      stroke="currentColor"
+      viewBox=""
+      width={25}
+      xmlns=""
+    />
+  </button>
+  <button
+    aria-label="Like"
+    className="ui basic button"
+    onClick={[Function]}
+    title="Like"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={25}
+      stroke="currentColor"
+      viewBox=""
+      width={25}
+      xmlns=""
+    />
+  </button>
+  <button
+    aria-label="Dislike"
+    className="ui basic button"
+    onClick={[Function]}
+    title="Dislike"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={25}
+      stroke="currentColor"
+      viewBox=""
+      width={25}
+      xmlns=""
+    />
+  </button>
+</div>
+`;
+
+exports[`UserActionsToolbar renders with custom className 1`] = `
+<div
+  className="message-actions custom-toolbar"
+>
+  <button
+    aria-label="Copy"
+    className="ui basic button"
+    onClick={[Function]}
+    title="Copy"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": undefined,
+        }
+      }
+      fill="currentColor"
+      height={25}
+      stroke="currentColor"
+      viewBox=""
+      width={25}
+      xmlns=""
+    />
+  </button>
+</div>
+`;

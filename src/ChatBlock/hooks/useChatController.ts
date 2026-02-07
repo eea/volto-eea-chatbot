@@ -18,6 +18,10 @@ interface RelatedQuestion {
 
 // Extract JSON array from related questions response
 function extractRelatedQuestions(str: string): RelatedQuestion[] {
+  if (str.toLowerCase().includes('no_response')) {
+    throw new Error('Related questions were not generated properly');
+  }
+
   const regex = /\[[\s\S]*?\]/;
   const match = str.match(regex);
 
@@ -65,7 +69,7 @@ async function fetchRelatedQuestions(
     };
 
     let result = '';
-    for await (const packets of sendMessage(params)) {
+    for await (const packets of sendMessage(params, true)) {
       for (const packet of packets) {
         if (packet.obj.type === PacketType.MESSAGE_DELTA) {
           result += packet.obj.content;
@@ -88,6 +92,7 @@ export function useChatController({
 }: UseChatControllerProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
+  const [chatSessionLoading, setChatSessionLoading] = useState(false);
   const [isDeepResearchEnabled, setIsDeepResearchEnabled] = useState(
     deepResearch === 'always_on' || deepResearch === 'user_on',
   );
@@ -183,6 +188,7 @@ export function useChatController({
         let sessionId = chatSessionId;
 
         if (!sessionId) {
+          setChatSessionLoading(true);
           sessionId = await createChatSession(personaId, 'Chat session');
           setChatSessionId(sessionId);
         }
@@ -241,6 +247,8 @@ export function useChatController({
         );
       } catch (error) {
         console.error('Failed to submit message:', error);
+      } finally {
+        setChatSessionLoading(false);
       }
     },
     [
@@ -319,7 +327,7 @@ export function useChatController({
 
   return {
     messages,
-    isStreaming,
+    isStreaming: isStreaming || chatSessionLoading,
     isCancelled,
     isFetchingRelatedQuestions,
     onSubmit,

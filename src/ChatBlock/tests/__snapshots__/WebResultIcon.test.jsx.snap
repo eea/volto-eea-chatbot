@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WebResultIcon renders FileIcon for invalid URL 1`] = `
+<svg
+  className="icon"
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": undefined,
+    }
+  }
+  fill="currentColor"
+  height={16}
+  stroke="currentColor"
+  viewBox=""
+  width={16}
+  xmlns=""
+/>
+`;
+
+exports[`WebResultIcon renders favicon for valid URL 1`] = `
+<img
+  alt="favicon"
+  height={16}
+  onError={[Function]}
+  src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://example.com&size=128"
+  style={
+    Object {
+      "height": "16px",
+      "objectFit": "contain",
+      "width": "16px",
+    }
+  }
+  width={16}
+/>
+`;
+
+exports[`WebResultIcon renders with default size 1`] = `
+<img
+  alt="favicon"
+  height={10}
+  onError={[Function]}
+  src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://example.com&size=128"
+  style={
+    Object {
+      "height": "10px",
+      "objectFit": "contain",
+      "width": "10px",
+    }
+  }
+  width={10}
+/>
+`;

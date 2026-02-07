@@ -474,7 +474,10 @@ export function AIMessage({
 
   // Tab panes - conditionally include Sources tab
   const panes = [
-    { menuItem: 'Answer', pane: <Tab.Pane key="answer">{answerTab}</Tab.Pane> },
+    {
+      menuItem: { key: 'answer', content: 'Answer', className: 'answer-tab' },
+      pane: <Tab.Pane key="answer">{answerTab}</Tab.Pane>,
+    },
     ...(showSources && !error
       ? [
           {
@@ -486,6 +489,7 @@ export function AIMessage({
                   <span className="sources-count">({sources.length})</span>
                 </span>
               ),
+              className: 'sources-tab',
             },
             pane: (
               <Tab.Pane key="sources">

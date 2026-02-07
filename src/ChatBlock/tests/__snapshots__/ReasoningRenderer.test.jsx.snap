@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReasoningRenderer concatenates multiple reasoning deltas 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Thinking
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="reasoning-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        First second
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ReasoningRenderer renders empty content when no packets 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  />
+</div>
+`;
+
+exports[`ReasoningRenderer renders thinking status when reasoning has started 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Thinking
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="reasoning-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        Let me think...
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ReasoningRenderer renders with REASONING_END packet type 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Thinking
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="reasoning-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        Analysis
+      </div>
+    </div>
+  </div>
+</div>
+`;

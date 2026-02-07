@@ -1,0 +1,110 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MessageTextRenderer renders blinking dot when no content and no packets 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <span
+      className="blinking-dot with-margin"
+    />
+  </div>
+</div>
+`;
+
+exports[`MessageTextRenderer renders message content without animation 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div
+      className="message-text-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        Hello world
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MessageTextRenderer renders with no remarkGfm 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div
+      className="message-text-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        Hello world
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MessageTextRenderer renders with remarkGfm plugin when available 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div
+      className="message-text-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        Hello world
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MessageTextRenderer shows cursor when stream is not complete 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div
+      className="message-text-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        Starting... ▊
+      </div>
+    </div>
+  </div>
+</div>
+`;

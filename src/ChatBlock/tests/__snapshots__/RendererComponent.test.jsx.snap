@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RendererComponent renders fallback for empty packets 1`] = `
+<div>
+  <span />
+  <span />
+</div>
+`;
+
+exports[`RendererComponent renders fallback for unrecognized packets 1`] = `
+<div>
+  <span />
+  <span />
+</div>
+`;

@@ -1,0 +1,191 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MultiToolRenderer renders multiple tool groups 1`] = `
+<div
+  className="multi-tool-renderer streaming"
+>
+  <div
+    className="tools-container collapsed-view"
+  >
+    <div
+      aria-expanded={false}
+      aria-label="2 processing steps, collapsed"
+      className="tools-collapsed-header"
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      role="button"
+      tabIndex={0}
+    >
+      <div
+        className="tools-count"
+      >
+        <span
+          className="tools-count-value"
+        >
+          2
+        </span>
+        <span
+          className="tools-count-label"
+        >
+          steps
+        </span>
+      </div>
+      <span
+        className="expand-chevron"
+      >
+        <span
+          data-icon="chevron-icon"
+          data-size={24}
+        />
+      </span>
+    </div>
+    <div
+      className="tools-collapsed-list"
+    >
+      <div
+        className="tools-list"
+      >
+        <div>
+          <div
+            className="tool-collaps ed-wrapper"
+          >
+            <div
+              className="tool-item-collapsed completed"
+            >
+              <div
+                className="tool-collapsed-icon"
+              >
+                <span
+                  data-icon={
+                    Object {
+                      "attributes": Object {
+                        "viewBox": "",
+                        "xmlns": "",
+                      },
+                    }
+                  }
+                  data-size={14}
+                />
+              </div>
+              <span
+                className="tool-collapsed-status"
+              >
+                Searched internal documents
+              </span>
+            </div>
+          </div>
+          <div
+            className="tool-collaps ed-wrapper"
+          >
+            <div
+              className="tool-item-collapsed active"
+            >
+              <div
+                className="tool-collapsed-icon"
+              >
+                <span
+                  data-icon={
+                    Object {
+                      "attributes": Object {
+                        "viewBox": "",
+                        "xmlns": "",
+                      },
+                    }
+                  }
+                  data-size={14}
+                />
+              </div>
+              <span
+                className="tool-collapsed-status"
+              >
+                Searched internal documents
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MultiToolRenderer renders search tool groups 1`] = `
+<div
+  className="multi-tool-renderer streaming"
+>
+  <div
+    className="tools-container collapsed-view"
+  >
+    <div
+      aria-expanded={false}
+      aria-label="1 processing step, collapsed"
+      className="tools-collapsed-header"
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      role="button"
+      tabIndex={0}
+    >
+      <div
+        className="tools-count"
+      >
+        <span
+          className="tools-count-value"
+        >
+          1
+        </span>
+        <span
+          className="tools-count-label"
+        >
+          step
+        </span>
+      </div>
+      <span
+        className="expand-chevron"
+      >
+        <span
+          data-icon="chevron-icon"
+          data-size={24}
+        />
+      </span>
+    </div>
+    <div
+      className="tools-collapsed-list"
+    >
+      <div
+        className="tools-list"
+      >
+        <div>
+          <div
+            className="tool-collaps ed-wrapper"
+          >
+            <div
+              className="tool-item-collapsed active"
+            >
+              <div
+                className="tool-collapsed-icon"
+              >
+                <span
+                  data-icon={
+                    Object {
+                      "attributes": Object {
+                        "viewBox": "",
+                        "xmlns": "",
+                      },
+                    }
+                  }
+                  data-size={14}
+                />
+              </div>
+              <span
+                className="tool-collapsed-status"
+              >
+                Searched internal documents
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

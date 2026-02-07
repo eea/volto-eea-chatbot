@@ -10,7 +10,7 @@ const QualityCheckToggle = ({ isEditMode, enabled, setEnabled }) => {
         content="Checks the AI's statements against cited sources to highlight possible inaccuracies and hallucinations."
         trigger={
           <Checkbox
-            id="fact-check-toggle"
+            id="quality-check-toggle"
             toggle
             label="Fact-check AI answer"
             disabled={isEditMode}

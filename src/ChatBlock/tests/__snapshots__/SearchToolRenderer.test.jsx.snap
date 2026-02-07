@@ -1,0 +1,720 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SearchToolRenderer handles empty packets array 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div />
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer handles web results with favicon 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searched the web
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                web search
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Results
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <div
+            className="result-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+              onClick={[Function]}
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <img
+                  alt="favicon"
+                  height={16}
+                  onError={[Function]}
+                  src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://example.com&size=128"
+                  style={
+                    Object {
+                      "height": "16px",
+                      "objectFit": "contain",
+                      "width": "16px",
+                    }
+                  }
+                  width={16}
+                />
+              </div>
+              <span>
+                Web Result
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searched internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                query
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Documents
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <div
+            className="result-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+              onClick={[Function]}
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                Doc 1
+              </span>
+            </button>
+          </div>
+          <div
+            className="result-item"
+            style={
+              Object {
+                "animationDelay": "30ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+              onClick={[Function]}
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                Doc 2
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer removes duplicate queries 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searching internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                duplicate
+              </span>
+            </button>
+          </div>
+          <div
+            className="query-item"
+            style={
+              Object {
+                "animationDelay": "30ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                unique
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Documents
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <span
+            className="blinking-dot "
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer renders empty state when no queries 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searching internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div />
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer renders searching state for internal documents 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searching internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                test query
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Documents
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <span
+            className="blinking-dot "
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer renders searching state for internet search 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searching the web
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                web query
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Results
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <span
+            className="blinking-dot "
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer renders with search results 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searched internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                query
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Documents
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <div
+            className="result-item"
+            style={
+              Object {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+              onClick={[Function]}
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": undefined,
+                    }
+                  }
+                  fill="currentColor"
+                  height={16}
+                  stroke="currentColor"
+                  viewBox=""
+                  width={16}
+                  xmlns=""
+                />
+              </div>
+              <span>
+                Document 1
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

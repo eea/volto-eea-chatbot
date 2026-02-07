@@ -22,6 +22,7 @@ import PenIcon from '../../icons/square-pen.svg';
 import '../style.less';
 
 interface ChatWindowProps {
+  block_id?: string;
   persona: Persona;
   rehypePrism?: any;
   remarkGfm?: any;
@@ -47,15 +48,18 @@ interface ChatWindowProps {
   enableMatomoTracking?: boolean;
   onDemandInputToggle?: boolean;
   maxContextSegments?: number;
+  isPlaywrightTest?: boolean;
   [key: string]: any;
 }
 
 function ChatWindow({
+  block_id,
   persona,
   rehypePrism,
   remarkGfm,
   placeholderPrompt = 'Ask a question',
   isEditMode,
+  isPlaywrightTest,
   ...data
 }: ChatWindowProps) {
   const {
@@ -141,7 +145,10 @@ function ChatWindow({
   );
 
   return (
-    <div className="chat-window">
+    <div
+      className="chat-window"
+      data-playwright-block-id={isPlaywrightTest ? block_id : undefined}
+    >
       <div className="messages">
         {showLandingPage ? (
           <>
@@ -211,7 +218,7 @@ function ChatWindow({
 
               {isStreaming &&
                 !isFetchingRelatedQuestions &&
-                !messages[messages.length - 1].isFinalMessageComing && (
+                !messages[messages.length - 1]?.isFinalMessageComing && (
                   <div className="comment">
                     <div className="circle assistant placeholder"></div>
                     <div className="comment-content">
@@ -269,7 +276,9 @@ function ChatWindow({
             </div>
           )}
 
-          {deepResearch === 'always_on' && <small>Deep research on</small>}
+          {deepResearch === 'always_on' && (
+            <small className="deep-research-toggle">Deep research on</small>
+          )}
         </div>
         <div ref={chatWindowEndRef} /> {/* End div to mark the bottom */}
       </div>

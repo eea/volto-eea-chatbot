@@ -73,7 +73,8 @@ const HalloumiFeedback = ({
   sources,
   retryHalloumi,
 }) => {
-  const noClaimsScore = markers?.claims[0]?.score === null;
+  const claims = (markers?.claims || []).filter((claim) => !claim.skipped);
+  const noClaimsScore = claims[0]?.score === null;
   const messageBySource =
     'Please allow a few minutes for claim verification when many references are involved.';
 
@@ -98,7 +99,7 @@ const HalloumiFeedback = ({
 
       {noClaimsScore && (
         <>
-          <Message color="red">{markers?.claims?.[0].rationale}</Message>
+          <Message color="red">{claims[0].rationale}</Message>
           <Button onClick={retryHalloumi} className="icon">
             <SVGIcon name={RotateIcon} /> Retry Fact-check AI answer
           </Button>

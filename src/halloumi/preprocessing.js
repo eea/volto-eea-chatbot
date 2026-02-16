@@ -48,12 +48,15 @@ export function splitIntoSentences(text, maxSegments = 0) {
  * @param annotationChar The character to use for annotation.
  * @returns The annotated string with annotation characters + sentence number.
  */
-export function annotate(sentences, annotationChar) {
+export function annotate(sentences, annotationChar, excludeIndices) {
   return sentences
-    .map(
-      (sentence, i) =>
-        `<|${annotationChar}${i + 1}|><${sentence}><end||${annotationChar}>`,
-    )
+    .map((sentence, i) => {
+      const id = i + 1;
+      if (excludeIndices && excludeIndices.has(id)) {
+        return '';
+      }
+      return `<|${annotationChar}${id}|><${sentence}><end||${annotationChar}>`;
+    })
     .join('');
 }
 
@@ -85,6 +88,7 @@ export function createHalloumiPrompt({
   response,
   request,
   maxContextSegments = 0,
+  excludeResponseIndices,
 }) {
   const finalRequest = request || DEFAULT_HALLOUMI_REQUEST;
   const contextSentences = sources.flatMap((text) =>
@@ -98,7 +102,11 @@ export function createHalloumiPrompt({
 
   const responseSentences = splitIntoSentences(response, maxContextSegments);
   const responseOffsets = getOffsets(response, responseSentences);
-  const annotatedResponseSentences = annotate(responseSentences, 'r');
+  const annotatedResponseSentences = annotate(
+    responseSentences,
+    'r',
+    excludeResponseIndices,
+  );
 
   const annotatedContext = `<|context|>${annotatedContextSentences}<end||context>`;
   const annotatedRequest = `<|request|><${finalRequest.trim()}><end||request>`;

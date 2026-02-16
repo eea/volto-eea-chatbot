@@ -5,7 +5,11 @@ import {
   getClaimsFromResponse,
   getTokenProbabilitiesFromLogits,
 } from './postprocessing';
-import { createHalloumiPrompt } from './preprocessing';
+import {
+  createHalloumiPrompt,
+  splitIntoSentences,
+  getOffsets,
+} from './preprocessing';
 
 // const CONTEXT_SEPARTOR = '\n---\n';
 
@@ -26,10 +30,8 @@ export async function getVerifyClaimResponse(
   sources,
   claims,
   maxContextSegments = 0,
+  filterModel,
 ) {
-  // const contextSeparator = CONTEXT_SEPARTOR;
-  // const joinedContext = sources.join(contextSeparator);
-
   if (!sources?.length || !claims) {
     const response = {
       claims: [],
@@ -38,24 +40,115 @@ export async function getVerifyClaimResponse(
     return response;
   }
 
+  let excludeResponseIndices;
+  let responseSentences;
+  let responseOffsets;
+
+  if (filterModel) {
+    responseSentences = splitIntoSentences(claims, maxContextSegments);
+    responseOffsets = getOffsets(claims, responseSentences);
+    excludeResponseIndices = await filterClaimSentences(
+      filterModel,
+      responseSentences,
+    );
+    log('Excluded indices', excludeResponseIndices);
+  }
+
   const prompt = createHalloumiPrompt({
     sources,
     response: claims,
     maxContextSegments,
     request: undefined,
+    excludeResponseIndices,
   });
 
   log('Halloumi prompt', JSON.stringify(prompt, null, 2));
 
   const rawClaims = await halloumiGenerativeAPI(model, prompt);
   log('Raw claims', rawClaims);
+  const converted = convertGenerativesClaimToVerifyClaimResponse(
+    rawClaims,
+    prompt,
+  );
+
+  if (filterModel && excludeResponseIndices.size > 0) {
+    for (const idx of excludeResponseIndices) {
+      if (responseOffsets.has(idx)) {
+        const offsets = responseOffsets.get(idx);
+        converted.claims.push({
+          claimId: idx,
+          claimString: responseSentences[idx - 1],
+          startOffset: offsets.startOffset,
+          endOffset: offsets.endOffset,
+          skipped: true,
+          score: null,
+        });
+      }
+    }
+    converted.claims.sort((a, b) => a.startOffset - b.startOffset);
+  }
+
   const result = {
-    ...convertGenerativesClaimToVerifyClaimResponse(rawClaims, prompt),
+    ...converted,
     rawClaims,
     halloumiPrompt: prompt,
   };
 
   return result;
+}
+
+export async function filterClaimSentences(filterModel, sentences) {
+  const numberedSentences = sentences
+    .map((s, i) => `${i + 1}. "${s.trim()}"`)
+    .join('\n');
+
+  const filterPrompt = `For each of the following sentences, determine if it is a verifiable factual claim.
+Answer YES if the sentence makes a specific, checkable assertion. Answer NO if it is a greeting, preamble, opinion, vague statement, or transitional phrase.
+
+Respond with exactly one line per sentence in the format: {number}. {YES/NO}
+
+Sentences:
+${numberedSentences}`;
+
+  const data = {
+    messages: [{ role: 'user', content: filterPrompt }],
+    temperature: 0.0,
+    model: filterModel.name,
+  };
+  const headers = {
+    'Content-Type': 'application/json',
+    accept: 'application/json',
+  };
+  if (filterModel.apiKey) {
+    headers['Authorization'] = `Bearer ${filterModel.apiKey}`;
+  }
+
+  const params = {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(data),
+  };
+
+  const response = await fetch(filterModel.apiUrl, params);
+  const jsonData = await response.json();
+  const content = jsonData.choices?.[0]?.message?.content || '';
+
+  log('Filter response', content);
+
+  const excludeIndices = new Set();
+  const lines = content.split('\n');
+  for (const line of lines) {
+    const match = line.match(/^(\d+)\.\s*(YES|NO)/i);
+    if (match) {
+      const idx = parseInt(match[1], 10);
+      const answer = match[2].toUpperCase();
+      if (answer === 'NO') {
+        excludeIndices.add(idx);
+      }
+    }
+  }
+
+  return excludeIndices;
 }
 
 const tokenChoices = new Set(['supported', 'unsupported']);
@@ -137,6 +230,12 @@ export async function halloumiGenerativeAPI(model, prompt) {
   const jsonData = await getLLMResponse(model, prompt);
 
   log('Generative response', jsonData);
+
+  const finishReason = jsonData.choices?.[0]?.finish_reason;
+  if (finishReason === 'length') {
+    throw new Error('HallOumi response truncated (finish_reason: length)');
+  }
+
   log('Logprobs', jsonData.choices[0].logprobs.content);
 
   const logits = jsonData.choices[0].logprobs.content;

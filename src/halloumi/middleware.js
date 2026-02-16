@@ -29,6 +29,11 @@ const classifyModel = {
   },
 };
 
+const filterModel = {
+  name: 'Inhouse-LLM/gpt-oss-120b',
+  apiUrl: `${LLMGW_URL}/chat/completions`,
+};
+
 export default async function middleware(req, res, next) {
   const path = req.url.replace('/_ha/', '/');
 
@@ -57,6 +62,7 @@ export default async function middleware(req, res, next) {
       sources,
       answer,
       maxContextSegments,
+      { ...filterModel, apiKey: LLMGW_TOKEN },
     );
     log('Halloumi response', resp);
     res.send(resp);

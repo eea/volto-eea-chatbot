@@ -142,11 +142,13 @@ function getContextSources(
       );
 }
 
-function getScoreDetails(claims: any, qualityCheckStages: any) {
+function getScoreDetails(rawClaims: any, qualityCheckStages: any) {
+  const claims = rawClaims.filter((claim: any) => !claim.skipped);
   const score = (
     (claims.length > 0
-      ? claims.reduce((acc: any, { score }: any) => acc + score, 0) /
-        claims.length
+      ? claims
+          .filter((claim: any) => !claim.skipped)
+          .reduce((acc: any, { score }: any) => acc + score, 0) / claims.length
       : 1) * 100
   ).toFixed(0);
 

@@ -3,16 +3,16 @@
 [![Releases](https://img.shields.io/github/v/release/eea/volto-eea-chatbot)](https://github.com/eea/volto-eea-chatbot/releases)
 
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-eea-chatbot%2Fmaster&subject=master)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-eea-chatbot/job/master/display/redirect)
-[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-master&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-master)
-[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-master&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-master)
-[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-master&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-master)
-[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-master&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-master)
+[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
+[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
+[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
+[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
 
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-eea-chatbot%2Fdevelop&subject=develop)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-eea-chatbot/job/develop/display/redirect)
-[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-develop&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-develop)
-[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-develop&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-develop)
-[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-develop&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-develop)
-[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-develop&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-develop)
+[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
+[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
+[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
+[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
 
 [Volto](https://github.com/plone/volto) add-on that integrates an AI-powered chatbot with a customizable interface and advanced settings to tailor its behavior and enhance user interactions.
 

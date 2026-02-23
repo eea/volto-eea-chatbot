@@ -72,6 +72,7 @@ const HalloumiFeedback = ({
   showVerifyClaimsButton,
   sources,
   retryHalloumi,
+  emptyClaims,
 }) => {
   const claims = (markers?.claims || []).filter((claim) => !claim.skipped);
   const noClaimsScore = claims[0]?.score === null;
@@ -111,12 +112,14 @@ const HalloumiFeedback = ({
           color={scoreColor}
           className={cx(
             'claim-message',
-            getSupportedBgColor(score / 100, 'claim'),
+            emptyClaims
+              ? 'claim-empty claim-gray-500'
+              : getSupportedBgColor(score / 100, 'claim'),
           )}
           icon
         >
           <MessageContent>
-            {printSlate(halloumiMessage, `${score}%`)}
+            {emptyClaims || printSlate(halloumiMessage, `${score}%`)}
           </MessageContent>
         </Message>
       )}

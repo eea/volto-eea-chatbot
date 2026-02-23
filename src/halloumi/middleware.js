@@ -1,7 +1,7 @@
-import debug from 'debug';
+// import debug from 'debug';
 import { getVerifyClaimResponse } from './generative';
 
-const log = debug('halloumi');
+// const log = debug('halloumi');
 
 const MSG_INVALID_CONFIGURATION =
   'Invalid configuration: missing LLMGW_TOKEN or LLMGW_URL';
@@ -29,11 +29,6 @@ const classifyModel = {
   },
 };
 
-const filterModel = {
-  name: 'Inhouse-LLM/gpt-oss-120b',
-  apiUrl: `${LLMGW_URL}/chat/completions`,
-};
-
 export default async function middleware(req, res, next) {
   const path = req.url.replace('/_ha/', '/');
 
@@ -50,8 +45,8 @@ export default async function middleware(req, res, next) {
   };
   const body = req.body;
 
-  log('Halloumi body', body);
-  const { sources, answer, maxContextSegments = 0 } = body;
+  // log('Halloumi body', body);
+  const { sources, answer } = body;
 
   res.set('Content-Type', 'application/json');
 
@@ -61,10 +56,8 @@ export default async function middleware(req, res, next) {
       // TODO: map with citation id
       sources,
       answer,
-      maxContextSegments,
-      { ...filterModel, apiKey: LLMGW_TOKEN },
     );
-    log('Halloumi response', resp);
+    // log('Halloumi response', resp);
     res.send(resp);
   } catch (error) {
     res.status(500).send({

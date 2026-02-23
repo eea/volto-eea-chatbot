@@ -1,68 +1,8 @@
 import {
-  createHalloumiPrompt,
-  splitIntoSentences,
+  createChunkedHalloumiPrompts,
   annotate,
   getOffsets,
 } from './preprocessing';
-
-describe('splitIntoSentences', () => {
-  it('should split a basic text into sentences', () => {
-    const text =
-      'This is sentence one. This is sentence two. This is sentence three.';
-    const expected = [
-      'This is sentence one. ',
-      'This is sentence two. ',
-      'This is sentence three.',
-    ];
-    expect(splitIntoSentences(text)).toEqual(expected);
-  });
-
-  it('should handle short sentences by merging them', () => {
-    const text = 'Short. This is a longer sentence. Also short.';
-    const expected = ['Short. This is a longer sentence. ', 'Also short.'];
-    expect(splitIntoSentences(text)).toEqual(expected);
-  });
-
-  it('should return an empty array for an empty string', () => {
-    expect(splitIntoSentences('')).toEqual([]);
-  });
-
-  it('should handle a single sentence', () => {
-    const text = 'This is a single sentence.';
-    expect(splitIntoSentences(text)).toEqual(['This is a single sentence.']);
-  });
-
-  it('should handle text without punctuation', () => {
-    const text = 'This is a sentence without punctuation';
-    expect(splitIntoSentences(text)).toEqual([
-      'This is a sentence without punctuation',
-    ]);
-  });
-
-  it('should not merge sentences when maxSegments is 0', () => {
-    const text = 'One. Two. Three. Four. Five.';
-    const expected = ['One. Two. ', 'Three. Four. ', 'Five.'];
-    expect(splitIntoSentences(text, 0)).toEqual(expected);
-  });
-
-  it('should not merge sentences when finalSentences.length <= maxSegments', () => {
-    const text = 'One. Two. Three.';
-    const expected = ['One. Two. ', 'Three.'];
-    expect(splitIntoSentences(text, 3)).toEqual(expected);
-  });
-
-  it('should merge sentences when finalSentences.length > maxSegments', () => {
-    const text = 'One. Two. Three. Four. Five.';
-    const expected = ['One. Two. Three. Four. ', 'Five.'];
-    expect(splitIntoSentences(text, 2)).toEqual(expected);
-  });
-
-  it('should merge sentences into a single segment if maxSegments is 1', () => {
-    const text = 'One. Two. Three. Four. Five.';
-    const expected = ['One. Two. Three. Four. Five.'];
-    expect(splitIntoSentences(text, 1)).toEqual(expected);
-  });
-});
 
 describe('annotate', () => {
   it('should annotate multiple sentences correctly', () => {
@@ -141,105 +81,106 @@ describe('getOffsets', () => {
   });
 });
 
-describe('createHalloumiPrompt', () => {
-  it('should create a Halloumi prompt with annotated context and response', () => {
-    const sources = [
-      'This is the first source. This is its second sentence.',
-      'This is the second source.',
+describe('createChunkedHalloumiPrompts', () => {
+  it('should create a single chunk for small input', () => {
+    const indexedContextSentences = [
+      { sentence: 'Context one.', sourceId: 1, globalId: 1 },
+      { sentence: 'Context two.', sourceId: 1, globalId: 2 },
     ];
-    const response = 'This is the response. It has two sentences.';
-    const request = 'Test request.';
+    const responseSentences = ['Response one.', 'Response two.'];
+    const responseOffsets = new Map([
+      [1, { startOffset: 0, endOffset: 13 }],
+      [2, { startOffset: 14, endOffset: 28 }],
+    ]);
 
-    const result = createHalloumiPrompt({ sources, response, request });
-
-    // Expect the prompt to contain annotated context and response
-    expect(result.prompt).toContain(
-      '<|context|><|s1|><This is the first source. ><end||s><|s2|><This is its second sentence.><end||s><|s3|><This is the second source.><end||s><end||context>',
-    );
-    expect(result.prompt).toContain('<|request|><Test request.><end||request>');
-    expect(result.prompt).toContain(
-      '<|response|><|r1|><This is the response. ><end||r><|r2|><It has two sentences.><end||r><end||response>',
-    );
-
-    // Expect contextOffsets and responseOffsets to be correctly populated
-    expect(result.contextOffsets).toBeInstanceOf(Map);
-    const s1 = 'This is the first source. ';
-    const s2 = 'This is its second sentence.';
-    const s3 = 'This is the second source.';
-
-    expect(result.contextOffsets.get(1)).toEqual({
-      startOffset: 0,
-      endOffset: s1.length,
-    });
-    expect(result.contextOffsets.get(2)).toEqual({
-      startOffset: s1.length,
-      endOffset: s1.length + s2.length,
-    });
-    expect(result.contextOffsets.get(3)).toEqual({
-      startOffset: s1.length + s2.length + 1, // +1 for the space between sentences
-      endOffset: s1.length + s2.length + 1 + s3.length,
+    const { prompts } = createChunkedHalloumiPrompts({
+      indexedContextSentences,
+      responseSentences,
+      responseOffsets,
     });
 
-    expect(result.responseOffsets).toBeInstanceOf(Map);
-    const r1 = 'This is the response. ';
-    const r2 = 'It has two sentences.';
-
-    expect(result.responseOffsets.get(1)).toEqual({
-      startOffset: 0,
-      endOffset: r1.length,
-    });
-    expect(result.responseOffsets.get(2)).toEqual({
-      startOffset: r1.length,
-      endOffset: r1.length + r2.length,
-    });
+    expect(prompts).toHaveLength(1);
+    expect(prompts[0].prompt).toContain('<|s1|><Context one.><end||s>');
+    expect(prompts[0].prompt).toContain('<|s2|><Context two.><end||s>');
+    expect(prompts[0].prompt).toContain('<|r1|><Response one.><end||r>');
+    expect(prompts[0].prompt).toContain('<|r2|><Response two.><end||r>');
   });
 
-  it('should handle empty sources, response, and request', () => {
-    const sources = [];
-    const response = '';
-    const request = '';
+  it('should handle empty context', () => {
+    const responseSentences = ['Response.'];
+    const responseOffsets = new Map([
+      [1, { startOffset: 0, endOffset: 9 }],
+    ]);
 
-    const result = createHalloumiPrompt({ sources, response, request });
+    const { prompts } = createChunkedHalloumiPrompts({
+      indexedContextSentences: [],
+      responseSentences,
+      responseOffsets,
+    });
 
-    expect(result.prompt).toBe(
-      '<|context|><end||context><|request|><Make one or more claims about information in the documents.><end||request><|response|><end||response>',
-    );
-    expect(result.contextOffsets).toBeInstanceOf(Map);
-    expect(result.contextOffsets.size).toBe(0);
-    expect(result.responseOffsets).toBeInstanceOf(Map);
-    expect(result.responseOffsets.size).toBe(0);
+    expect(prompts).toHaveLength(1);
+    expect(prompts[0].prompt).toContain('<|context|><end||context>');
   });
 
-  it('should handle maxContextSegments correctly', () => {
-    const sources = [
-      'Sentence one. Sentence two. Sentence three. Sentence four.',
+  it('should exclude response sentences based on excludeResponseIndices', () => {
+    const indexedContextSentences = [
+      { sentence: 'Context.', sourceId: 1, globalId: 1 },
     ];
-    const response = 'Response one. Response two.';
-    const request = 'Test request.';
-    const maxContextSegments = 2;
+    const responseSentences = ['Keep this.', 'Skip this.', 'Keep too.'];
+    const responseOffsets = new Map([
+      [1, { startOffset: 0, endOffset: 10 }],
+      [2, { startOffset: 11, endOffset: 21 }],
+      [3, { startOffset: 22, endOffset: 31 }],
+    ]);
+    const excludeResponseIndices = new Set([2]);
 
-    const result = createHalloumiPrompt({
-      sources,
-      response,
-      request,
-      maxContextSegments,
+    const { prompts } = createChunkedHalloumiPrompts({
+      indexedContextSentences,
+      responseSentences,
+      responseOffsets,
+      excludeResponseIndices,
     });
 
-    // With maxContextSegments = 2, the 4 sentences should be merged into 2.
-    // "Sentence one. Sentence two." and "Sentence three. Sentence four."
-    expect(result.prompt).toContain(
-      '<|context|><|s1|><Sentence one. Sentence two. ><end||s><|s2|><Sentence three. Sentence four.><end||s><end||context>',
-    );
-    const mergedS1 = 'Sentence one. Sentence two. ';
-    const mergedS2 = 'Sentence three. Sentence four.';
+    expect(prompts[0].prompt).toContain('<|r1|><Keep this.><end||r>');
+    expect(prompts[0].prompt).not.toContain('Skip this.');
+    expect(prompts[0].prompt).toContain('<|r3|><Keep too.><end||r>');
+  });
 
-    expect(result.contextOffsets.get(1)).toEqual({
-      startOffset: 0,
-      endOffset: mergedS1.length,
+  it('should keep sources together with bin packing', () => {
+    // 3 sources: 60 + 60 + 30 = 150 sentences
+    // Should pack into 2 chunks: (60+30) and (60) or similar
+    const indexed = [];
+    let gid = 1;
+    // Source 1: 60 sentences
+    for (let i = 0; i < 60; i++) {
+      indexed.push({ sentence: `S1-${i}`, sourceId: 1, globalId: gid++ });
+    }
+    // Source 2: 60 sentences
+    for (let i = 0; i < 60; i++) {
+      indexed.push({ sentence: `S2-${i}`, sourceId: 2, globalId: gid++ });
+    }
+    // Source 3: 30 sentences
+    for (let i = 0; i < 30; i++) {
+      indexed.push({ sentence: `S3-${i}`, sourceId: 3, globalId: gid++ });
+    }
+
+    const { prompts } = createChunkedHalloumiPrompts({
+      indexedContextSentences: indexed,
+      responseSentences: ['Claim.'],
+      responseOffsets: new Map([[1, { startOffset: 0, endOffset: 6 }]]),
     });
-    expect(result.contextOffsets.get(2)).toEqual({
-      startOffset: mergedS1.length,
-      endOffset: mergedS1.length + mergedS2.length,
-    });
+
+    expect(prompts).toHaveLength(2);
+
+    // Each source should be entirely within one chunk
+    for (const prompt of prompts) {
+      const s1Count = (prompt.prompt.match(/S1-/g) || []).length;
+      const s2Count = (prompt.prompt.match(/S2-/g) || []).length;
+      const s3Count = (prompt.prompt.match(/S3-/g) || []).length;
+
+      if (s1Count > 0) expect(s1Count).toBe(60);
+      if (s2Count > 0) expect(s2Count).toBe(60);
+      if (s3Count > 0) expect(s3Count).toBe(30);
+    }
   });
 });

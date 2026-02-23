@@ -580,6 +580,53 @@ mark {
       background-color: @grey;
     }
   }
+
+  // Inline code
+  code {
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    background-color: #eef0f2;
+    color: @grey;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.875em;
+    word-break: break-word;
+  }
+
+  // Code blocks
+  pre {
+    overflow-x: auto;
+    padding: 1em 1.25em;
+    border-radius: @borderRadius;
+    margin: 0 0 @marginBottom;
+    background-color: #1e2a35;
+    color: #e2e8f0;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 3px;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    // Reset inline code inside blocks
+    code {
+      padding: 0;
+      background-color: transparent;
+      color: inherit;
+      font-size: inherit;
+      word-break: normal;
+    }
+  }
 }
 
 .circle {

@@ -1,19 +1,16 @@
 import debug from 'debug';
-import fetch from 'node-fetch';
 import fs from 'fs';
 import {
   getClaimsFromResponse,
   getTokenProbabilitiesFromLogits,
 } from './postprocessing';
-import {
-  createHalloumiPrompt,
-  splitIntoSentences,
-  getOffsets,
-} from './preprocessing';
-
-// const CONTEXT_SEPARTOR = '\n---\n';
+import { createChunkedHalloumiPrompts, getOffsets } from './preprocessing';
+import { splitMarkdown, splitProse } from './markdown-splitter';
+import { callLLM, excludeClaimSentences } from './filtering';
 
 const log = debug('halloumi');
+
+const tokenChoices = new Set(['supported', 'unsupported']);
 
 function sigmoid(x) {
   return 1 / (1 + Math.exp(-x));
@@ -25,53 +22,111 @@ export function applyPlattScaling(platt, probability) {
   return sigmoid(-1 * (platt.a * log_prob + platt.b));
 }
 
-export async function getVerifyClaimResponse(
-  model,
-  sources,
-  claims,
-  maxContextSegments = 0,
-  filterModel,
-) {
-  if (!sources?.length || !claims) {
-    const response = {
-      claims: [],
-      segments: {},
+/**
+ * Merges claims from multiple chunked HallOumi responses.
+ * For each response sentence (claimId), combines segment citations
+ * and takes the max supported score.
+ */
+function mergeChunkClaims(chunkResults) {
+  const claimMap = new Map();
+
+  for (const claims of chunkResults) {
+    for (const claim of claims) {
+      if (!claimMap.has(claim.claimId)) {
+        claimMap.set(claim.claimId, { ...claim });
+      } else {
+        const existing = claimMap.get(claim.claimId);
+        existing.segments.push(...claim.segments);
+        // Keep the result with the higher supported score
+        const existingScore = existing.probabilities.get('supported') || 0;
+        const newScore = claim.probabilities.get('supported') || 0;
+        if (newScore > existingScore) {
+          existing.probabilities = claim.probabilities;
+          existing.explanation = claim.explanation;
+          existing.supported = claim.supported;
+        }
+      }
+    }
+  }
+
+  return Array.from(claimMap.values());
+}
+
+export async function getVerifyClaimResponse(model, sources, answer) {
+  const emptyResponse = {
+    claims: [],
+    segments: {},
+  };
+  if (!sources?.length || !answer) {
+    return { ...emptyResponse, reason: 'Context is empty' };
+  }
+
+  // Split sentences
+  const responseSentences = splitMarkdown(answer);
+  const responseOffsets = getOffsets(answer, responseSentences);
+
+  // Filter claims and context in parallel
+  const [excludeResponseIndices] = await Promise.all([
+    excludeClaimSentences(responseSentences),
+  ]);
+
+  const contextSentences = [];
+  const indexedContextSentences = sources.reduce((acc, text, sourceIdx) => {
+    const sentences = splitProse(text, 50).map((sentence, sentenceIdx) => {
+      const globalId = acc.length + sentenceIdx + 1;
+      contextSentences.push(sentence);
+      return {
+        sentence,
+        sourceId: sourceIdx + 1,
+        globalId,
+      };
+    });
+    acc.push(...sentences);
+    return acc;
+  }, []);
+  const joinedContext = sources.join('');
+  const contextOffsets = getOffsets(joinedContext, contextSentences);
+
+  if (excludeResponseIndices.size === responseSentences.length) {
+    log('All response sentences excluded');
+    return {
+      ...emptyResponse,
+      empty: 'Claims in the document could not be verified',
     };
-    return response;
   }
-
-  let excludeResponseIndices;
-  let responseSentences;
-  let responseOffsets;
-
-  if (filterModel) {
-    responseSentences = splitIntoSentences(claims, maxContextSegments);
-    responseOffsets = getOffsets(claims, responseSentences);
-    excludeResponseIndices = await filterClaimSentences(
-      filterModel,
-      responseSentences,
-    );
-    log('Excluded indices', excludeResponseIndices);
-  }
-
-  const prompt = createHalloumiPrompt({
-    sources,
-    response: claims,
-    maxContextSegments,
-    request: undefined,
+  log('Excluded response indices', excludeResponseIndices);
+  const { prompts } = createChunkedHalloumiPrompts({
+    indexedContextSentences,
+    responseSentences,
+    responseOffsets,
+    request: null,
     excludeResponseIndices,
   });
 
-  log('Halloumi prompt', JSON.stringify(prompt, null, 2));
+  log(`Split into ${prompts.length} chunk(s)`);
 
-  const rawClaims = await halloumiGenerativeAPI(model, prompt);
-  log('Raw claims', rawClaims);
-  const converted = convertGenerativesClaimToVerifyClaimResponse(
-    rawClaims,
-    prompt,
+  // Run all chunks in parallel
+  const chunkResults = await Promise.all(
+    prompts.map((chunkPrompt, i) => {
+      log(`Chunk ${i + 1} request`);
+      return halloumiGenerativeAPI(model, chunkPrompt);
+    }),
   );
 
-  if (filterModel && excludeResponseIndices.size > 0) {
+  // Merge raw claims across chunks
+  const rawClaims = mergeChunkClaims(chunkResults);
+
+  const mergedPrompt = {
+    contextOffsets,
+    responseOffsets,
+    joinedContext,
+  };
+  const converted = convertGenerativesClaimToVerifyClaimResponse(
+    rawClaims,
+    mergedPrompt,
+  );
+
+  if (excludeResponseIndices.size > 0) {
     for (const idx of excludeResponseIndices) {
       if (responseOffsets.has(idx)) {
         const offsets = responseOffsets.get(idx);
@@ -91,67 +146,13 @@ export async function getVerifyClaimResponse(
   const result = {
     ...converted,
     rawClaims,
-    halloumiPrompt: prompt,
+    ...(prompts.length === 1
+      ? { halloumiPrompt: prompts[0] }
+      : { halloumiPrompts: prompts }),
   };
 
   return result;
 }
-
-export async function filterClaimSentences(filterModel, sentences) {
-  const numberedSentences = sentences
-    .map((s, i) => `${i + 1}. "${s.trim()}"`)
-    .join('\n');
-
-  const filterPrompt = `For each of the following sentences, determine if it is a verifiable factual claim.
-Answer YES if the sentence makes a specific, checkable assertion. Answer NO if it is a greeting, preamble, opinion, vague statement, or transitional phrase.
-
-Respond with exactly one line per sentence in the format: {number}. {YES/NO}
-
-Sentences:
-${numberedSentences}`;
-
-  const data = {
-    messages: [{ role: 'user', content: filterPrompt }],
-    temperature: 0.0,
-    model: filterModel.name,
-  };
-  const headers = {
-    'Content-Type': 'application/json',
-    accept: 'application/json',
-  };
-  if (filterModel.apiKey) {
-    headers['Authorization'] = `Bearer ${filterModel.apiKey}`;
-  }
-
-  const params = {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(data),
-  };
-
-  const response = await fetch(filterModel.apiUrl, params);
-  const jsonData = await response.json();
-  const content = jsonData.choices?.[0]?.message?.content || '';
-
-  log('Filter response', content);
-
-  const excludeIndices = new Set();
-  const lines = content.split('\n');
-  for (const line of lines) {
-    const match = line.match(/^(\d+)\.\s*(YES|NO)/i);
-    if (match) {
-      const idx = parseInt(match[1], 10);
-      const answer = match[2].toUpperCase();
-      if (answer === 'NO') {
-        excludeIndices.add(idx);
-      }
-    }
-  }
-
-  return excludeIndices;
-}
-
-const tokenChoices = new Set(['supported', 'unsupported']);
 
 /**
  * Fetches a response from the LLM.
@@ -183,34 +184,17 @@ async function getLLMResponse(model, prompt) {
     logprobs: true,
     top_logprobs: 3,
   };
-  const headers = {
-    'Content-Type': 'application/json',
-    accept: 'application/json',
-  };
-  if (model.apiKey) {
-    headers['Authorization'] = `Bearer ${model.apiKey}`;
-  }
 
-  const params = {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  };
   if (process.env.DUMP_HALLOUMI_REQ_FILE_PATH) {
     const filePath = process.env.DUMP_HALLOUMI_REQ_FILE_PATH;
     fs.writeFileSync(
       filePath,
-      JSON.stringify(
-        { url: model.apiUrl, params: { ...params, body: data } },
-        null,
-        2,
-      ),
+      JSON.stringify({ url: model.apiUrl, body: data }, null, 2),
     );
-    log(`Dumped halloumi response: ${filePath}`);
+    log(`Dumped halloumi request: ${filePath}`);
   }
 
-  const response = await fetch(model.apiUrl, params);
-  jsonData = await response.json();
+  jsonData = await callLLM(model.apiUrl, model.apiKey, data);
 
   if (process.env.DUMP_HALLOUMI_FILE_PATH) {
     const filePath = process.env.DUMP_HALLOUMI_FILE_PATH;
@@ -229,14 +213,16 @@ async function getLLMResponse(model, prompt) {
 export async function halloumiGenerativeAPI(model, prompt) {
   const jsonData = await getLLMResponse(model, prompt);
 
-  log('Generative response', jsonData);
+  // Todo: restore log
+  // log('Generative response', jsonData);
 
   const finishReason = jsonData.choices?.[0]?.finish_reason;
   if (finishReason === 'length') {
     throw new Error('HallOumi response truncated (finish_reason: length)');
   }
 
-  log('Logprobs', jsonData.choices[0].logprobs.content);
+  // Todo: restore log
+  // log('Logprobs', jsonData.choices[0].logprobs.content);
 
   const logits = jsonData.choices[0].logprobs.content;
   const tokenProbabilities = getTokenProbabilitiesFromLogits(
@@ -248,11 +234,20 @@ export async function halloumiGenerativeAPI(model, prompt) {
   );
 
   if (parsedResponse.length !== tokenProbabilities.length) {
-    throw new Error('Token probabilities and claims do not match.');
+    log(
+      'Warning: token probabilities (%d) and claims (%d) do not match — using available probabilities, defaulting remainder to 0.5',
+      tokenProbabilities.length,
+      parsedResponse.length,
+    );
   }
 
+  const defaultScoreMap = new Map([
+    ['supported', 0.5],
+    ['unsupported', 0.5],
+  ]);
+
   for (let i = 0; i < parsedResponse.length; i++) {
-    const scoreMap = tokenProbabilities[i];
+    const scoreMap = tokenProbabilities[i] ?? new Map(defaultScoreMap);
     if (model.plattScaling) {
       const platt = model.plattScaling;
       const unsupportedScore = applyPlattScaling(
@@ -282,12 +277,17 @@ export function convertGenerativesClaimToVerifyClaimResponse(
       id,
       startOffset: offset[1].startOffset,
       endOffset: offset[1].endOffset,
+      text: prompt.joinedContext.slice(
+        offset[1].startOffset,
+        offset[1].endOffset,
+      ),
     };
   }
 
   for (const generativeClaim of generativeClaims) {
     const segmentIds = [];
     for (const seg of generativeClaim.segments) {
+      if (!seg) continue;
       segmentIds.push(seg.toString());
     }
 

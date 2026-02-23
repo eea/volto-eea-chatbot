@@ -67,28 +67,30 @@ function addQualityMarkersPlugin() {
 }
 
 export function addHalloumiContext(doc: any, text: string) {
-  const updatedDate = doc.updated_at
-    ? new Date(doc.updated_at).toLocaleString('en-GB', {
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '';
+  // TODO: CLEAN UP
+  // const updatedDate = doc.updated_at
+  //   ? new Date(doc.updated_at).toLocaleString('en-GB', {
+  //       year: 'numeric',
+  //       month: 'long',
+  //       day: '2-digit',
+  //       hour: '2-digit',
+  //       minute: '2-digit',
+  //     })
+  //   : '';
 
-  const docIndex = doc.index ? `DOCUMENT ${doc.index}: ` : '';
-  const sources: any = { web: 'Website', file: 'File' };
+  // const docIndex = doc.index ? `DOCUMENT ${doc.index}: ` : '';
+  // const sources: any = { web: 'Website', file: 'File' };
 
-  const sourceType = doc.source_type
-    ? sources[doc.source_type] || capitalize(doc.source_type)
-    : '';
+  // const sourceType = doc.source_type
+  //   ? sources[doc.source_type] || capitalize(doc.source_type)
+  //   : '';
 
-  const header = `${docIndex}${doc.semantic_identifier}${
-    sourceType ? `\nSource: ${sourceType}` : ''
-  }${updatedDate ? `\nUpdated: ${updatedDate}` : ''}`;
+  // const header = `${docIndex}${doc.semantic_identifier}${
+  //   sourceType ? `\nSource: ${sourceType}` : ''
+  // }${updatedDate ? `\nUpdated: ${updatedDate}` : ''}`;
 
-  return `${header}\n${text}`;
+  // return `${header}\n${text}`;
+  return text.replace(/\u00A0/g, ' ');
 }
 
 function mapToolDocumentsToText(message: any) {
@@ -167,6 +169,7 @@ function getScoreDetails(rawClaims: any, qualityCheckStages: any) {
 
 export function AIMessage({
   message,
+  prevMessage,
   isLoading,
   libs,
   onChoice,
@@ -285,6 +288,7 @@ export function AIMessage({
   );
 
   const claims = markers?.claims || [];
+  const emptyClaims = markers?.empty || false;
   const { score, scoreStage, scoreColor, isFirstScoreStage } = getScoreDetails(
     claims,
     qualityCheckStages,
@@ -436,6 +440,7 @@ export function AIMessage({
           }}
           showVerifyClaimsButton={showVerifyClaimsButton}
           retryHalloumi={retryHalloumi}
+          emptyClaims={emptyClaims}
         />
       )}
 

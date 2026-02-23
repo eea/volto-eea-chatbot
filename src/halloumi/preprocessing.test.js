@@ -108,9 +108,7 @@ describe('createChunkedHalloumiPrompts', () => {
 
   it('should handle empty context', () => {
     const responseSentences = ['Response.'];
-    const responseOffsets = new Map([
-      [1, { startOffset: 0, endOffset: 9 }],
-    ]);
+    const responseOffsets = new Map([[1, { startOffset: 0, endOffset: 9 }]]);
 
     const { prompts } = createChunkedHalloumiPrompts({
       indexedContextSentences: [],

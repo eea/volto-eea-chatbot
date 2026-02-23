@@ -30,20 +30,19 @@ exports[`RenderClaimView handles segment ending with newline 1`] = `
         className="citation-highlight"
       >
         Segment text
+M
         <sup
           className="citation-ref"
         >
           1
         </sup>
       </mark>
+       
     </span>
-    <span
-      className="br"
-    />
     <span
       className="citation-line"
     >
-      More text
+      ore text
     </span>
   </div>
 </div>
@@ -67,7 +66,7 @@ exports[`RenderClaimView handles segments with sourceStartIndex offset 1`] = `
       <mark
         className="citation-highlight"
       >
-        segment
+        segment.
         <sup
           className="citation-ref"
         >
@@ -75,11 +74,6 @@ exports[`RenderClaimView handles segments with sourceStartIndex offset 1`] = `
         </sup>
       </mark>
        
-    </span>
-    <span
-      className="citation-line"
-    >
-      .
     </span>
   </div>
 </div>
@@ -163,7 +157,7 @@ exports[`RenderClaimView renders text with a single segment 1`] = `
     <span
       className="citation-line"
     >
-       here.
+      here.
     </span>
   </div>
 </div>
@@ -194,7 +188,7 @@ exports[`RenderClaimView renders text with multiple segments 1`] = `
     <span
       className="citation-line"
     >
-       and 
+      and 
     </span>
     <span
       className="citation-segment "
@@ -214,7 +208,7 @@ exports[`RenderClaimView renders text with multiple segments 1`] = `
     <span
       className="citation-line"
     >
-       here.
+      here.
     </span>
   </div>
 </div>
@@ -243,11 +237,6 @@ exports[`RenderClaimView sorts segments by startOffset 1`] = `
        
     </span>
     <span
-      className="citation-line"
-    >
-       
-    </span>
-    <span
       className="citation-segment "
     >
       <mark
@@ -261,11 +250,6 @@ exports[`RenderClaimView sorts segments by startOffset 1`] = `
         </sup>
       </mark>
        
-    </span>
-    <span
-      className="citation-line"
-    >
-       
     </span>
     <span
       className="citation-segment "

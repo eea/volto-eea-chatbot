@@ -1,29 +1,3 @@
-// /**
-//  * Represents a claim object with all relevant information.
-//  */
-// export interface GenerativeClaim {
-//     claimId: number;
-//     claimString: string;
-//     subclaims: string[];
-//     segments: number[];
-//     explanation: string;
-//     supported: boolean;
-//     probabilities: Map<string, number>;
-// }
-//
-// export interface OpenAITokenLogProb {
-//     token: string;
-//     bytes: number[];
-//     logprob: number;
-// }
-//
-// export interface OpenAILogProb {
-//     token: string;
-//     bytes: number[];
-//     logprob: number;
-//     top_logprobs: OpenAITokenLogProb[];
-// }
-//
 /**
  * Gets the claim id from a subsegment.
  * @param subsegment A subsegment string of the form "<|r1|".

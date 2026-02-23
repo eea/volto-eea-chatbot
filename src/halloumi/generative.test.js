@@ -77,17 +77,29 @@ describe('applyPlattScaling', () => {
 describe('getVerifyClaimResponse', () => {
   it('returns empty response when sources is empty', async () => {
     const result = await getVerifyClaimResponse({}, [], 'claims');
-    expect(result).toEqual({ claims: [], segments: {} });
+    expect(result).toEqual({
+      claims: [],
+      segments: {},
+      reason: 'Context is empty',
+    });
   });
 
   it('returns empty response when sources is null', async () => {
     const result = await getVerifyClaimResponse({}, null, 'claims');
-    expect(result).toEqual({ claims: [], segments: {} });
+    expect(result).toEqual({
+      claims: [],
+      segments: {},
+      reason: 'Context is empty',
+    });
   });
 
   it('returns empty response when claims is falsy', async () => {
     const result = await getVerifyClaimResponse({}, ['source'], null);
-    expect(result).toEqual({ claims: [], segments: {} });
+    expect(result).toEqual({
+      claims: [],
+      segments: {},
+      reason: 'Context is empty',
+    });
   });
 });
 
@@ -257,7 +269,7 @@ describe('halloumiGenerativeAPI via real fetch', () => {
     expect(callHeaders.Authorization).toBeUndefined();
   });
 
-  it('throws when token probabilities and claims do not match', async () => {
+  it('defaults to 0.5 when token probabilities and claims do not match', async () => {
     jest.doMock('./postprocessing', () => ({
       getClaimsFromResponse: jest.fn(() => [
         { claimId: 1, claimString: 'Claim 1' },
@@ -290,9 +302,11 @@ describe('halloumiGenerativeAPI via real fetch', () => {
       responseOffsets: new Map(),
     };
 
-    await expect(halloumiGenerativeAPI(model, prompt)).rejects.toThrow(
-      'Token probabilities and claims do not match',
-    );
+    const result = await halloumiGenerativeAPI(model, prompt);
+    // First claim gets the available probability
+    expect(result[0].probabilities.get('supported')).toBe(0.9);
+    // Second claim defaults to 0.5
+    expect(result[1].probabilities.get('supported')).toBe(0.5);
   });
 });
 
@@ -316,6 +330,7 @@ describe('convertGenerativesClaimToVerifyClaimResponse', () => {
     const prompt = {
       contextOffsets: new Map([[1, { startOffset: 0, endOffset: 10 }]]),
       responseOffsets: new Map([[1, { startOffset: 100, endOffset: 120 }]]),
+      joinedContext: 'Test conte',
     };
 
     const result = convertGenerativesClaimToVerifyClaimResponse(
@@ -336,7 +351,12 @@ describe('convertGenerativesClaimToVerifyClaimResponse', () => {
         },
       ],
       segments: {
-        1: { id: '1', startOffset: 0, endOffset: 10 },
+        1: {
+          id: '1',
+          startOffset: 0,
+          endOffset: 10,
+          text: 'Test conte',
+        },
       },
     });
   });

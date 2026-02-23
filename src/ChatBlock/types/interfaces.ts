@@ -121,6 +121,7 @@ export interface ToolCallMetadata {
 
 export interface ChatMessageProps {
   message: Message;
+  prevMessage?: Message;
   isLoading: boolean;
   isDeepResearchEnabled?: boolean;
   libs?: any;

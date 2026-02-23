@@ -430,7 +430,7 @@ module.exports = {
       '<rootDir>/node_modules/@plone/volto/jest-addons-loader.js',
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(@plone|@root|@package|@eeacms)/).*/',
+    '/node_modules/(?!(@plone|@root|@package|@eeacms|compromise|efrt|grad-school|suffix-thumb)/).*/',
   ],
   transform: {
     '^.+\\.js(x)?$': 'babel-jest',

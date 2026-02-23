@@ -22,21 +22,6 @@ function extractRelatedQuestions(str: string): RelatedQuestion[] {
     throw new Error('Related questions were not generated properly');
   }
 
-  const regex = /\[[\s\S]*?\]/;
-  const match = str.match(regex);
-
-  if (match) {
-    try {
-      return JSON.parse(match[0]);
-    } catch {
-      // Fallback to line-by-line parsing
-      return str
-        .split('\n')
-        .filter((line) => line.trim())
-        .map((question) => ({ question }));
-    }
-  }
-
   return str
     .split('\n')
     .filter((line) => line.trim())

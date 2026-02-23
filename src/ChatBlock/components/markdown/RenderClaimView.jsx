@@ -19,7 +19,7 @@ export const RenderClaimView = (props) => {
 
   sortedSegments.forEach((segment) => {
     const segmentStart = segment.startOffset - sourceStartIndex;
-    const segmentEnd = segment.endOffset - sourceStartIndex;
+    const segmentEnd = segment.endOffset - sourceStartIndex + 1;
 
     // Add the text part before the current segment
     if (segmentStart > lastIndex) {

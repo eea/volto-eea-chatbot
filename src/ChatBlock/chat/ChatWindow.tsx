@@ -185,6 +185,7 @@ function ChatWindow({
                 <React.Fragment>
                   <ChatMessage
                     key={message.messageId}
+                    prevMessage={messages[index - 1]}
                     message={message}
                     isLoading={isStreaming}
                     isDeepResearchEnabled={isDeepResearchEnabled}

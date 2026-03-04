@@ -13,13 +13,16 @@ const filterModel = {
   apiKey: LLMGW_API_KEY,
 };
 
-export async function callLLM(apiUrl, apiKey, requestBody) {
+export async function callLLM(apiUrl, apiKey, requestBody, { ip } = {}) {
   const headers = {
     'Content-Type': 'application/json',
     accept: 'application/json',
   };
   if (apiKey) {
     headers['Authorization'] = `Bearer ${apiKey}`;
+  }
+  if (ip) {
+    headers['X-Forwarded-For'] = ip;
   }
 
   const response = await fetch(apiUrl, {
@@ -92,24 +95,26 @@ export function parseExcludeIndices(content, maxIndex) {
   return excludeIndices;
 }
 
-async function callFilterModel(prompt) {
+async function callFilterModel(prompt, { ip } = {}) {
   const data = {
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.0,
     model: filterModel.name,
   };
-  const jsonData = await callLLM(filterModel.apiUrl, filterModel.apiKey, data);
+  const jsonData = await callLLM(filterModel.apiUrl, filterModel.apiKey, data, {
+    ip,
+  });
   return jsonData.choices?.[0]?.message?.content || '';
 }
 
-export async function excludeClaimSentences(sentences) {
+export async function excludeClaimSentences(sentences, { ip } = {}) {
   if (sentences.length === 0) {
     return new Set();
   }
 
   try {
     const prompt = buildClaimFilterPrompt(sentences);
-    const content = await callFilterModel(prompt);
+    const content = await callFilterModel(prompt, { ip });
     const excludedIndices = parseExcludeIndices(content, sentences.length);
     log('Claim filter response', excludedIndices.size);
     return excludedIndices;
@@ -122,6 +127,7 @@ export async function excludeClaimSentences(sentences) {
 export async function excludeContextSentences(
   contextSentences,
   claimSentences,
+  { ip } = {},
 ) {
   if (contextSentences.length <= MIN_CONTEXT_SENTENCES_FOR_FILTERING) {
     return new Set();
@@ -129,7 +135,7 @@ export async function excludeContextSentences(
 
   try {
     const prompt = buildContextFilterPrompt(contextSentences, claimSentences);
-    const content = await callFilterModel(prompt);
+    const content = await callFilterModel(prompt, { ip });
     const excludedIndices = parseExcludeIndices(
       content,
       contextSentences.length,

@@ -59,6 +59,8 @@ describe('src/middleware', () => {
       url: '/_da/chat/send-message',
       method: 'POST',
       body: { message: 'hello' },
+      ip: '127.0.0.1',
+      headers: {},
     };
     res = {
       send: jest.fn(),

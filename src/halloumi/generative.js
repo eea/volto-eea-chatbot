@@ -52,7 +52,12 @@ function mergeChunkClaims(chunkResults) {
   return Array.from(claimMap.values());
 }
 
-export async function getVerifyClaimResponse(model, sources, answer, { ip } = {}) {
+export async function getVerifyClaimResponse(
+  model,
+  sources,
+  answer,
+  { ip } = {},
+) {
   const emptyResponse = {
     claims: [],
     segments: {},

@@ -52,7 +52,7 @@ function mergeChunkClaims(chunkResults) {
   return Array.from(claimMap.values());
 }
 
-export async function getVerifyClaimResponse(model, sources, answer) {
+export async function getVerifyClaimResponse(model, sources, answer, { ip } = {}) {
   const emptyResponse = {
     claims: [],
     segments: {},
@@ -67,7 +67,7 @@ export async function getVerifyClaimResponse(model, sources, answer) {
 
   // Filter claims and context in parallel
   const [excludeResponseIndices] = await Promise.all([
-    excludeClaimSentences(responseSentences),
+    excludeClaimSentences(responseSentences, { ip }),
   ]);
 
   const contextSentences = [];
@@ -109,7 +109,7 @@ export async function getVerifyClaimResponse(model, sources, answer) {
   const chunkResults = await Promise.all(
     prompts.map((chunkPrompt, i) => {
       log(`Chunk ${i + 1} request`);
-      return halloumiGenerativeAPI(model, chunkPrompt);
+      return halloumiGenerativeAPI(model, chunkPrompt, { ip });
     }),
   );
 
@@ -166,7 +166,7 @@ export async function getVerifyClaimResponse(model, sources, answer) {
  * - `DUMP_HALLOUMI_REQ_FILE_PATH`: If set, the LLM request (URL and parameters) is dumped to the specified file path.
  * - `DUMP_HALLOUMI_FILE_PATH`: If set, the LLM response is dumped to the specified file path.
  */
-async function getLLMResponse(model, prompt) {
+async function getLLMResponse(model, prompt, { ip } = {}) {
   let jsonData;
 
   if (process.env.MOCK_HALLOUMI_FILE_PATH) {
@@ -194,7 +194,7 @@ async function getLLMResponse(model, prompt) {
     log(`Dumped halloumi request: ${filePath}`);
   }
 
-  jsonData = await callLLM(model.apiUrl, model.apiKey, data);
+  jsonData = await callLLM(model.apiUrl, model.apiKey, data, { ip });
 
   if (process.env.DUMP_HALLOUMI_FILE_PATH) {
     const filePath = process.env.DUMP_HALLOUMI_FILE_PATH;
@@ -210,8 +210,8 @@ async function getLLMResponse(model, prompt) {
  * @param response A string containing all claims and their information.
  * @returns A list of claim objects.
  */
-export async function halloumiGenerativeAPI(model, prompt) {
-  const jsonData = await getLLMResponse(model, prompt);
+export async function halloumiGenerativeAPI(model, prompt, { ip } = {}) {
+  const jsonData = await getLLMResponse(model, prompt, { ip });
 
   // Todo: restore log
   // log('Generative response', jsonData);

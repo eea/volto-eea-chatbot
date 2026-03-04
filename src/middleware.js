@@ -166,11 +166,13 @@ async function send_onyx_request(
     headers = {
       Cookie: cached_auth_cookie,
       'Content-Type': 'application/json',
+      'X-Forwarded-For': req.ip,
     };
   } else {
     headers = {
       Authorization: 'Bearer ' + api_key,
       'Content-Type': 'application/json',
+      'X-Forwarded-For': req.ip,
     };
   }
 

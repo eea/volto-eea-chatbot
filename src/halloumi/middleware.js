@@ -56,6 +56,7 @@ export default async function middleware(req, res, next) {
       // TODO: map with citation id
       sources,
       answer,
+      { ip: req.ip },
     );
     // log('Halloumi response', resp);
     res.send(resp);

@@ -151,7 +151,9 @@ async function send_onyx_request(
   res,
   { username, password, api_key, url, is_related_question },
 ) {
-  let headers = {};
+  let headers = {
+    'X-Forwarded-For': req.headers['x-forwarded-for'] || req.ip,
+  };
   if (!api_key) {
     await login(username, password);
 
@@ -166,13 +168,11 @@ async function send_onyx_request(
     headers = {
       Cookie: cached_auth_cookie,
       'Content-Type': 'application/json',
-      'X-Forwarded-For': req.ip,
     };
   } else {
     headers = {
       Authorization: 'Bearer ' + api_key,
       'Content-Type': 'application/json',
-      'X-Forwarded-For': req.ip,
     };
   }
 

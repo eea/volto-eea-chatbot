@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { useDeepCompareMemoize } from '../hooks/useDeepCompareMemoize';
 
 describe('useDeepCompareMemoize', () => {

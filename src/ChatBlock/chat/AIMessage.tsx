@@ -1,7 +1,7 @@
 import type { ChatMessageProps } from '../types/interfaces';
 import { useState, useMemo, useEffect } from 'react';
 import cx from 'classnames';
-import visit from 'unist-util-visit';
+import { visit } from 'unist-util-visit';
 import loadable from '@loadable/component';
 import {
   Tab,

@@ -1,5 +1,5 @@
 import renderer from 'react-test-renderer';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { ClaimSegments } from '../components/markdown/ClaimSegments';
 
 // Mock semantic-ui-react

@@ -45,9 +45,9 @@ export const ImageToolRenderer: MessageRenderer<ImageGenerationToolPacket> = ({
               alt={image.revised_prompt}
               className={`image-shape-${image.shape || 'square'}`}
             />
-            {image.revised_prompt && (
+            {image.revised_prompt ? (
               <div className="image-prompt">{image.revised_prompt}</div>
-            )}
+            ) : null}
           </div>
         ))}
       </div>

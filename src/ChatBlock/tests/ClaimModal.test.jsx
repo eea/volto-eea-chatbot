@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { ClaimModal } from '../components/markdown/ClaimModal';
 
 // Mock semantic-ui-react Modal

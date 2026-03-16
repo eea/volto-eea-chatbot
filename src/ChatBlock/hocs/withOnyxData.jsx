@@ -28,7 +28,6 @@ export default function withOnyxData(callback) {
             try {
               const response = await fetcher;
               setState({ [name]: response.body });
-
             } catch (error) {
               setState({ [`${name}-error`]: error.message, [name]: null });
             }

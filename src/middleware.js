@@ -240,9 +240,9 @@ export default async function middleware(req, res, next) {
 
   const api_key = process.env.ONYX_API_KEY;
   if (!api_key) {
-    res.send({
-      error: MSG_INVALID_CONFIGURATION,
-    });
+    res.statusCode = 500;
+    res.statusMessage = MSG_INVALID_CONFIGURATION
+    res.send({ error: MSG_INVALID_CONFIGURATION });
     return;
   }
 
@@ -254,8 +254,10 @@ export default async function middleware(req, res, next) {
     });
   } catch (error) {
     // eslint-disable-next-line
-    console.error(MSG_ERROR_REQUEST, error?.response?.text);
-
-    res.send({ error: `Onyx error: ${error?.response?.text || 'error'}` });
+    const errorMessage = `Onyx error: ${error?.response?.text || 'error'}`
+    console.error(MSG_ERROR_REQUEST, errorMessage);
+    res.statusCode = 500;
+    res.statusMessage = errorMessage;
+    res.send({ error: errorMessage });
   }
 }

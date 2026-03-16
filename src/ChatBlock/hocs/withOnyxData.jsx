@@ -25,8 +25,12 @@ export default function withOnyxData(callback) {
       React.useEffect(() => {
         async function handler() {
           if (fetcher) {
-            const response = await fetcher;
-            setState({ [name]: response.body });
+            try {
+              const response = await fetcher;
+              setState({ [name]: response.body });
+            } catch (error) {
+              setState({ [`${name}-error`]: error.message, [name]: null });
+            }
           }
         }
         handler();

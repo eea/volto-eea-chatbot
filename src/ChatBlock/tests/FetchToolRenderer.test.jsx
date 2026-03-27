@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { FetchToolRenderer } from '../packets/renderers/FetchToolRenderer';
 import { PacketType } from '../types/streamingModels';
 

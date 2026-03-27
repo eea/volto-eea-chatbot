@@ -1,46 +1,4 @@
-const DEFAULT_HALLOUMI_REQUEST =
-  'Make one or more claims about information in the documents.';
-
-/**
- * Splits a given text into sentences using sentence-splitter.
- * @param text The input string to split.
- * @returns An array of sentence strings.
- */
-export function splitIntoSentences(text, maxSegments = 0) {
-  const segmenter = new Intl.Segmenter('en', { granularity: 'sentence' });
-  const segments = Array.from(segmenter.segment(text)).map((s) => s.segment);
-
-  const initialSentences = [];
-  let currentSentence = '';
-
-  for (const segment of segments) {
-    currentSentence += segment;
-    if (currentSentence.trim().length > 8) {
-      initialSentences.push(currentSentence);
-      currentSentence = '';
-    }
-  }
-  // Push any remaining part that didn't make it to 8 characters
-  if (currentSentence) {
-    initialSentences.push(currentSentence);
-  }
-
-  if (maxSegments <= 0) {
-    return initialSentences;
-  }
-
-  if (initialSentences.length > maxSegments) {
-    const groupSize = Math.ceil(initialSentences.length / maxSegments);
-    const mergedSentences = [];
-    for (let i = 0; i < initialSentences.length; i += groupSize) {
-      const group = initialSentences.slice(i, i + groupSize);
-      mergedSentences.push(group.join(''));
-    }
-    return mergedSentences;
-  }
-
-  return initialSentences;
-}
+const MAX_CONTEXT_SEGMENTS_PER_CHUNK = 100;
 
 /**
  * Annotate a set of sentences with a given annotation character.
@@ -48,11 +6,26 @@ export function splitIntoSentences(text, maxSegments = 0) {
  * @param annotationChar The character to use for annotation.
  * @returns The annotated string with annotation characters + sentence number.
  */
-export function annotate(sentences, annotationChar) {
+export function annotate(sentences, annotationChar, excludeIndices) {
   return sentences
+    .map((sentence, i) => {
+      const id = i + 1;
+      if (excludeIndices && excludeIndices.has(id)) {
+        return '';
+      }
+      return `<|${annotationChar}${id}|><${sentence}><end||${annotationChar}>`;
+    })
+    .join('');
+}
+
+/**
+ * Annotates a chunk of indexed sentences with their global IDs.
+ */
+function annotateChunk(chunk, annotationChar) {
+  return chunk
     .map(
-      (sentence, i) =>
-        `<|${annotationChar}${i + 1}|><${sentence}><end||${annotationChar}>`,
+      ({ sentence, globalId }) =>
+        `<|${annotationChar}${globalId}|><${sentence}><end||${annotationChar}>`,
     )
     .join('');
 }
@@ -74,42 +47,71 @@ export function getOffsets(originalString, sentences) {
 }
 
 /**
- * Creates a Halloumi prompt from a given context, request and response.
- * @param context The context or document to reference.
- * @param response The response to the request.
- * @param request The request or question that was used to produce the response.
- * @returns The Halloumi prompt.
+ * Creates multiple HallOumi prompts by chunking context segments.
+ * Each chunk uses global segment IDs (s5, s42, ...) so no local-to-global
+ * mapping is needed when merging results.
+ *
+ * @returns {{ prompts: Array<{prompt, responseOffsets}> }}
  */
-export function createHalloumiPrompt({
-  sources,
-  response,
-  request,
-  maxContextSegments = 0,
+export function createChunkedHalloumiPrompts({
+  indexedContextSentences,
+  responseSentences,
+  responseOffsets,
+  request = 'Make one or more claims about information in the documents.',
+  excludeResponseIndices,
 }) {
-  const finalRequest = request || DEFAULT_HALLOUMI_REQUEST;
-  const contextSentences = sources.flatMap((text) =>
-    splitIntoSentences(text, maxContextSegments),
+  // Build response annotation (same for all chunks)
+  const annotatedResponseSentences = annotate(
+    responseSentences || [],
+    'r',
+    excludeResponseIndices,
   );
-  const joinedContext = sources.join('\n');
-  // const contextSentences = splitIntoSentences(sources, maxContextSegments);
-  const contextOffsets = getOffsets(joinedContext, contextSentences);
-
-  const annotatedContextSentences = annotate(contextSentences, 's');
-
-  const responseSentences = splitIntoSentences(response, maxContextSegments);
-  const responseOffsets = getOffsets(response, responseSentences);
-  const annotatedResponseSentences = annotate(responseSentences, 'r');
-
-  const annotatedContext = `<|context|>${annotatedContextSentences}<end||context>`;
-  const annotatedRequest = `<|request|><${finalRequest.trim()}><end||request>`;
+  const annotatedRequest = `<|request|><${request}><end||request>`;
   const annotatedResponse = `<|response|>${annotatedResponseSentences}<end||response>`;
 
-  const prompt = `${annotatedContext}${annotatedRequest}${annotatedResponse}`;
-  const halloumiPrompt = {
-    prompt,
-    contextOffsets, // used by convertGenerativesClaimToVerifyClaimResponse
-    responseOffsets,
-  };
+  // Group sentences by source
+  const sourceGroups = [];
+  let currentSourceId = null;
+  for (const s of indexedContextSentences) {
+    if (s.sourceId !== currentSourceId) {
+      sourceGroups.push([]);
+      currentSourceId = s.sourceId;
+    }
+    sourceGroups[sourceGroups.length - 1].push(s);
+  }
 
-  return halloumiPrompt;
+  // Pack whole sources into chunks (first-fit decreasing bin packing)
+  // Sort by size descending so large sources get placed first
+  const sorted = [...sourceGroups].sort((a, b) => b.length - a.length);
+  const chunks = [];
+  const chunkSizes = [];
+  for (const group of sorted) {
+    let placed = false;
+    for (let c = 0; c < chunks.length; c++) {
+      if (chunkSizes[c] + group.length <= MAX_CONTEXT_SEGMENTS_PER_CHUNK) {
+        chunks[c].push(...group);
+        chunkSizes[c] += group.length;
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      chunks.push([...group]);
+      chunkSizes.push(group.length);
+    }
+  }
+  if (chunks.length === 0) chunks.push([]);
+
+  // Build one prompt per chunk with global segment IDs
+  const prompts = chunks.map((chunk) => {
+    const annotatedContext = `<|context|>${annotateChunk(
+      chunk,
+      's',
+    )}<end||context>`;
+    const prompt = `${annotatedContext}${annotatedRequest}${annotatedResponse}`;
+
+    return { prompt, responseOffsets };
+  });
+
+  return { prompts };
 }

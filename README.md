@@ -3,16 +3,16 @@
 [![Releases](https://img.shields.io/github/v/release/eea/volto-eea-chatbot)](https://github.com/eea/volto-eea-chatbot/releases)
 
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-eea-chatbot%2Fmaster&subject=master)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-eea-chatbot/job/master/display/redirect)
-[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-master&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-master)
-[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-master&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-master)
-[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-master&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-master)
-[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-master&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-master)
+[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
+[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
+[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
+[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
 
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-eea-chatbot%2Fdevelop&subject=develop)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-eea-chatbot/job/develop/display/redirect)
-[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-develop&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-develop)
-[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-develop&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-develop)
-[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-develop&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-develop)
-[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot-develop&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot-develop)
+[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
+[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
+[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
+[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
 
 [Volto](https://github.com/plone/volto) add-on that integrates an AI-powered chatbot with a customizable interface and advanced settings to tailor its behavior and enhance user interactions.
 
@@ -67,6 +67,11 @@ make start
 
 Go to http://localhost:3000
 
+`make start` now defaults to Volto 18. To run the same setup against Volto 17, use:
+
+      VOLTO_VERSION=17 make
+      VOLTO_VERSION=17 make start
+
 ### Add volto-eea-chatbot to your Volto project
 
 1. Make sure you have a [Plone backend](https://plone.org/download) up-and-running at http://localhost:8080/Plone
@@ -89,20 +94,27 @@ Go to http://localhost:3000
   }
   ```
 
-- If not, create one:
+- If not, create one with Cookieplone, as recommended by the official Plone documentation for Volto 18+:
 
   ```
-  npm install -g yo @plone/generator-volto
-  yo @plone/volto my-volto-project --canary --addon @eeacms/volto-eea-chatbot
-  cd my-volto-project
+  uvx cookieplone project
+  cd project-title
   ```
 
-1. Install new add-ons and restart Volto:
+1. Install or update dependencies, then start the project:
 
    ```
-   yarn
-   yarn start
+   make install
    ```
+
+   For a Cookieplone project, start the backend and frontend in separate terminals:
+
+   ```
+   make backend-start
+   make frontend-start
+   ```
+
+   For a legacy Volto 17 project, install the package with `yarn` and restart the frontend as usual.
 
 ## Environment Configuration
 

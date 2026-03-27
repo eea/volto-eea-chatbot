@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { CustomToolRenderer } from '../packets/renderers/CustomToolRenderer';
 import { PacketType } from '../types/streamingModels';
 

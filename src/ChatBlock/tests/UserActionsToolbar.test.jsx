@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import renderer from 'react-test-renderer';
 import { render, fireEvent, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { Provider } from 'react-intl-redux';
 import UserActionsToolbar from '../components/UserActionsToolbar';
 

@@ -1,9 +1,12 @@
-import type { Message } from '../types/interfaces';
+import type { Message } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useChatStreaming } from './useChatStreaming';
-import { createChatSession, sendMessage } from '../services/streamingService';
-import { PacketType } from '../types/streamingModels';
-import { ResearchType } from '../types/interfaces';
+import {
+  createChatSession,
+  sendMessage,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import { ResearchType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 
 interface UseChatControllerProps {
   personaId: number;

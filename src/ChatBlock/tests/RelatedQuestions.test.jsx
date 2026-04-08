@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import RelatedQuestions from '../components/RelatedQuestions';
+import RelatedQuestions from '@eeacms/volto-eea-chatbot/ChatBlock/components/RelatedQuestions';
 
 import { trackEvent } from '@eeacms/volto-matomo/utils';
 

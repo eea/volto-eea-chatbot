@@ -1,6 +1,9 @@
-import type { Packet } from '../types/streamingModels';
-import type { RendererResult, Message } from '../types/interfaces';
-import { PacketType } from '../types/streamingModels';
+import type { Packet } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type {
+  RendererResult,
+  Message,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 import {
   MessageTextRenderer,
   SearchToolRenderer,

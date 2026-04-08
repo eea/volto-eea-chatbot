@@ -1,8 +1,8 @@
-import type { Message } from '../types/interfaces';
-import type { SendMessageParams } from '../services/streamingService';
+import type { Message } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
+import type { SendMessageParams } from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
 import { useState, useCallback, useRef } from 'react';
-import { sendMessage } from '../services/streamingService';
-import { MessageProcessor } from '../services/messageProcessor';
+import { sendMessage } from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
+import { MessageProcessor } from '@eeacms/volto-eea-chatbot/ChatBlock/services/messageProcessor';
 
 interface UseChatStreamingProps {
   onMessageUpdate?: (message: Message, processor: MessageProcessor) => void;

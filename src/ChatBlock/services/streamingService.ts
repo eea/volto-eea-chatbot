@@ -1,5 +1,11 @@
-import { PacketType, type Packet } from '../types/streamingModels';
-import type { FileDescriptor, Filters } from '../types/interfaces';
+import {
+  PacketType,
+  type Packet,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type {
+  FileDescriptor,
+  Filters,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 
 export interface SendMessageParams {
   regenerate: boolean;

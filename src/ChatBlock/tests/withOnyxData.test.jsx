@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import withOnyxData from '../hocs/withOnyxData';
+import withOnyxData from '@eeacms/volto-eea-chatbot/ChatBlock/hocs/withOnyxData';
 
 describe('withOnyxData', () => {
   it('shows loader initially', () => {

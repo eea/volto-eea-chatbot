@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import '@testing-library/jest-dom';
-import Spinner from '../components/Spinner';
+import Spinner from '@eeacms/volto-eea-chatbot/ChatBlock/components/Spinner';
 
 describe('Spinner', () => {
   it('renders correctly', () => {

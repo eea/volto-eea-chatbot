@@ -1,7 +1,8 @@
 import React from 'react';
 import { compose } from 'redux';
 import superagent from 'superagent';
-import { BlockDataForm, SidebarPortal } from '@plone/volto/components';
+import SidebarPortal from '@plone/volto/components/manage/Sidebar/SidebarPortal';
+import BlockDataForm from '@plone/volto/components/manage/Form/BlockDataForm';
 
 import ChatBlockView from './ChatBlockView';
 import { ChatBlockSchema } from './schema';

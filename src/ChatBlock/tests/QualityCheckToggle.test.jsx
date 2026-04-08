@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import QualityCheckToggle from '../components/QualityCheckToggle';
+import QualityCheckToggle from '@eeacms/volto-eea-chatbot/ChatBlock/components/QualityCheckToggle';
 
 describe('QualityCheckToggle', () => {
   const mockSetEnabled = jest.fn();

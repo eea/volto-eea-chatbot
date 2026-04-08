@@ -4,7 +4,7 @@ import renderer from 'react-test-renderer';
 
 import '@testing-library/jest-dom';
 import { Provider } from 'react-intl-redux';
-import SourceDetails from '../components/Source';
+import SourceDetails from '@eeacms/volto-eea-chatbot/ChatBlock/components/Source';
 
 const mockStore = configureStore();
 

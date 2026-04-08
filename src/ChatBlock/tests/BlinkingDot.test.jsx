@@ -4,7 +4,7 @@ import renderer from 'react-test-renderer';
 
 import '@testing-library/jest-dom';
 import { Provider } from 'react-intl-redux';
-import { BlinkingDot } from '../components/BlinkingDot';
+import { BlinkingDot } from '@eeacms/volto-eea-chatbot/ChatBlock/components/BlinkingDot';
 
 const mockStore = configureStore();
 

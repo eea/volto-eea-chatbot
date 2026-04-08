@@ -1,11 +1,11 @@
 import { Modal, ModalContent, ModalHeader } from 'semantic-ui-react';
 import cx from 'classnames';
-import { convertToPercentage } from '../../utils';
-import SVGIcon from '../Icon';
+import { convertToPercentage } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
+import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import { getSupportedBgColor } from './colors';
 import { ClaimSegments } from './ClaimSegments';
 
-import BotIcon from '../../../icons/bot.svg';
+import BotIcon from '@eeacms/volto-eea-chatbot/icons/bot.svg';
 
 const stripHtml = (html) => {
   const tmp = document.createElement('div');

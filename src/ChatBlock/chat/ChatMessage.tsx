@@ -1,5 +1,5 @@
 import { Message as SemanticMessage } from 'semantic-ui-react';
-import type { ChatMessageProps } from '../types/interfaces';
+import type { ChatMessageProps } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { UserMessage, AIMessage } from '.';
 
 export function ChatMessage(props: ChatMessageProps) {

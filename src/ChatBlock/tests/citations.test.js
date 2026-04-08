@@ -1,4 +1,4 @@
-import { addCitations } from '../utils/citations';
+import { addCitations } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/citations';
 
 describe('addCitations', () => {
   it('transforms single citation marker into markdown link', () => {

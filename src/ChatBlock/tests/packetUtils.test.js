@@ -3,8 +3,8 @@ import {
   isToolPacket,
   isDisplayPacket,
   isFinalAnswerComplete,
-} from '../services/packetUtils';
-import { PacketType } from '../types/streamingModels';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/services/packetUtils';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 describe('packetUtils', () => {
   describe('getSynteticPacket', () => {

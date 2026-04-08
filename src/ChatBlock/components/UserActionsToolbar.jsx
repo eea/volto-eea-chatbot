@@ -1,11 +1,11 @@
 import cx from 'classnames';
 import { Button } from 'semantic-ui-react';
-import { useCopyToClipboard } from '../utils';
+import { useCopyToClipboard } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 import SVGIcon from './Icon';
 import ChatMessageFeedback from './ChatMessageFeedback';
 
-import CopyIcon from '../../icons/copy.svg';
-import CheckIcon from '../../icons/check.svg';
+import CopyIcon from '@eeacms/volto-eea-chatbot/icons/copy.svg';
+import CheckIcon from '@eeacms/volto-eea-chatbot/icons/check.svg';
 
 const UserActionsToolbar = ({
   className,

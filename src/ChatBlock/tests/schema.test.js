@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { ChatBlockSchema } from '../schema';
+import { ChatBlockSchema } from '@eeacms/volto-eea-chatbot/ChatBlock/schema';
 
 describe('ChatBlockSchema', () => {
   const mockAssistants = [

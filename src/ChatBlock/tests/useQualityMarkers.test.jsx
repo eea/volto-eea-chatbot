@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 
-import { useQualityMarkers } from '../hooks/useQualityMarkers';
+import { useQualityMarkers } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useQualityMarkers';
 
 // Mock loadable before importing the hook
 jest.mock('@loadable/component', () => {

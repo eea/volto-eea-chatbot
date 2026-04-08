@@ -1,10 +1,10 @@
 import React from 'react';
 import { Tab, TabPane } from 'semantic-ui-react';
-import SVGIcon from '../Icon';
+import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import { RenderClaimView } from './RenderClaimView';
-import LinkIcon from '../../../icons/external-link.svg';
-import FileIcon from '../../../icons/file.svg';
-import GlobeIcon from '../../../icons/globe.svg';
+import LinkIcon from '@eeacms/volto-eea-chatbot/icons/external-link.svg';
+import FileIcon from '@eeacms/volto-eea-chatbot/icons/file.svg';
+import GlobeIcon from '@eeacms/volto-eea-chatbot/icons/globe.svg';
 
 const VISIBLE_SEGMENTS = 50; // Number of citations to show by default
 

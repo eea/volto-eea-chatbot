@@ -6,8 +6,8 @@ import Spinner from './Spinner';
 import SVGIcon from './Icon';
 import { getSupportedBgColor } from './markdown/colors';
 
-import GlassesIcon from '../../icons/glasses.svg';
-import RotateIcon from '../../icons/rotate.svg';
+import GlassesIcon from '@eeacms/volto-eea-chatbot/icons/glasses.svg';
+import RotateIcon from '@eeacms/volto-eea-chatbot/icons/rotate.svg';
 
 const VERIFY_CLAIM_MESSAGES = [
   'Going through each claim and verify against the referenced documents...',

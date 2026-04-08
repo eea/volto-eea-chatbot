@@ -1,8 +1,8 @@
-import type { ChatMessageProps } from '../types/interfaces';
+import type { ChatMessageProps } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import loadable from '@loadable/component';
-import SVGIcon from '../components/Icon';
-import { components } from '../components/markdown';
-import UserIcon from '../../icons/user.svg';
+import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
+import { components } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown';
+import UserIcon from '@eeacms/volto-eea-chatbot/icons/user.svg';
 
 const Markdown: any = loadable(() => import('react-markdown'));
 

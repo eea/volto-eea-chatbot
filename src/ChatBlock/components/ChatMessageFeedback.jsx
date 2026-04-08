@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button, Icon } from 'semantic-ui-react';
 import FeedbackModal from './FeedbackModal';
 import SVGIcon from './Icon';
-import ThumbsUpIcon from '../../icons/thumbs-up.svg';
-import ThumbsDownIcon from '../../icons/thumbs-down.svg';
+import ThumbsUpIcon from '@eeacms/volto-eea-chatbot/icons/thumbs-up.svg';
+import ThumbsDownIcon from '@eeacms/volto-eea-chatbot/icons/thumbs-down.svg';
 
 const Toast = ({ message, type, isActive }) => (
   <div className={`feedback-toast ${type} ${isActive ? 'active' : ''}`}>

@@ -3,9 +3,9 @@ import type {
   ImageGenerationToolPacket,
   ImageGenerationToolDelta,
   GeneratedImage,
-} from '../../types/streamingModels';
-import type { MessageRenderer } from '../../types/interfaces';
-import { PacketType } from '../../types/streamingModels';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type { MessageRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 export const ImageToolRenderer: MessageRenderer<ImageGenerationToolPacket> = ({
   packets,

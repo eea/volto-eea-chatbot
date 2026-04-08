@@ -1,6 +1,6 @@
 import renderer from 'react-test-renderer';
 import '@testing-library/jest-dom';
-import { ClaimSegments } from '../components/markdown/ClaimSegments';
+import { ClaimSegments } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimSegments';
 
 // Mock semantic-ui-react
 jest.mock('semantic-ui-react', () => ({
@@ -30,11 +30,14 @@ jest.mock('semantic-ui-react', () => ({
 }));
 
 // Mock RenderClaimView
-jest.mock('../components/markdown/RenderClaimView', () => ({
-  RenderClaimView: () => (
-    <div data-testid="render-claim-view">RenderClaimView</div>
-  ),
-}));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/RenderClaimView',
+  () => ({
+    RenderClaimView: () => (
+      <div data-testid="render-claim-view">RenderClaimView</div>
+    ),
+  }),
+);
 
 describe('ClaimSegments', () => {
   const defaultProps = {

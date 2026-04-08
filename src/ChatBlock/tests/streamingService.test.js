@@ -6,8 +6,8 @@ import {
   createChatSession,
   submitFeedback,
   regenerateMessage,
-} from '../services/streamingService';
-import { PacketType } from '../types/streamingModels';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
@@ -277,7 +277,9 @@ describe('submitFeedback', () => {
 // ── sendMessage ──────────────────────────────────────────────────────
 
 describe('sendMessage', () => {
-  const { sendMessage } = require('../services/streamingService');
+  const {
+    sendMessage,
+  } = require('@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService');
 
   beforeEach(() => {
     global.fetch = jest.fn();

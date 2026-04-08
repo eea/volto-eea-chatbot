@@ -2,7 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { render, fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { WebResultIcon } from '../components/WebResultIcon';
+import { WebResultIcon } from '@eeacms/volto-eea-chatbot/ChatBlock/components/WebResultIcon';
 
 describe('WebResultIcon', () => {
   it('renders favicon for valid URL', () => {

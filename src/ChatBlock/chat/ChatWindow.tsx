@@ -5,21 +5,21 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import type { Persona } from '../types/interfaces';
+import type { Persona } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { Button, Form, Segment, Checkbox } from 'semantic-ui-react';
 import { injectLazyLibs } from '@plone/volto/helpers/Loadable';
 import { trackEvent } from '@eeacms/volto-matomo/utils';
 
 import { ChatMessage } from '.';
-import { PacketType } from '../types/streamingModels';
-import AutoResizeTextarea from '../components/AutoResizeTextarea';
-import QualityCheckToggle from '../components/QualityCheckToggle';
-import EmptyState from '../components/EmptyState';
-import { useChatController } from '../hooks';
-import SVGIcon from '../components/Icon';
-import PenIcon from '../../icons/square-pen.svg';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import AutoResizeTextarea from '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea';
+import QualityCheckToggle from '@eeacms/volto-eea-chatbot/ChatBlock/components/QualityCheckToggle';
+import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState';
+import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
+import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
+import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
 
-import '../style.less';
+import '@eeacms/volto-eea-chatbot/ChatBlock/style.less';
 
 interface ChatWindowProps {
   block_id?: string;
@@ -182,9 +182,8 @@ function ChatWindow({
               style={{ maxHeight: height }}
             >
               {messages.map((message, index) => (
-                <React.Fragment>
+                <React.Fragment key={message.messageId}>
                   <ChatMessage
-                    key={message.messageId}
                     prevMessage={messages[index - 1]}
                     message={message}
                     isLoading={isStreaming}

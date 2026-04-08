@@ -1,7 +1,10 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { findRenderer, RendererComponent } from '../packets/RendererComponent';
-import { PacketType } from '../types/streamingModels';
+import {
+  findRenderer,
+  RendererComponent,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/packets/RendererComponent';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 // Mock loadable
 jest.mock('@loadable/component', () => {

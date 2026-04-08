@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { MessageTextRenderer } from '../packets/renderers/MessageTextRenderer';
-import { PacketType } from '../types/streamingModels';
+import { MessageTextRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/MessageTextRenderer';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 // Mock AudioContext
 const mockClose = jest.fn();

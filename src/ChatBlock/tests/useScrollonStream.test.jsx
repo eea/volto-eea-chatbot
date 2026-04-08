@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { useScrollonStream } from '../hooks/useScrollonStream';
+import { useScrollonStream } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useScrollonStream';
 
 describe('useScrollonStream', () => {
   let addEventListenerSpy;

@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import FeedbackModal from '../components/FeedbackModal';
-import * as lib from '../utils';
+import FeedbackModal from '@eeacms/volto-eea-chatbot/ChatBlock/components/FeedbackModal';
+import * as lib from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 
-jest.mock('../utils');
+jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/utils');
 
 beforeEach(() => {
   jest.clearAllMocks();

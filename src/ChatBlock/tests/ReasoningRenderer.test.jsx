@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { ReasoningRenderer } from '../packets/renderers/ReasoningRenderer';
-import { PacketType } from '../types/streamingModels';
+import { ReasoningRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/ReasoningRenderer';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 jest.mock('@loadable/component', () => {
   const loadable = () => {

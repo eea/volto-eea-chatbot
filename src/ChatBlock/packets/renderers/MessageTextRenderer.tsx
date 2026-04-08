@@ -1,11 +1,11 @@
-import type { ChatPacket } from '../../types/streamingModels';
-import type { MessageRenderer } from '../../types/interfaces';
+import type { ChatPacket } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type { MessageRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { useEffect, useMemo, useState } from 'react';
 import loadable from '@loadable/component';
-import { components } from '../../components/markdown';
-import { isFinalAnswerComplete } from '../../services/packetUtils';
-import { PacketType } from '../../types/streamingModels';
-import { BlinkingDot } from '../../components/BlinkingDot';
+import { components } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown';
+import { isFinalAnswerComplete } from '@eeacms/volto-eea-chatbot/ChatBlock/services/packetUtils';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import { BlinkingDot } from '@eeacms/volto-eea-chatbot/ChatBlock/components/BlinkingDot';
 
 const Markdown: any = loadable(() => import('react-markdown'));
 
@@ -104,8 +104,8 @@ export const MessageTextRenderer: MessageRenderer<ChatPacket> = ({
       const resetCount = isStreamFinished
         ? packets.length // Show all if stream is finished
         : packets.length > 0
-        ? 1
-        : 0;
+          ? 1
+          : 0;
       setDisplayedPacketCount(resetCount);
     }
   }, [animate, packets.length, displayedPacketCount, isStreamFinished]);

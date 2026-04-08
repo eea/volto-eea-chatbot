@@ -4,17 +4,17 @@ import type {
   SearchToolDelta,
   SectionEnd,
   OnyxDocument,
-} from '../../types/streamingModels';
-import type { MessageRenderer } from '../../types/interfaces';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type { MessageRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { PacketType } from '../../types/streamingModels';
-import { SourceChip } from '../../components/SourceChip';
-import { BlinkingDot } from '../../components/BlinkingDot';
-import SVGIcon from '../../components/Icon';
-import { WebResultIcon } from '../../components/WebResultIcon';
-import SearchIcon from '../../../icons/search.svg';
-import GlobeIcon from '../../../icons/globe.svg';
-import FileIcon from '../../../icons/file.svg';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import { SourceChip } from '@eeacms/volto-eea-chatbot/ChatBlock/components/SourceChip';
+import { BlinkingDot } from '@eeacms/volto-eea-chatbot/ChatBlock/components/BlinkingDot';
+import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
+import { WebResultIcon } from '@eeacms/volto-eea-chatbot/ChatBlock/components/WebResultIcon';
+import SearchIcon from '@eeacms/volto-eea-chatbot/icons/search.svg';
+import GlobeIcon from '@eeacms/volto-eea-chatbot/icons/globe.svg';
+import FileIcon from '@eeacms/volto-eea-chatbot/icons/file.svg';
 
 const INITIAL_RESULTS_TO_SHOW = 3;
 const RESULTS_PER_EXPANSION = 10;

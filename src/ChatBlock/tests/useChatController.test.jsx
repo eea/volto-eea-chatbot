@@ -1,18 +1,21 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { PacketType } from '../types/streamingModels';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
-import { useChatController } from '../hooks/useChatController';
-import { createChatSession } from '../services/streamingService';
+import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useChatController';
+import { createChatSession } from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
 
 // Mock the streaming service with configurable sendMessage behavior
 const mockSendMessage = jest.fn(async function* () {
   yield [];
 });
 
-jest.mock('../services/streamingService', () => ({
-  sendMessage: (...args) => mockSendMessage(...args),
-  createChatSession: jest.fn().mockResolvedValue('session-123'),
-}));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService',
+  () => ({
+    sendMessage: (...args) => mockSendMessage(...args),
+    createChatSession: jest.fn().mockResolvedValue('session-123'),
+  }),
+);
 
 describe('useChatController', () => {
   afterEach(() => {

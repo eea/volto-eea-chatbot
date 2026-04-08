@@ -1,8 +1,8 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import '@testing-library/jest-dom';
-import { SearchToolRenderer } from '../packets/renderers/SearchToolRenderer';
-import { PacketType } from '../types/streamingModels';
+import { SearchToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/SearchToolRenderer';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 describe('SearchToolRenderer', () => {
   beforeEach(() => {

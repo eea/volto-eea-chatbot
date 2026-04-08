@@ -8,7 +8,7 @@ import {
   useCopyToClipboard,
   convertToPercentage,
   createChatMessageFeedback,
-} from '../utils';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 
 describe('utils', () => {
   describe('EMAIL_REGEX', () => {

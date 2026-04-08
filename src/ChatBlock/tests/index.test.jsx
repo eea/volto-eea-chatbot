@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import installChatBlock from '../index';
+import installChatBlock from '@eeacms/volto-eea-chatbot/ChatBlock/index';
 
 // Mock @plone/volto/components
 jest.mock('@plone/volto/components', () => ({
@@ -8,8 +8,12 @@ jest.mock('@plone/volto/components', () => ({
 }));
 
 // Mock other dependencies
-jest.mock('../ChatBlockView', () => () => <div>ChatBlockView</div>);
-jest.mock('../ChatBlockEdit', () => () => <div>ChatBlockEdit</div>);
+jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView', () => () => (
+  <div>ChatBlockView</div>
+));
+jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockEdit', () => () => (
+  <div>ChatBlockEdit</div>
+));
 
 describe('ChatBlock installation', () => {
   let mockConfig;

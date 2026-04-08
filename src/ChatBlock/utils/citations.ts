@@ -1,4 +1,4 @@
-import type { Message } from '../types/interfaces';
+import type { Message } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 
 /**
  * Regex to match citation markers like [1], [2], etc.

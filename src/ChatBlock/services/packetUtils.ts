@@ -1,5 +1,5 @@
-import type { Packet } from '../types/streamingModels';
-import { PacketType } from '../types/streamingModels';
+import type { Packet } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 export function getSynteticPacket(ind: number, type: PacketType): Packet {
   return {

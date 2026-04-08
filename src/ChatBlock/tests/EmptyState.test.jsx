@@ -4,7 +4,7 @@ import renderer from 'react-test-renderer';
 
 import '@testing-library/jest-dom';
 import { Provider } from 'react-intl-redux';
-import EmptyState from '../components/EmptyState';
+import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState';
 
 const mockStore = configureStore();
 

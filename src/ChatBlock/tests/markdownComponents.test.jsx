@@ -3,15 +3,21 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { components } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown';
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimModal', () => ({
-  ClaimModal: ({ text }) => <span data-testid="claim-modal">{text}</span>,
-}));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimModal',
+  () => ({
+    ClaimModal: ({ text }) => <span data-testid="claim-modal">{text}</span>,
+  }),
+);
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/Citation', () => ({
-  Citation: ({ value, children }) => (
-    <span data-testid="citation">{value || children}</span>
-  ),
-}));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/Citation',
+  () => ({
+    Citation: ({ value, children }) => (
+      <span data-testid="citation">{value || children}</span>
+    ),
+  }),
+);
 
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/utils', () => ({
   transformEmailsToLinks: (text) => [text],
@@ -39,7 +45,11 @@ describe('markdown components()', () => {
           <tbody />
         </TableComp>,
       );
-      expect(container.querySelector('table')).toHaveClass('ui', 'celled', 'table');
+      expect(container.querySelector('table')).toHaveClass(
+        'ui',
+        'celled',
+        'table',
+      );
     });
   });
 
@@ -137,9 +147,7 @@ describe('markdown components()', () => {
 
     it('renders ClaimModal when text overlaps a claim', () => {
       const markers = {
-        claims: [
-          { score: 0.9, startOffset: 5, endOffset: 15 },
-        ],
+        claims: [{ score: 0.9, startOffset: 5, endOffset: 15 }],
       };
       const compsWithMarkers = components(mockMessage, markers, []);
       const Span = compsWithMarkers.span;
@@ -152,8 +160,14 @@ describe('markdown components()', () => {
           },
         ],
       };
-      const { container } = render(<span><Span node={node}>Hello World!!!</Span></span>);
-      expect(container.querySelector('[data-testid="claim-modal"]')).toBeInTheDocument();
+      const { container } = render(
+        <span>
+          <Span node={node}>Hello World!!!</Span>
+        </span>,
+      );
+      expect(
+        container.querySelector('[data-testid="claim-modal"]'),
+      ).toBeInTheDocument();
     });
 
     it('skips claims with null score', () => {
@@ -171,7 +185,11 @@ describe('markdown components()', () => {
           },
         ],
       };
-      render(<span><Span node={node}>no claim</Span></span>);
+      render(
+        <span>
+          <Span node={node}>no claim</Span>
+        </span>,
+      );
       expect(screen.queryByTestId('claim-modal')).not.toBeInTheDocument();
     });
   });

@@ -230,7 +230,11 @@ describe('MessageTextRenderer', () => {
     const packets = [
       {
         ind: 1,
-        obj: { type: PacketType.MESSAGE_START, content: 'A', final_documents: null },
+        obj: {
+          type: PacketType.MESSAGE_START,
+          content: 'A',
+          final_documents: null,
+        },
       },
       { ind: 2, obj: { type: PacketType.MESSAGE_DELTA, content: 'B' } },
     ];
@@ -260,7 +264,11 @@ describe('MessageTextRenderer', () => {
     const packets = [
       {
         ind: 1,
-        obj: { type: PacketType.MESSAGE_START, content: 'Hello', final_documents: null },
+        obj: {
+          type: PacketType.MESSAGE_START,
+          content: 'Hello',
+          final_documents: null,
+        },
       },
       { ind: 2, obj: { type: PacketType.MESSAGE_DELTA, content: ' world' } },
       { ind: 3, obj: { type: PacketType.MESSAGE_END } },
@@ -296,7 +304,11 @@ describe('MessageTextRenderer', () => {
     const packets = [
       {
         ind: 1,
-        obj: { type: PacketType.MESSAGE_START, content: 'Hi', final_documents: null },
+        obj: {
+          type: PacketType.MESSAGE_START,
+          content: 'Hi',
+          final_documents: null,
+        },
       },
       { ind: 2, obj: { type: PacketType.STOP } },
     ];
@@ -341,7 +353,11 @@ describe('MessageTextRenderer', () => {
     const packets = [
       {
         ind: 1,
-        obj: { type: PacketType.MESSAGE_START, content: 'test', final_documents: null },
+        obj: {
+          type: PacketType.MESSAGE_START,
+          content: 'test',
+          final_documents: null,
+        },
       },
       { ind: 2, obj: { type: PacketType.STOP } },
     ];

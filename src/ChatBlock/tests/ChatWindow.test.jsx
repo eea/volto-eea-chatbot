@@ -2,9 +2,15 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+// Import the unwrapped ChatWindow (before injectLazyLibs wraps it)
+// We need to import it through the module that injectLazyLibs passes through
+import ChatWindowWrapped from '@eeacms/volto-eea-chatbot/ChatBlock/chat/ChatWindow';
+import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
+
 jest.mock('@plone/volto/helpers/Loadable', () => ({
-  injectLazyLibs: (libs) => (Component) => (props) =>
-    <Component {...props} rehypePrism={null} remarkGfm={null} />,
+  injectLazyLibs: (libs) => (Component) => (props) => (
+    <Component {...props} rehypePrism={null} remarkGfm={null} />
+  ),
 }));
 
 jest.mock('@eeacms/volto-matomo/utils', () => ({
@@ -24,12 +30,15 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hooks', () => ({
   })),
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea', () => ({
-  __esModule: true,
-  default: ({ placeholder }) => (
-    <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
-  ),
-}));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea',
+  () => ({
+    __esModule: true,
+    default: ({ placeholder }) => (
+      <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
+    ),
+  }),
+);
 
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState', () => ({
   __esModule: true,
@@ -40,30 +49,32 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState', () => ({
   ),
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/QualityCheckToggle', () => ({
-  __esModule: true,
-  default: ({ enabled }) => (
-    <div data-testid="quality-check-toggle" data-enabled={String(enabled)} />
-  ),
-}));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/components/QualityCheckToggle',
+  () => ({
+    __esModule: true,
+    default: ({ enabled }) => (
+      <div data-testid="quality-check-toggle" data-enabled={String(enabled)} />
+    ),
+  }),
+);
 
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
   __esModule: true,
   default: () => <span data-testid="svg-icon" />,
 }));
 
-jest.mock('.', () => ({
-  ChatMessage: () => <div data-testid="chat-message" />,
-}), { virtual: true });
+jest.mock(
+  '.',
+  () => ({
+    ChatMessage: () => <div data-testid="chat-message" />,
+  }),
+  { virtual: true },
+);
 
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
   ChatMessage: () => <div data-testid="chat-message" />,
 }));
-
-// Import the unwrapped ChatWindow (before injectLazyLibs wraps it)
-// We need to import it through the module that injectLazyLibs passes through
-import ChatWindowWrapped from '@eeacms/volto-eea-chatbot/ChatBlock/chat/ChatWindow';
-import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 
 const mockPersona = {
   id: 1,
@@ -139,13 +150,10 @@ describe('ChatWindow', () => {
   });
 
   it('does not render quality check toggle when qualityCheck is disabled', () => {
-    render(
-      <ChatWindowWrapped
-        persona={mockPersona}
-        qualityCheck="disabled"
-      />,
-    );
-    expect(screen.queryByTestId('quality-check-toggle')).not.toBeInTheDocument();
+    render(<ChatWindowWrapped persona={mockPersona} qualityCheck="disabled" />);
+    expect(
+      screen.queryByTestId('quality-check-toggle'),
+    ).not.toBeInTheDocument();
   });
 
   it('shows deep research label when deepResearch is always_on', () => {

@@ -1,4 +1,3 @@
-jest.mock('node-fetch');
 import fetch from 'node-fetch';
 
 import {
@@ -7,6 +6,7 @@ import {
   excludeClaimSentences,
   excludeContextSentences,
 } from './filtering';
+jest.mock('node-fetch');
 
 describe('parseExcludeIndices', () => {
   it('parses single indices', () => {
@@ -168,7 +168,8 @@ describe('excludeClaimSentences', () => {
 
   it('passes ip option to LLM call', async () => {
     fetch.mockResolvedValue({
-      json: () => Promise.resolve({ choices: [{ message: { content: 'NONE' } }] }),
+      json: () =>
+        Promise.resolve({ choices: [{ message: { content: 'NONE' } }] }),
     });
 
     await excludeClaimSentences(['test sentence'], { ip: '10.0.0.1' });

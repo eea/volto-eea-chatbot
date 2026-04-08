@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+import ChatBlockView from '@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView';
+
 // Mock withOnyxData to transparently pass props through
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hocs/withOnyxData', () => {
   return (_callback) => (Component) => Component;
@@ -23,8 +25,6 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
     </div>
   ),
 }));
-
-import ChatBlockView from '@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView';
 
 describe('ChatBlockView', () => {
   const defaultProps = {

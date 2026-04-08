@@ -13,10 +13,7 @@ jest.mock('superagent', () => ({
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView', () => ({
   __esModule: true,
   default: ({ isEditMode }) => (
-    <div
-      data-testid="chat-block-view"
-      data-edit-mode={String(isEditMode)}
-    >
+    <div data-testid="chat-block-view" data-edit-mode={String(isEditMode)}>
       ChatBlockView
     </div>
   ),
@@ -30,9 +27,7 @@ jest.mock('@plone/volto/components/manage/Sidebar/SidebarPortal', () => ({
 
 jest.mock('@plone/volto/components/manage/Form/BlockDataForm', () => ({
   __esModule: true,
-  default: ({ title }) => (
-    <div data-testid="block-data-form">{title}</div>
-  ),
+  default: ({ title }) => <div data-testid="block-data-form">{title}</div>,
 }));
 
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/schema', () => ({

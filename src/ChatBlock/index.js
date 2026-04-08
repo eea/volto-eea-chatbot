@@ -28,5 +28,13 @@ export default function installChatBlock(config) {
     },
     variations: [],
   };
+
+  if (!config.blocks.blocksConfig.danswerChat) {
+    config.blocks.blocksConfig.danswerChat = {
+      ...config.blocks.blocksConfig.eeaChatbot,
+      id: 'danswerChat',
+    };
+  }
+
   return config;
 }

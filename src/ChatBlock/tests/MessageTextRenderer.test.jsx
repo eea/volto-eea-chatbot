@@ -224,4 +224,144 @@ describe('MessageTextRenderer', () => {
     });
     expect(component.toJSON()).toMatchSnapshot();
   });
+
+  it('starts animation with 1 packet initially when animate=true', () => {
+    jest.useFakeTimers();
+    const packets = [
+      {
+        ind: 1,
+        obj: { type: PacketType.MESSAGE_START, content: 'A', final_documents: null },
+      },
+      { ind: 2, obj: { type: PacketType.MESSAGE_DELTA, content: 'B' } },
+    ];
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MessageTextRenderer
+          packets={packets}
+          onComplete={jest.fn()}
+          animate={true}
+          stopPacketSeen={false}
+          message={{ ...defaultMessage, message: 'AB' }}
+          libs={defaultLibs}
+        >
+          {mockChildRenderer}
+        </MessageTextRenderer>,
+      );
+    });
+    expect(component.toJSON()).toMatchSnapshot();
+    jest.useRealTimers();
+  });
+
+  it('animates through packets with timer ticks', () => {
+    jest.useFakeTimers();
+    const onComplete = jest.fn();
+    const packets = [
+      {
+        ind: 1,
+        obj: { type: PacketType.MESSAGE_START, content: 'Hello', final_documents: null },
+      },
+      { ind: 2, obj: { type: PacketType.MESSAGE_DELTA, content: ' world' } },
+      { ind: 3, obj: { type: PacketType.MESSAGE_END } },
+      { ind: 4, obj: { type: PacketType.STOP } },
+    ];
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MessageTextRenderer
+          packets={packets}
+          onComplete={onComplete}
+          animate={true}
+          stopPacketSeen={true}
+          message={{ ...defaultMessage, message: 'Hello world' }}
+          libs={defaultLibs}
+        >
+          {mockChildRenderer}
+        </MessageTextRenderer>,
+      );
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+
+    expect(component.toJSON()).toMatchSnapshot();
+    jest.useRealTimers();
+  });
+
+  it('resets packet count when packets array shrinks', () => {
+    jest.useFakeTimers();
+    const packets = [
+      {
+        ind: 1,
+        obj: { type: PacketType.MESSAGE_START, content: 'Hi', final_documents: null },
+      },
+      { ind: 2, obj: { type: PacketType.STOP } },
+    ];
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MessageTextRenderer
+          packets={packets}
+          onComplete={jest.fn()}
+          animate={true}
+          stopPacketSeen={true}
+          message={{ ...defaultMessage, message: 'Hi' }}
+          libs={defaultLibs}
+        >
+          {mockChildRenderer}
+        </MessageTextRenderer>,
+      );
+    });
+
+    // Simulate fewer packets (new message reset)
+    act(() => {
+      component.update(
+        <MessageTextRenderer
+          packets={[]}
+          onComplete={jest.fn()}
+          animate={true}
+          stopPacketSeen={false}
+          message={{ ...defaultMessage, message: '' }}
+          libs={defaultLibs}
+        >
+          {mockChildRenderer}
+        </MessageTextRenderer>,
+      );
+    });
+
+    expect(component.toJSON()).toMatchSnapshot();
+    jest.useRealTimers();
+  });
+
+  it('renders with addQualityMarkersPlugin prop', () => {
+    const packets = [
+      {
+        ind: 1,
+        obj: { type: PacketType.MESSAGE_START, content: 'test', final_documents: null },
+      },
+      { ind: 2, obj: { type: PacketType.STOP } },
+    ];
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MessageTextRenderer
+          packets={packets}
+          onComplete={jest.fn()}
+          animate={false}
+          stopPacketSeen={true}
+          message={defaultMessage}
+          libs={defaultLibs}
+          addQualityMarkersPlugin={() => {}}
+        >
+          {mockChildRenderer}
+        </MessageTextRenderer>,
+      );
+    });
+    expect(component.toJSON()).toMatchSnapshot();
+  });
 });

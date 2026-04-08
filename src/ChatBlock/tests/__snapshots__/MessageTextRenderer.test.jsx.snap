@@ -1,5 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`MessageTextRenderer animates through packets with timer ticks 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div
+      className="message-text-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        Hello world
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`MessageTextRenderer renders blinking dot when no content and no packets 1`] = `
 <div
   data-testid="renderer-result"
@@ -18,6 +41,29 @@ exports[`MessageTextRenderer renders blinking dot when no content and no packets
 `;
 
 exports[`MessageTextRenderer renders message content without animation 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div
+      className="message-text-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        Hello world
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MessageTextRenderer renders with addQualityMarkersPlugin prop 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -86,6 +132,23 @@ exports[`MessageTextRenderer renders with remarkGfm plugin when available 1`] = 
 </div>
 `;
 
+exports[`MessageTextRenderer resets packet count when packets array shrinks 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <span
+      className="blinking-dot with-margin"
+    />
+  </div>
+</div>
+`;
+
 exports[`MessageTextRenderer shows cursor when stream is not complete 1`] = `
 <div
   data-testid="renderer-result"
@@ -103,6 +166,29 @@ exports[`MessageTextRenderer shows cursor when stream is not complete 1`] = `
         data-testid="markdown"
       >
         Starting... ▊
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MessageTextRenderer starts animation with 1 packet initially when animate=true 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div
+      className="message-text-content"
+    >
+      <div
+        data-testid="markdown"
+      >
+        A ▊
       </div>
     </div>
   </div>

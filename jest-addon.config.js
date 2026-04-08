@@ -423,6 +423,7 @@ module.exports = {
     'schema\\.[jt]s?$',
     'index\\.[jt]s?$',
     'config\\.[jt]sx?$',
+    '/types/',
   ],
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',

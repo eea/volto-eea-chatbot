@@ -55,11 +55,6 @@ describe('markdown components()', () => {
 
   // ── td ────────────────────────────────────────────────
   describe('td', () => {
-    const TdComp = () => {
-      const Td = components(mockMessage, null, []).td;
-      return Td;
-    };
-
     it('renders td with plain text children unchanged', () => {
       const Td = comps.td;
       const { container } = render(

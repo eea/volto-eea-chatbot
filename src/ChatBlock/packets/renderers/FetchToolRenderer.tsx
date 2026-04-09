@@ -1,10 +1,10 @@
 import type {
   FetchToolPacket,
   FetchToolStart,
-} from '../../types/streamingModels';
-import type { MessageRenderer } from '../../types/interfaces';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type { MessageRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { useEffect } from 'react';
-import { PacketType } from '../../types/streamingModels';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 export const FetchToolRenderer: MessageRenderer<FetchToolPacket> = ({
   packets,

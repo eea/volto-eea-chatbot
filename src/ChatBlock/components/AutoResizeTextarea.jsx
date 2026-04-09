@@ -4,7 +4,7 @@ import { trackEvent } from '@eeacms/volto-matomo/utils';
 import TextareaAutosize from 'react-textarea-autosize';
 
 import SVGIcon from './Icon';
-import SendIcon from '../../icons/send.svg';
+import SendIcon from '@eeacms/volto-eea-chatbot/icons/send.svg';
 
 export default React.forwardRef(function AutoResizeTextarea(props, ref) {
   const { onSubmit, isStreaming, enableMatomoTracking, persona, ...rest } =

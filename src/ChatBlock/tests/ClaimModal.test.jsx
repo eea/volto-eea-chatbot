@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import '@testing-library/jest-dom';
-import { ClaimModal } from '../components/markdown/ClaimModal';
+import { ClaimModal } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimModal';
 
 // Mock semantic-ui-react Modal
 jest.mock('semantic-ui-react', () => ({
@@ -18,9 +18,12 @@ jest.mock('semantic-ui-react', () => ({
 }));
 
 // Mock ClaimSegments
-jest.mock('../components/markdown/ClaimSegments', () => ({
-  ClaimSegments: () => <div data-testid="claim-segments">ClaimSegments</div>,
-}));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimSegments',
+  () => ({
+    ClaimSegments: () => <div data-testid="claim-segments">ClaimSegments</div>,
+  }),
+);
 
 describe('ClaimModal', () => {
   const defaultProps = {

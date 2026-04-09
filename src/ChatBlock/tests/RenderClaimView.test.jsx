@@ -2,7 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { RenderClaimView } from '../components/markdown/RenderClaimView';
+import { RenderClaimView } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/RenderClaimView';
 
 describe('RenderClaimView', () => {
   const createRef = () => ({ current: {} });

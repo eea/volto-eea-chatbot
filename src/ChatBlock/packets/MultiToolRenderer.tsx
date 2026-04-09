@@ -1,13 +1,13 @@
-import type { Packet } from '../types/streamingModels';
-import type { Message } from '../types/interfaces';
+import type { Packet } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type { Message } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import React, { useState, useEffect, useMemo } from 'react';
 import cx from 'classnames';
-import { PacketType } from '../types/streamingModels';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 import { RendererComponent } from './RendererComponent';
-import { useToolDisplayTiming } from '../hooks/useToolDisplayTiming';
-import SVGIcon from '../components/Icon';
-import DoneIcon from '../../icons/done.svg';
-import ChevronIcon from '../../icons/chevron.svg';
+import { useToolDisplayTiming } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useToolDisplayTiming';
+import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
+import DoneIcon from '@eeacms/volto-eea-chatbot/icons/done.svg';
+import ChevronIcon from '@eeacms/volto-eea-chatbot/icons/chevron.svg';
 
 interface MultiToolRendererProps {
   toolGroups: { ind: number; packets: Packet[] }[];
@@ -30,11 +30,10 @@ export function MultiToolRenderer({
   // Filter tool groups based on allowed tool types
   const filteredToolGroups = useMemo(
     () =>
-      toolGroups.filter(
-        (group) =>
-          group.packets?.some(
-            (packet) => showTools?.includes(packet.obj.type as PacketType),
-          ),
+      toolGroups.filter((group) =>
+        group.packets?.some((packet) =>
+          showTools?.includes(packet.obj.type as PacketType),
+        ),
       ),
     [toolGroups, showTools],
   );

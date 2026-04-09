@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks';
-import { useMarked } from '../hooks/useMarked';
+import { useMarked } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useMarked';
 
 describe('useMarked', () => {
   const createMockLibs = () => ({

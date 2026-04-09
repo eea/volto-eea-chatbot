@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import AutoResizeTextarea from '../components/AutoResizeTextarea';
+import AutoResizeTextarea from '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea';
 
 jest.mock('@eeacms/volto-matomo/utils', () => ({
   trackEvent: jest.fn(),

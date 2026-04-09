@@ -1,7 +1,7 @@
-import type { ChatMessageProps } from '../types/interfaces';
+import type { ChatMessageProps } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { useState, useMemo, useEffect } from 'react';
 import cx from 'classnames';
-import visit from 'unist-util-visit';
+import { visit } from 'unist-util-visit';
 import loadable from '@loadable/component';
 import {
   Tab,
@@ -14,28 +14,32 @@ import {
   useDeepCompareMemoize,
   useQualityMarkers,
   useScrollonStream,
-} from '../hooks';
-import { MultiToolRenderer, RendererComponent } from '../packets';
-import { addCitations } from '../utils/citations';
-import SVGIcon from '../components/Icon';
-import BotIcon from '../../icons/bot.svg';
-import ClearIcon from '../../icons/clear.svg';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
+import {
+  MultiToolRenderer,
+  RendererComponent,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/packets';
+import { addCitations } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/citations';
+import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
+import BotIcon from '@eeacms/volto-eea-chatbot/icons/bot.svg';
+import ClearIcon from '@eeacms/volto-eea-chatbot/icons/clear.svg';
 
 // Lazy load heavy components
-const SourceDetails: any = loadable(() => import('../components/Source'));
+const SourceDetails: any = loadable(
+  () => import('@eeacms/volto-eea-chatbot/ChatBlock/components/Source'),
+);
 const UserActionsToolbar: any = loadable(
-  () => import('../components/UserActionsToolbar'),
+  () =>
+    import('@eeacms/volto-eea-chatbot/ChatBlock/components/UserActionsToolbar'),
 );
 const RelatedQuestions: any = loadable(
-  () => import('../components/RelatedQuestions'),
+  () =>
+    import('@eeacms/volto-eea-chatbot/ChatBlock/components/RelatedQuestions'),
 );
 const HalloumiFeedback: any = loadable(
-  () => import('../components/HalloumiFeedback'),
+  () =>
+    import('@eeacms/volto-eea-chatbot/ChatBlock/components/HalloumiFeedback'),
 );
-
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 function addQualityMarkersPlugin() {
   return function (tree: any) {

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom';
-import { useDeepCompareMemoize } from '../hooks/useDeepCompareMemoize';
+import { useDeepCompareMemoize } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useDeepCompareMemoize';
 
 describe('useDeepCompareMemoize', () => {
   it('returns the same reference for equal objects', () => {

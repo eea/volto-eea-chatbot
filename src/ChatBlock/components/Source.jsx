@@ -1,8 +1,8 @@
 import { Popup } from 'semantic-ui-react';
 import SVGIcon from './Icon';
 
-import FileIcon from '../../icons/file.svg';
-import GlobeIcon from '../../icons/globe.svg';
+import FileIcon from '@eeacms/volto-eea-chatbot/icons/file.svg';
+import GlobeIcon from '@eeacms/volto-eea-chatbot/icons/globe.svg';
 
 import { injectLazyLibs } from '@plone/volto/helpers/Loadable/Loadable';
 

@@ -1,5 +1,5 @@
-import { MessageProcessor } from '../services/messageProcessor';
-import { PacketType } from '../types/streamingModels';
+import { MessageProcessor } from '@eeacms/volto-eea-chatbot/ChatBlock/services/messageProcessor';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 describe('MessageProcessor', () => {
   let processor;

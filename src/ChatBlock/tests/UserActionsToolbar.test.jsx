@@ -5,7 +5,7 @@ import renderer from 'react-test-renderer';
 import { render, fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-intl-redux';
-import UserActionsToolbar from '../components/UserActionsToolbar';
+import UserActionsToolbar from '@eeacms/volto-eea-chatbot/ChatBlock/components/UserActionsToolbar';
 
 const mockStore = configureStore();
 

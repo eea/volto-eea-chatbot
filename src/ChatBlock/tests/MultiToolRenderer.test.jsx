@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { MultiToolRenderer } from '../packets/MultiToolRenderer';
-import { PacketType } from '../types/streamingModels';
+import { MultiToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/MultiToolRenderer';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 jest.mock('@loadable/component', () => {
   const loadable = () => {
@@ -19,13 +19,13 @@ jest.mock('@loadable/component', () => {
 });
 
 // Mock SVGIcon
-jest.mock('../components/Icon', () => {
+jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => {
   return ({ name, size }) => <span data-icon={name} data-size={size} />;
 });
 
 // Mock SVG imports
-jest.mock('../../icons/done.svg', () => 'done-icon');
-jest.mock('../../icons/chevron.svg', () => 'chevron-icon');
+jest.mock('@eeacms/volto-eea-chatbot/icons/done.svg', () => 'done-icon');
+jest.mock('@eeacms/volto-eea-chatbot/icons/chevron.svg', () => 'chevron-icon');
 
 describe('MultiToolRenderer', () => {
   const defaultMessage = {

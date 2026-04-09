@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { useToolDisplayTiming } from '../hooks/useToolDisplayTiming';
+import { useToolDisplayTiming } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useToolDisplayTiming';
 
 describe('useToolDisplayTiming', () => {
   beforeEach(() => {

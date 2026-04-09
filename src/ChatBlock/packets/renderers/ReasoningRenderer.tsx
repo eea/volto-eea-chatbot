@@ -1,13 +1,13 @@
 import type {
   ReasoningPacket,
   ReasoningDelta,
-} from '../../types/streamingModels';
-import type { MessageRenderer } from '../../types/interfaces';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type { MessageRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import loadable from '@loadable/component';
-import { PacketType } from '../../types/streamingModels';
-import { components } from '../../components/markdown';
-import { addCitations } from '../../utils/citations';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import { components } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown';
+import { addCitations } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/citations';
 
 const Markdown: any = loadable(() => import('react-markdown'));
 

@@ -1,16 +1,19 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
-import HalloumiFeedback from '../components/HalloumiFeedback';
+import HalloumiFeedback from '@eeacms/volto-eea-chatbot/ChatBlock/components/HalloumiFeedback';
 
-jest.mock('../components/Spinner', () => () => (
-  <div data-testid="spinner">Loading...</div>
-));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/components/Spinner',
+  () => () => <div data-testid="spinner">Loading...</div>,
+);
 
-jest.mock('../components/Icon', () => ({ name }) => (
-  <img src={name} alt="icon" />
-));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon',
+  () =>
+    ({ name }) => <img src={name} alt="icon" />,
+);
 
-jest.mock('../../icons/glasses.svg', () => 'glasses.svg');
+jest.mock('@eeacms/volto-eea-chatbot/icons/glasses.svg', () => 'glasses.svg');
 
 jest.mock('@plone/volto-slate/editor/render', () => ({
   serializeNodes: (nodes) => {

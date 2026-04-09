@@ -1,8 +1,8 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import '@testing-library/jest-dom';
-import { FetchToolRenderer } from '../packets/renderers/FetchToolRenderer';
-import { PacketType } from '../types/streamingModels';
+import { FetchToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/FetchToolRenderer';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 describe('FetchToolRenderer', () => {
   const mockChildRenderer = (result) => (

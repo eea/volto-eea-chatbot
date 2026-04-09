@@ -1,8 +1,8 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import '@testing-library/jest-dom';
-import { CustomToolRenderer } from '../packets/renderers/CustomToolRenderer';
-import { PacketType } from '../types/streamingModels';
+import { CustomToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/CustomToolRenderer';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 describe('CustomToolRenderer', () => {
   const mockChildRenderer = (result) => (

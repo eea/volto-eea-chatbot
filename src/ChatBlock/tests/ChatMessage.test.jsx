@@ -4,7 +4,7 @@ import renderer from 'react-test-renderer';
 
 import '@testing-library/jest-dom';
 import { Provider } from 'react-intl-redux';
-import { ChatMessage } from '../chat/ChatMessage';
+import { ChatMessage } from '@eeacms/volto-eea-chatbot/ChatBlock/chat/ChatMessage';
 
 const mockStore = configureStore();
 

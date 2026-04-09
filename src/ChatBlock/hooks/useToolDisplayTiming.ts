@@ -1,4 +1,4 @@
-import type { Packet } from '../types/streamingModels';
+import type { Packet } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 
 interface ToolState {

@@ -1,14 +1,17 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 
-import { useChatStreaming } from '../hooks/useChatStreaming';
-import { sendMessage } from '../services/streamingService';
-import { PacketType } from '../types/streamingModels';
+import { useChatStreaming } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useChatStreaming';
+import { sendMessage } from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 // Mock the streaming service
-jest.mock('../services/streamingService', () => ({
-  sendMessage: jest.fn(),
-  createChatSession: jest.fn(),
-}));
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService',
+  () => ({
+    sendMessage: jest.fn(),
+    createChatSession: jest.fn(),
+  }),
+);
 
 describe('useChatStreaming', () => {
   afterEach(() => {

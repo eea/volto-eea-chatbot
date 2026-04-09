@@ -1,8 +1,8 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import '@testing-library/jest-dom';
-import { ImageToolRenderer } from '../packets/renderers/ImageToolRenderer';
-import { PacketType } from '../types/streamingModels';
+import { ImageToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/ImageToolRenderer';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 describe('ImageToolRenderer', () => {
   const mockChildRenderer = (result) => (

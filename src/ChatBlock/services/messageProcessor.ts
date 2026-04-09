@@ -5,14 +5,17 @@ import type {
   OnyxDocument,
   Packet,
   StreamingCitation,
-} from '../types/streamingModels';
-import type { Message, ToolCallMetadata } from '../types/interfaces';
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import type {
+  Message,
+  ToolCallMetadata,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import {
   getSynteticPacket,
   isToolPacket,
   isDisplayPacket,
 } from './packetUtils';
-import { PacketType } from '../types/streamingModels';
+import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 /**
  * Process streaming packets into a message object

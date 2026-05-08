@@ -320,8 +320,11 @@ export function AIMessage({
     if (isFetchingRelatedQuestions || typeof relatedQuestions !== 'undefined') {
       return;
     }
-    if (messageDisplayed && isComplete && onFetchRelatedQuestions) {
-      onFetchRelatedQuestions();
+    if (isLastMessage && isComplete && onFetchRelatedQuestions) {
+      console.log(`[AIMessage] Triggering RQ: messageDisplayed=${messageDisplayed}, isComplete=${isComplete}, hasContent=${!!message.message}`);
+      if (messageDisplayed) {
+        onFetchRelatedQuestions();
+      }
     }
   }, [
     messageDisplayed,
@@ -329,6 +332,8 @@ export function AIMessage({
     isComplete,
     onFetchRelatedQuestions,
     isFetchingRelatedQuestions,
+    isLastMessage,
+    message.message,
   ]);
 
   useEffect(() => {

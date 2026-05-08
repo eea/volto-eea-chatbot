@@ -26,7 +26,10 @@ function isChatPacket(packet: Packet): boolean {
 }
 
 function isSearchToolPacket(packet: Packet): boolean {
-  return packet.obj.type === PacketType.SEARCH_TOOL_START;
+  return (
+    packet.obj.type === PacketType.SEARCH_TOOL_START ||
+    packet.obj.type === PacketType.SEARCH_TOOL_START_V3
+  );
 }
 
 function isImageToolPacket(packet: Packet): boolean {
@@ -44,7 +47,9 @@ function isFetchToolPacket(packet: Packet): boolean {
 function isReasoningPacket(packet: Packet): boolean {
   return (
     packet.obj.type === PacketType.REASONING_START ||
-    packet.obj.type === PacketType.REASONING_DELTA
+    packet.obj.type === PacketType.REASONING_DELTA ||
+    packet.obj.type === PacketType.REASONING_DONE ||
+    packet.obj.type === PacketType.REASONING_END
   );
 }
 

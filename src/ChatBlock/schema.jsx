@@ -104,6 +104,7 @@ export function ChatBlockSchema({ assistants, data }) {
           'scrollToInput',
           'showAssistantTitle',
           'showAssistantDescription',
+          'onyxVersion',
         ],
       },
     ],
@@ -367,6 +368,18 @@ range is from 0 to 100`,
         title: 'Show assistant description',
         type: 'boolean',
         default: true,
+      },
+      onyxVersion: {
+        title: 'Onyx API version',
+        choices: [
+          ['2', 'Onyx 2.x'],
+          ['3', 'Onyx 3.x'],
+        ],
+        default: '2',
+        description:
+          'Select which Onyx API version the backend is running. ' +
+          'Onyx 2.x uses the legacy send-message payload; ' +
+          'Onyx 3.x uses the new send-message payload with placement-based streaming.',
       },
       showAssistantPrompts: {
         title: 'Show predefined prompts',

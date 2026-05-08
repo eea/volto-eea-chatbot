@@ -76,5 +76,6 @@ export function useToolDisplayTiming(
     visibleTools,
     handleToolComplete,
     allToolsDisplayed,
+    toolStates,
   };
 }

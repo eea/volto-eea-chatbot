@@ -441,11 +441,9 @@ module.exports = {
     '~/(.*)$': '<rootDir>/src/$1',
     'load-volto-addons':
       '<rootDir>/node_modules/@plone/volto/jest-addons-loader.js',
-    '^unist-util-visit-parents/do-not-use-color$':
-      '<rootDir>/node_modules/unist-util-visit/node_modules/unist-util-visit-parents/lib/color.js',
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(@plone|@root|@package|@eeacms|compromise|efrt|grad-school|suffix-thumb|unist-util-visit|unist-util-visit-parents|unist-util-is)/).*/',
+    '/node_modules/(?!(@plone|@root|@package|@eeacms|compromise|efrt|grad-school|suffix-thumb)/).*/',
   ],
   transform: {
     '^.+\\.js(x)?$': 'babel-jest',

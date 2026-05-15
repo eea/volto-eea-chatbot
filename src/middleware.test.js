@@ -18,6 +18,7 @@ jest.mock('node-fetch', () => {
     status: 200,
     headers: {
       get: jest.fn().mockReturnValue('application/json'),
+      raw: jest.fn().mockReturnValue({}),
     },
     body: { pipe: mockPipe },
   });

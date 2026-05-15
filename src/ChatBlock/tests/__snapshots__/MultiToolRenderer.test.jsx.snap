@@ -47,59 +47,107 @@ exports[`MultiToolRenderer renders multiple tool groups 1`] = `
       >
         <div>
           <div
-            className="tool-collaps ed-wrapper"
+            className="tool-collapsed-wrapper"
           >
             <div
-              className="tool-item-collapsed completed"
+              className="tool-item-expanded"
             >
               <div
-                className="tool-collapsed-icon"
+                className="tool-connector-line"
+              />
+              <div
+                className="tool-item-row"
               >
-                <span
-                  data-icon={
-                    Object {
-                      "attributes": Object {
-                        "viewBox": "",
-                        "xmlns": "",
-                      },
-                    }
-                  }
-                  data-size={14}
-                />
+                <div
+                  className="tool-icon-wrapper"
+                >
+                  <div
+                    className="tool-icon-circle"
+                  >
+                    <span
+                      data-icon={
+                        Object {
+                          "attributes": Object {
+                            "viewBox": "",
+                            "xmlns": "",
+                          },
+                        }
+                      }
+                      data-size={14}
+                    />
+                  </div>
+                </div>
+                <div
+                  className="tool-content with-padding"
+                >
+                  <div
+                    className="tool-status-row"
+                  >
+                    <div
+                      className="tool-status"
+                    >
+                      Searched internal documents
+                    </div>
+                  </div>
+                  <div
+                    className="tool-text"
+                  >
+                    <div />
+                  </div>
+                </div>
               </div>
-              <span
-                className="tool-collapsed-status"
-              >
-                Searched internal documents
-              </span>
             </div>
           </div>
           <div
-            className="tool-collaps ed-wrapper"
+            className="tool-collapsed-wrapper"
           >
             <div
-              className="tool-item-collapsed active"
+              className="tool-item-expanded"
             >
               <div
-                className="tool-collapsed-icon"
+                className="tool-connector-line"
+              />
+              <div
+                className="tool-item-row"
               >
-                <span
-                  data-icon={
-                    Object {
-                      "attributes": Object {
-                        "viewBox": "",
-                        "xmlns": "",
-                      },
-                    }
-                  }
-                  data-size={14}
-                />
+                <div
+                  className="tool-icon-wrapper"
+                >
+                  <div
+                    className="tool-icon-circle"
+                  >
+                    <span
+                      data-icon={
+                        Object {
+                          "attributes": Object {
+                            "viewBox": "",
+                            "xmlns": "",
+                          },
+                        }
+                      }
+                      data-size={14}
+                    />
+                  </div>
+                </div>
+                <div
+                  className="tool-content"
+                >
+                  <div
+                    className="tool-status-row"
+                  >
+                    <div
+                      className="tool-status"
+                    >
+                      Searched internal documents
+                    </div>
+                  </div>
+                  <div
+                    className="tool-text"
+                  >
+                    <div />
+                  </div>
+                </div>
               </div>
-              <span
-                className="tool-collapsed-status"
-              >
-                Searched internal documents
-              </span>
             </div>
           </div>
         </div>
@@ -156,31 +204,55 @@ exports[`MultiToolRenderer renders search tool groups 1`] = `
       >
         <div>
           <div
-            className="tool-collaps ed-wrapper"
+            className="tool-collapsed-wrapper"
           >
             <div
-              className="tool-item-collapsed active"
+              className="tool-item-expanded"
             >
               <div
-                className="tool-collapsed-icon"
+                className="tool-connector-line"
+              />
+              <div
+                className="tool-item-row"
               >
-                <span
-                  data-icon={
-                    Object {
-                      "attributes": Object {
-                        "viewBox": "",
-                        "xmlns": "",
-                      },
-                    }
-                  }
-                  data-size={14}
-                />
+                <div
+                  className="tool-icon-wrapper"
+                >
+                  <div
+                    className="tool-icon-circle"
+                  >
+                    <span
+                      data-icon={
+                        Object {
+                          "attributes": Object {
+                            "viewBox": "",
+                            "xmlns": "",
+                          },
+                        }
+                      }
+                      data-size={14}
+                    />
+                  </div>
+                </div>
+                <div
+                  className="tool-content"
+                >
+                  <div
+                    className="tool-status-row"
+                  >
+                    <div
+                      className="tool-status"
+                    >
+                      Searched internal documents
+                    </div>
+                  </div>
+                  <div
+                    className="tool-text"
+                  >
+                    <div />
+                  </div>
+                </div>
               </div>
-              <span
-                className="tool-collapsed-status"
-              >
-                Searched internal documents
-              </span>
             </div>
           </div>
         </div>

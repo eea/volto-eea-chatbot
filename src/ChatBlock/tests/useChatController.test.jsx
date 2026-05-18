@@ -302,7 +302,9 @@ describe('useChatController', () => {
     });
 
     const userMsg = result.current.messages.find((m) => m.type === 'user');
-    const assistantMsg = result.current.messages.find((m) => m.type === 'assistant');
+    const assistantMsg = result.current.messages.find(
+      (m) => m.type === 'assistant',
+    );
 
     expect(userMsg.messageId).toBe(101);
     expect(assistantMsg.messageId).toBe(202);
@@ -358,7 +360,8 @@ describe('useChatController', () => {
             ind: 0,
             obj: {
               type: PacketType.MESSAGE_DELTA,
-              content: '1. What is the weather like?\n2. What is climate change?\n',
+              content:
+                '1. What is the weather like?\n2. What is climate change?\n',
             },
           },
           { ind: 1, obj: { type: PacketType.STOP } },
@@ -470,7 +473,7 @@ describe('useChatController', () => {
             ind: 0,
             obj: {
               type: PacketType.MESSAGE_DELTA,
-              content: JSON.stringify(["Question A", "Question B"]),
+              content: JSON.stringify(['Question A', 'Question B']),
             },
           },
           { ind: 1, obj: { type: PacketType.STOP } },
@@ -503,4 +506,3 @@ describe('useChatController', () => {
     ]);
   });
 });
-

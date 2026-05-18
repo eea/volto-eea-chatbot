@@ -230,7 +230,8 @@ describe('src/middleware', () => {
     await middleware(req, res, next);
 
     const fs = require('fs');
-    expect(fs.createWriteStream).toHaveBeenCalledWith('/tmp/dumped_response.jsonl');
+    expect(fs.createWriteStream).toHaveBeenCalledWith(
+      '/tmp/dumped_response.jsonl',
+    );
   });
 });
-

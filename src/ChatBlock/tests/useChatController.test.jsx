@@ -268,4 +268,242 @@ describe('useChatController', () => {
 
     expect(result.current.isFetchingRelatedQuestions).toBe(false);
   });
+
+  it('updates messageIds on MESSAGE_END_ID_INFO in streaming response', async () => {
+    createChatSession.mockResolvedValue('session-123');
+
+    mockSendMessage.mockImplementation(async function* () {
+      yield [
+        {
+          ind: 0,
+          obj: {
+            type: PacketType.MESSAGE_START,
+            id: 'msg1',
+            content: 'Hello',
+            final_documents: null,
+          },
+        },
+        {
+          ind: -1,
+          obj: {
+            type: PacketType.MESSAGE_END_ID_INFO,
+            user_message_id: 101,
+            reserved_assistant_message_id: 202,
+          },
+        },
+        { ind: 1, obj: { type: PacketType.STOP } },
+      ];
+    });
+
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
+
+    await act(async () => {
+      await result.current.onSubmit({ message: 'First' });
+    });
+
+    const userMsg = result.current.messages.find((m) => m.type === 'user');
+    const assistantMsg = result.current.messages.find(
+      (m) => m.type === 'assistant',
+    );
+
+    expect(userMsg.messageId).toBe(101);
+    expect(assistantMsg.messageId).toBe(202);
+  });
+
+  it('adds an error message on streaming failure', async () => {
+    createChatSession.mockResolvedValue('session-123');
+
+    mockSendMessage.mockImplementation(async function* () {
+      if (false) yield;
+      throw new Error('Streaming failed unexpectedly');
+    });
+
+    const { result } = renderHook(() => useChatController({ personaId: 1 }));
+
+    const consoleSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    await act(async () => {
+      await result.current.onSubmit({ message: 'Trigger error' });
+    });
+
+    expect(result.current.messages.length).toBeGreaterThan(0);
+    const errorMsg = result.current.messages.find((m) => m.type === 'error');
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg.error).toContain('Streaming failed unexpectedly');
+
+    consoleSpy.mockRestore();
+  });
+
+  it('successfully fetches related questions when enableQgen is true', async () => {
+    createChatSession.mockResolvedValue('session-123');
+
+    let callCount = 0;
+    mockSendMessage.mockImplementation(async function* () {
+      callCount++;
+      if (callCount === 1) {
+        yield [
+          {
+            ind: 0,
+            obj: {
+              type: PacketType.MESSAGE_START,
+              id: 'msg1',
+              content: 'This is the answer',
+              final_documents: null,
+            },
+          },
+          { ind: 1, obj: { type: PacketType.STOP } },
+        ];
+      } else {
+        yield [
+          {
+            ind: 0,
+            obj: {
+              type: PacketType.MESSAGE_DELTA,
+              content:
+                '1. What is the weather like?\n2. What is climate change?\n',
+            },
+          },
+          { ind: 1, obj: { type: PacketType.STOP } },
+        ];
+      }
+    });
+
+    const { result } = renderHook(() =>
+      useChatController({
+        personaId: 1,
+        enableQgen: true,
+        qgenAsistantId: 2,
+        deepResearch: 'disabled',
+      }),
+    );
+
+    // 1. Submit normal message
+    await act(async () => {
+      await result.current.onSubmit({ message: 'Hello' });
+    });
+
+    // 2. Fetch related questions
+    await act(async () => {
+      await result.current.onFetchRelatedQuestions();
+    });
+
+    const assistantMsg = result.current.messages.find(
+      (m) => m.type === 'assistant',
+    );
+    expect(assistantMsg.relatedQuestions).toEqual([
+      { question: 'What is the weather like?' },
+      { question: 'What is climate change?' },
+    ]);
+  });
+
+  it('handles related questions fetch error gracefully', async () => {
+    createChatSession.mockResolvedValue('session-123');
+
+    let callCount = 0;
+    mockSendMessage.mockImplementation(async function* () {
+      callCount++;
+      if (callCount === 1) {
+        yield [
+          {
+            ind: 0,
+            obj: {
+              type: PacketType.MESSAGE_START,
+              id: 'msg1',
+              content: 'This is the answer',
+              final_documents: null,
+            },
+          },
+          { ind: 1, obj: { type: PacketType.STOP } },
+        ];
+      } else {
+        throw new Error('Failed to fetch related questions');
+      }
+    });
+
+    const { result } = renderHook(() =>
+      useChatController({
+        personaId: 1,
+        enableQgen: true,
+        qgenAsistantId: 2,
+        deepResearch: 'disabled',
+      }),
+    );
+
+    await act(async () => {
+      await result.current.onSubmit({ message: 'Hello' });
+    });
+
+    const consoleSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    await act(async () => {
+      await result.current.onFetchRelatedQuestions();
+    });
+
+    const assistantMsg = result.current.messages.find(
+      (m) => m.type === 'assistant',
+    );
+    expect(assistantMsg.relatedQuestions).toEqual([]);
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  it('extracts related questions from JSON formats', async () => {
+    createChatSession.mockResolvedValue('session-123');
+
+    let callCount = 0;
+    mockSendMessage.mockImplementation(async function* () {
+      callCount++;
+      if (callCount === 1) {
+        yield [
+          {
+            ind: 0,
+            obj: {
+              type: PacketType.MESSAGE_START,
+              content: 'Answer',
+            },
+          },
+          { ind: 1, obj: { type: PacketType.STOP } },
+        ];
+      } else {
+        yield [
+          {
+            ind: 0,
+            obj: {
+              type: PacketType.MESSAGE_DELTA,
+              content: JSON.stringify(['Question A', 'Question B']),
+            },
+          },
+          { ind: 1, obj: { type: PacketType.STOP } },
+        ];
+      }
+    });
+
+    const { result } = renderHook(() =>
+      useChatController({
+        personaId: 1,
+        enableQgen: true,
+        qgenAsistantId: 2,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.onSubmit({ message: 'Hello' });
+    });
+
+    await act(async () => {
+      await result.current.onFetchRelatedQuestions();
+    });
+
+    const assistantMsg = result.current.messages.find(
+      (m) => m.type === 'assistant',
+    );
+    expect(assistantMsg.relatedQuestions).toEqual([
+      { question: 'Question A' },
+      { question: 'Question B' },
+    ]);
+  });
 });

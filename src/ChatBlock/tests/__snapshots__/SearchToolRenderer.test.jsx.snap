@@ -37,7 +37,7 @@ exports[`SearchToolRenderer handles web results with favicon 1`] = `
           className="queries-header"
         >
           <strong>
-            Queries
+            Web Queries
           </strong>
         </div>
         <div
@@ -86,7 +86,7 @@ exports[`SearchToolRenderer handles web results with favicon 1`] = `
           className="results-header"
         >
           <strong>
-            Results
+            Web Results
           </strong>
         </div>
         <div
@@ -156,7 +156,7 @@ exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
           className="queries-header"
         >
           <strong>
-            Queries
+            Internal Search Queries
           </strong>
         </div>
         <div
@@ -310,7 +310,7 @@ exports[`SearchToolRenderer removes duplicate queries 1`] = `
           className="queries-header"
         >
           <strong>
-            Queries
+            Internal Search Queries
           </strong>
         </div>
         <div
@@ -448,7 +448,7 @@ exports[`SearchToolRenderer renders searching state for internal documents 1`] =
           className="queries-header"
         >
           <strong>
-            Queries
+            Internal Search Queries
           </strong>
         </div>
         <div
@@ -535,7 +535,7 @@ exports[`SearchToolRenderer renders searching state for internet search 1`] = `
           className="queries-header"
         >
           <strong>
-            Queries
+            Web Queries
           </strong>
         </div>
         <div
@@ -584,7 +584,7 @@ exports[`SearchToolRenderer renders searching state for internet search 1`] = `
           className="results-header"
         >
           <strong>
-            Results
+            Web Results
           </strong>
         </div>
         <div
@@ -622,7 +622,7 @@ exports[`SearchToolRenderer renders with search results 1`] = `
           className="queries-header"
         >
           <strong>
-            Queries
+            Internal Search Queries
           </strong>
         </div>
         <div

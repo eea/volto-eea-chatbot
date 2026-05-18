@@ -21,6 +21,7 @@ function constructCurrentReasoningState(packets: ReasoningPacket[]) {
   const hasEnd = packets.some(
     (p) =>
       p.obj.type === PacketType.SECTION_END ||
+      p.obj.type === PacketType.REASONING_DONE ||
       // Support either convention for reasoning completion
       (p.obj as any).type === PacketType.REASONING_END,
   );

@@ -30,6 +30,7 @@ export interface SendMessageParams {
   enabledToolIds?: number[];
   forcedToolIds?: number[];
   retrieval_options?: any;
+  onyxVersion?: '2' | '3';
 }
 
 export interface StreamResponse {
@@ -90,11 +91,131 @@ export const processRawChunkString = (
   return [parsedChunkSections, currPartialChunk];
 };
 
+// ─── Payload Templates ─────────────────────────────────────────────────────
+
+/**
+ * Build the Onyx 2.x send-message payload
+ */
+function buildPayloadV2(params: SendMessageParams): Record<string, unknown> {
+  const documentsAreSelected =
+    params.selectedDocumentIds && params.selectedDocumentIds.length > 0;
+
+  return {
+    alternate_assistant_id: params.alternateAssistantId,
+    chat_session_id: params.chatSessionId,
+    parent_message_id: params.parentMessageId,
+    message: params.message,
+    prompt_id: null,
+    search_doc_ids: documentsAreSelected ? params.selectedDocumentIds : null,
+    file_descriptors: params.fileDescriptors,
+    current_message_files: params.currentMessageFiles,
+    regenerate: params.regenerate,
+    retrieval_options:
+      params.retrieval_options ??
+      (!documentsAreSelected
+        ? {
+            run_search:
+              params.queryOverride || params.forceSearch ? 'always' : 'auto',
+            real_time: true,
+            filters: params.filters,
+          }
+        : null),
+    query_override: params.queryOverride,
+    prompt_override: {
+      ...(params.systemPromptOverride
+        ? { system_prompt: params.systemPromptOverride }
+        : {}),
+      ...(params.taskPromptOverride
+        ? { task_prompt: params.taskPromptOverride }
+        : {}),
+    },
+    llm_override:
+      params.temperature || params.modelVersion
+        ? {
+            temperature: params.temperature,
+            model_provider: params.modelProvider,
+            model_version: params.modelVersion,
+          }
+        : null,
+    use_existing_user_message: params.useExistingUserMessage,
+    use_agentic_search: params.useAgentSearch ?? false,
+    allowed_tool_ids: params.enabledToolIds,
+    forced_tool_ids: params.forcedToolIds,
+  };
+}
+
+/**
+ * Build the Onyx 3.x send-message payload
+ */
+function buildPayloadV3(params: SendMessageParams): Record<string, unknown> {
+  const payload = {
+    message: params.message,
+    chat_session_id: params.chatSessionId,
+    parent_message_id: params.parentMessageId,
+    file_descriptors: params.fileDescriptors ?? [],
+    internal_search_filters: {
+      source_type: params.filters?.source_type ?? ['web', 'github'],
+      document_set: params.filters?.document_set ?? null,
+      time_cutoff: params.filters?.time_cutoff ?? null,
+      tags: params.filters?.tags ?? [],
+    },
+    deep_research: params.useAgentSearch ?? false,
+    allowed_tool_ids: params.enabledToolIds?.length
+      ? params.enabledToolIds
+      : [1],
+    forced_tool_id: params.forcedToolIds?.[0] ?? null,
+    llm_override: {
+      temperature: params.temperature ?? 0.5,
+      model_provider:
+        params.modelProvider || 'Inhouse LiteLLM provider oss 120b',
+      model_version: params.modelVersion || 'Inhouse-LLM/gpt-oss-120b',
+    },
+    llm_overrides: null,
+    origin: 'webapp',
+    additional_context: null,
+    alternate_assistant_id: params.alternateAssistantId ?? null,
+    stream: true,
+  };
+  return payload;
+}
+
+/**
+ * Normalise a raw Onyx 3.x stream object into the canonical { ind, obj } Packet shape.
+ */
+function normaliseV3Chunk(raw: any): Packet | null {
+  // Bare identity packet (user/assistant message IDs – no placement wrapper)
+  if ('user_message_id' in raw && 'reserved_assistant_message_id' in raw) {
+    return {
+      ind: -1,
+      obj: {
+        type: PacketType.MESSAGE_END_ID_INFO,
+        user_message_id: raw.user_message_id,
+        reserved_assistant_message_id: raw.reserved_assistant_message_id,
+      },
+    } as Packet;
+  }
+
+  if (!raw.placement || typeof raw.obj !== 'object') return null;
+
+  const ind: number = raw.placement.turn_index ?? 0;
+  const obj = raw.obj;
+
+  // Map citation_number to citation_num for compatibility with CitationDelta consumers
+  if (obj.type === PacketType.CITATION_INFO && 'citation_number' in obj) {
+    obj.citation_num = obj.citation_number;
+  }
+
+  const normalised = { ind, obj } as Packet;
+  // console.log('[Onyx v3] Normalised packet:', normalised);
+  return normalised;
+}
+
 /**
  * Handle streaming response from the backend
  */
 export async function* handleStream(
   streamingResponse: Response,
+  onyxVersion: '2' | '3' = '2',
 ): AsyncGenerator<Packet[], void, unknown> {
   const reader = streamingResponse.body?.getReader();
   if (!reader) {
@@ -120,6 +241,10 @@ export async function* handleStream(
       previousPartialChunk,
     );
 
+    if (onyxVersion === '3' && completedChunks.length > 0) {
+      // console.log('[Onyx v3] Raw completed chunks:', completedChunks);
+    }
+
     if (!completedChunks.length && !partialChunk) {
       break;
     }
@@ -130,6 +255,10 @@ export async function* handleStream(
     const packets: Packet[] = completedChunks
       .filter((chunk) => chunk && typeof chunk === 'object')
       .map((chunk) => {
+        if (onyxVersion === '3') {
+          return normaliseV3Chunk(chunk);
+        }
+
         // Onyx v2 format: { ind: number, obj: { type: string, ... } }
         if ('ind' in chunk && 'obj' in chunk) {
           return chunk as Packet;
@@ -173,77 +302,24 @@ export async function* handleStream(
  * Send a message and stream the response
  */
 export async function* sendMessage(
-  {
-    regenerate,
-    retrieval_options,
-    message,
-    fileDescriptors,
-    currentMessageFiles,
-    parentMessageId,
-    chatSessionId,
-    filters,
-    selectedDocumentIds,
-    queryOverride,
-    forceSearch,
-    modelProvider,
-    modelVersion,
-    temperature,
-    systemPromptOverride,
-    taskPromptOverride,
-    useExistingUserMessage,
-    alternateAssistantId,
-    signal,
-    useAgentSearch,
-    enabledToolIds,
-    forcedToolIds,
-  }: SendMessageParams,
+  params: SendMessageParams,
   isRelatedQuestion: boolean = false,
 ): AsyncGenerator<Packet[], void, unknown> {
-  const documentsAreSelected =
-    selectedDocumentIds && selectedDocumentIds.length > 0;
+  const { onyxVersion = '2', signal } = params;
 
-  const payload = {
-    alternate_assistant_id: alternateAssistantId,
-    chat_session_id: chatSessionId,
-    parent_message_id: parentMessageId,
-    message,
-    prompt_id: null,
-    search_doc_ids: documentsAreSelected ? selectedDocumentIds : null,
-    file_descriptors: fileDescriptors,
-    current_message_files: currentMessageFiles,
-    regenerate,
-    retrieval_options:
-      retrieval_options ??
-      (!documentsAreSelected
-        ? {
-            run_search: queryOverride || forceSearch ? 'always' : 'auto',
-            real_time: true,
-            filters: filters,
-          }
-        : null),
-    query_override: queryOverride,
-    prompt_override: {
-      ...(systemPromptOverride ? { system_prompt: systemPromptOverride } : {}),
-      ...(taskPromptOverride ? { task_prompt: taskPromptOverride } : {}),
-    },
-    llm_override:
-      temperature || modelVersion
-        ? {
-            temperature,
-            model_provider: modelProvider,
-            model_version: modelVersion,
-          }
-        : null,
-    use_existing_user_message: useExistingUserMessage,
-    use_agentic_search: useAgentSearch ?? false,
-    allowed_tool_ids: enabledToolIds,
-    forced_tool_ids: forcedToolIds,
-  };
+  const payload =
+    onyxVersion === '3' ? buildPayloadV3(params) : buildPayloadV2(params);
 
   const body = JSON.stringify(payload);
 
   const middleware = isRelatedQuestion ? '_rq' : '_da';
-  const sendMessageResponse = await fetch(`/${middleware}/chat/send-message`, {
+  const endpoint =
+    onyxVersion === '3' ? 'send-chat-message' : 'send-message';
+
+  console.log(`[sendMessage] Target URL: /${middleware}/chat/${endpoint} (v${onyxVersion})`);
+  console.log(`[sendMessage] Payload:`, payload);
+
+  const sendMessageResponse = await fetch(`/${middleware}/chat/${endpoint}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -258,7 +334,7 @@ export async function* sendMessage(
     throw new Error(`Failed to send message - ${errorMsg}`);
   }
 
-  yield* handleStream(sendMessageResponse);
+  yield* handleStream(sendMessageResponse, onyxVersion);
 }
 
 /**
@@ -267,8 +343,13 @@ export async function* sendMessage(
 export async function createChatSession(
   personaId: number,
   description?: string,
+  isRelatedQuestion: boolean = false,
 ): Promise<string> {
-  const response = await fetch('/_da/chat/create-chat-session', {
+  const middleware = isRelatedQuestion ? '_rq' : '_da';
+  const url = `/${middleware}/chat/create-chat-session`;
+  console.log(`[createChatSession] URL: ${url}`);
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

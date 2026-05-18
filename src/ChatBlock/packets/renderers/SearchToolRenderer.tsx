@@ -55,26 +55,33 @@ const constructCurrentSearchState = (
   isInternetSearch: boolean;
 } => {
   const searchStart = packets.find(
-    (packet) => packet.obj.type === PacketType.SEARCH_TOOL_START,
+    (packet) =>
+      packet.obj.type === PacketType.SEARCH_TOOL_START ||
+      packet.obj.type === PacketType.SEARCH_TOOL_START_V3,
   )?.obj as SearchToolStart | null;
 
   const searchDeltas = packets
-    .filter((packet) => packet.obj.type === PacketType.SEARCH_TOOL_DELTA)
-    .map((packet) => packet.obj as SearchToolDelta);
+    .filter(
+      (packet) =>
+        packet.obj.type === PacketType.SEARCH_TOOL_DELTA ||
+        packet.obj.type === PacketType.SEARCH_TOOL_QUERIES_DELTA ||
+        packet.obj.type === PacketType.SEARCH_TOOL_DOCUMENTS_DELTA,
+    )
+    .map((packet) => packet.obj);
 
   const searchEnd = packets.find(
     (packet) => packet.obj.type === PacketType.SECTION_END,
   )?.obj as SectionEnd | null;
 
-  // Extract queries from ToolDelta packets
+  // Extract queries from various delta packets
   const queries = searchDeltas
-    .flatMap((delta) => delta?.queries || [])
+    .flatMap((delta: any) => delta?.queries || [])
     .filter((query, index, arr) => arr.indexOf(query) === index); // Remove duplicates
 
   const seenDocIds = new Set<string>();
   const results = searchDeltas
-    .flatMap((delta) => delta?.documents || [])
-    .filter((doc) => {
+    .flatMap((delta: any) => delta?.documents || [])
+    .filter((doc: OnyxDocument) => {
       if (!doc || !doc.document_id) return false;
       if (seenDocIds.has(doc.document_id)) return false;
       seenDocIds.add(doc.document_id);
@@ -202,8 +209,8 @@ export const SearchToolRenderer: MessageRenderer<SearchToolPacket> = ({
     <SVGIcon name={isInternetSearch ? GlobeIcon : SearchIcon} size={size} />
   );
 
-  // Don't render anything if search hasn't started
-  if (queries.length === 0) {
+  // Don't render anything if search hasn't started or has no data yet
+  if (queries.length === 0 && results.length === 0) {
     return children({
       icon: IconComponent,
       status: status,
@@ -218,7 +225,9 @@ export const SearchToolRenderer: MessageRenderer<SearchToolPacket> = ({
       <div className="search-tool-renderer">
         <div className="queries-section">
           <div className="queries-header">
-            <strong>Queries</strong>
+            <strong>
+              {isInternetSearch ? 'Web Queries' : 'Internal Search Queries'}
+            </strong>
           </div>
           <div className="queries-list">
             {queries.slice(0, queriesToShow).map((query, index) => (
@@ -262,7 +271,7 @@ export const SearchToolRenderer: MessageRenderer<SearchToolPacket> = ({
 
         <div className="results-section">
           <div className="results-header">
-            <strong>{isInternetSearch ? 'Results' : 'Documents'}</strong>
+            <strong>{isInternetSearch ? 'Web Results' : 'Documents'}</strong>
           </div>
 
           <div className="results-list">

@@ -377,7 +377,7 @@ const getCoveragePatterns = () => {
           arg === reserved || arg.startsWith(reserved.split('=')[0] + '='),
       ) &&
       process.argv.indexOf(arg) >
-        process.argv.findIndex((item) => item === 'test'),
+      process.argv.findIndex((item) => item === 'test'),
   );
 
   if (directoryArg) {

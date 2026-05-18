@@ -11,11 +11,15 @@ export function getSynteticPacket(ind: number, type: PacketType): Packet {
 export function isToolPacket(packet: Packet): boolean {
   const toolPacketTypes = [
     PacketType.SEARCH_TOOL_START,
+    PacketType.SEARCH_TOOL_START_V3,
+    PacketType.SEARCH_TOOL_QUERIES_DELTA,
+    PacketType.SEARCH_TOOL_DOCUMENTS_DELTA,
     PacketType.SEARCH_TOOL_DELTA,
     PacketType.CUSTOM_TOOL_START,
     PacketType.CUSTOM_TOOL_DELTA,
     PacketType.REASONING_START,
     PacketType.REASONING_DELTA,
+    PacketType.REASONING_DONE,
     PacketType.FETCH_TOOL_START,
   ];
 
@@ -40,9 +44,15 @@ export function isFinalAnswerComplete(packets: Packet[]): boolean {
     return false;
   }
 
-  return packets.some(
+  const hasSectionEnd = packets.some(
     (packet) =>
       packet.obj.type === PacketType.SECTION_END &&
       packet.ind === messageStartPacket.ind,
   );
+
+  if (hasSectionEnd) {
+    console.log(`[isFinalAnswerComplete] Complete! ind=${messageStartPacket.ind}`);
+  }
+
+  return hasSectionEnd;
 }

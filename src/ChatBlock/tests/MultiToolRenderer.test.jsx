@@ -2,6 +2,7 @@ import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { MultiToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/MultiToolRenderer';
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+import { RendererComponent } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/RendererComponent';
 
 jest.mock('@loadable/component', () => {
   const loadable = () => {
@@ -129,6 +130,112 @@ describe('MultiToolRenderer', () => {
         />,
       );
     });
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+
+  it('toggles expansion with onClick and onKeyDown', () => {
+    const toolGroups = [
+      {
+        ind: 1,
+        packets: [{ ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } }],
+      },
+    ];
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MultiToolRenderer
+          toolGroups={toolGroups}
+          showTools={[PacketType.SEARCH_TOOL_START]}
+          message={defaultMessage}
+          libs={defaultLibs}
+        />,
+      );
+    });
+
+    const header = component.root.findByProps({
+      className: 'tools-collapsed-header',
+    });
+
+    // Test onClick (toggleExpanded)
+    act(() => {
+      header.props.onClick();
+    });
+
+    // Test onKeyDown with Enter
+    act(() => {
+      header.props.onKeyDown({ key: 'Enter', preventDefault: jest.fn() });
+    });
+
+    // Test onKeyDown with Space
+    act(() => {
+      header.props.onKeyDown({ key: ' ', preventDefault: jest.fn() });
+    });
+
+    // Test onKeyDown with another key
+    act(() => {
+      header.props.onKeyDown({ key: 'a', preventDefault: jest.fn() });
+    });
+  });
+
+  it('triggers handleToolComplete on RendererComponent onComplete', () => {
+    const toolGroups = [
+      {
+        ind: 1,
+        packets: [{ ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } }],
+      },
+    ];
+
+    const onAllToolsDisplayed = jest.fn();
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MultiToolRenderer
+          toolGroups={toolGroups}
+          showTools={[PacketType.SEARCH_TOOL_START]}
+          message={{
+            ...defaultMessage,
+            isComplete: true,
+            isFinalMessageComing: true,
+          }}
+          libs={defaultLibs}
+          onAllToolsDisplayed={onAllToolsDisplayed}
+        />,
+      );
+    });
+
+    const rendererComp = component.root.findByType(RendererComponent);
+    act(() => {
+      rendererComp.props.onComplete();
+    });
+
+    // Since toolGroups only has 1 group, completing it completes all tools
+    expect(onAllToolsDisplayed).toHaveBeenCalled();
+  });
+
+  it('renders non-detailed tool collapsed view when streaming', () => {
+    const toolGroups = [
+      {
+        ind: 1,
+        packets: [
+          { ind: 1, obj: { type: PacketType.IMAGE_GENERATION_TOOL_START } },
+        ],
+      },
+    ];
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MultiToolRenderer
+          toolGroups={toolGroups}
+          showTools={[PacketType.IMAGE_GENERATION_TOOL_START]}
+          message={defaultMessage}
+          libs={defaultLibs}
+        />,
+      );
+    });
+
     expect(component.toJSON()).toMatchSnapshot();
   });
 });

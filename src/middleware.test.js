@@ -221,4 +221,16 @@ describe('src/middleware', () => {
 
     expect(res.write).toHaveBeenCalled();
   });
+
+  it('dumps LLM response when DUMP_LLM_FILE_PATH is set', async () => {
+    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_URL = 'http://localhost:3000';
+    process.env.DUMP_LLM_FILE_PATH = '/tmp/dumped_response.jsonl';
+
+    await middleware(req, res, next);
+
+    const fs = require('fs');
+    expect(fs.createWriteStream).toHaveBeenCalledWith('/tmp/dumped_response.jsonl');
+  });
 });
+

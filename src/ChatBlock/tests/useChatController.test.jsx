@@ -312,6 +312,7 @@ describe('useChatController', () => {
     createChatSession.mockResolvedValue('session-123');
 
     mockSendMessage.mockImplementation(async function* () {
+      if (false) yield;
       throw new Error('Streaming failed unexpectedly');
     });
 

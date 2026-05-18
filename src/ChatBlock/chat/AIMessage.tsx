@@ -1,7 +1,7 @@
 import type { ChatMessageProps } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { useState, useMemo, useEffect } from 'react';
 import cx from 'classnames';
-import { visit } from 'unist-util-visit';
+
 import loadable from '@loadable/component';
 import {
   Tab,
@@ -40,6 +40,17 @@ const HalloumiFeedback: any = loadable(
   () =>
     import('@eeacms/volto-eea-chatbot/ChatBlock/components/HalloumiFeedback'),
 );
+
+function visit(node: any, type: string, visitor: (node: any, idx?: number, parent?: any) => void, idx?: number, parent?: any) {
+  if (node.type === type) {
+    visitor(node, idx, parent);
+  }
+  if (node.children && Array.isArray(node.children)) {
+    node.children.forEach((child: any, cidx: number) => {
+      visit(child, type, visitor, cidx, node);
+    });
+  }
+}
 
 function addQualityMarkersPlugin() {
   return function (tree: any) {
@@ -320,8 +331,11 @@ export function AIMessage({
     if (isFetchingRelatedQuestions || typeof relatedQuestions !== 'undefined') {
       return;
     }
-    if (messageDisplayed && isComplete && onFetchRelatedQuestions) {
-      onFetchRelatedQuestions();
+    if (isLastMessage && isComplete && onFetchRelatedQuestions) {
+      console.log(`[AIMessage] Triggering RQ: messageDisplayed=${messageDisplayed}, isComplete=${isComplete}, hasContent=${!!message.message}`);
+      if (messageDisplayed) {
+        onFetchRelatedQuestions();
+      }
     }
   }, [
     messageDisplayed,
@@ -329,6 +343,8 @@ export function AIMessage({
     isComplete,
     onFetchRelatedQuestions,
     isFetchingRelatedQuestions,
+    isLastMessage,
+    message.message,
   ]);
 
   useEffect(() => {

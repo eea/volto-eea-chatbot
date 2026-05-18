@@ -48,6 +48,7 @@ interface ChatWindowProps {
   enableMatomoTracking?: boolean;
   onDemandInputToggle?: boolean;
   maxContextSegments?: number;
+  onyxVersion?: '2' | '3';
   isPlaywrightTest?: boolean;
   [key: string]: any;
 }
@@ -83,6 +84,7 @@ function ChatWindow({
     enableMatomoTracking = true,
     onDemandInputToggle = true,
     maxContextSegments = 0,
+    onyxVersion = '2',
   } = data;
   const [qualityCheckEnabled, setQualityCheckEnabled] = useState(
     onDemandInputToggle ?? true,
@@ -117,6 +119,7 @@ function ChatWindow({
     qgenAsistantId,
     enableQgen,
     deepResearch,
+    onyxVersion,
   });
 
   const [showLandingPage, setShowLandingPage] = useState(true);

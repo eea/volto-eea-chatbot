@@ -111,23 +111,36 @@ export class MessageProcessor {
       this.indicesStarted.push(packet.ind);
     }
 
-    // Send synthetic SECTION_END when needed
-    if (
-      packet.obj.type === PacketType.SECTION_END &&
-      this.indicesStarted.length > 0
-    ) {
-      processedPacket = getSynteticPacket(
-        this.indicesStarted.shift()!,
-        PacketType.SECTION_END,
-      );
-    } else if (packet.obj.type === PacketType.SECTION_END) {
-      return;
+    // Handle SECTION_END (v2/v3 compatible)
+    if (packet.obj.type === PacketType.SECTION_END) {
+      let targetInd = packet.ind;
+
+      // If ind is -1 (common in v2), use synthetic logic
+      if (targetInd === -1 && this.indicesStarted.length > 0) {
+        targetInd = this.indicesStarted.shift()!;
+      } else if (targetInd !== -1) {
+        // If ind is provided (v3), remove it from indicesStarted if present
+        const startIdx = this.indicesStarted.indexOf(targetInd);
+        if (startIdx > -1) {
+          this.indicesStarted.splice(startIdx, 1);
+        }
+      }
+
+      if (targetInd === -1) {
+        return; // Skip if we can't map it to a turn
+      }
+
+      processedPacket = getSynteticPacket(targetInd, PacketType.SECTION_END);
     }
 
     const { ind } = processedPacket;
 
     // Store processed packet for later aggregation
     this.packets.push(processedPacket);
+
+    if (processedPacket.obj.type === PacketType.MESSAGE_START || processedPacket.obj.type === PacketType.SECTION_END) {
+        console.log(`[MessageProcessor] Processed ${processedPacket.obj.type} for ind=${processedPacket.ind}`);
+    }
 
     // Group packets by index for later processing
     if (!this.groupedPackets.has(ind)) {
@@ -174,6 +187,7 @@ export class MessageProcessor {
         PacketType.MESSAGE_START,
         PacketType.SEARCH_TOOL_DELTA,
         PacketType.FETCH_TOOL_START,
+        PacketType.SEARCH_TOOL_DOCUMENTS_DELTA,
       ].includes(packet.obj.type)
     ) {
       return;
@@ -181,7 +195,8 @@ export class MessageProcessor {
     let newDocuments = false;
     const data = packet.obj as any;
     const documents = data.final_documents || data.documents;
-    if (documents) {
+
+    if (documents && Array.isArray(documents)) {
       documents.forEach((doc: OnyxDocument) => {
         const docId = doc.document_id;
         if (docId && !this.documentMap.has(docId)) {
@@ -190,8 +205,23 @@ export class MessageProcessor {
         }
       });
     }
+
     if (newDocuments) {
       this._documents = Array.from(this.documentMap.values());
+
+      // If we have final_documents and no citations yet, create a fallback mapping
+      // This ensures the Sources tab shows up in v3 when citation_info is missing
+      if (
+        packet.obj.type === PacketType.MESSAGE_START &&
+        data.final_documents &&
+        this._citations.size === 0
+      ) {
+        data.final_documents.forEach((doc: OnyxDocument, index: number) => {
+          if (doc.document_id) {
+            this._citations.set(index + 1, doc.document_id);
+          }
+        });
+      }
     }
   }
 
@@ -200,6 +230,16 @@ export class MessageProcessor {
    * Updates the internal citation collection and notifies when new citations are added
    */
   private processCitations(packet: Packet) {
+    if (packet.obj.type === PacketType.CITATION_INFO) {
+      const citationInfo = packet.obj as any;
+      if (citationInfo.citation_number && citationInfo.document_id) {
+        this._citations.set(
+          citationInfo.citation_number,
+          citationInfo.document_id,
+        );
+      }
+      return;
+    }
     if (packet.obj.type !== PacketType.CITATION_DELTA) {
       return;
     }
@@ -237,6 +277,13 @@ export class MessageProcessor {
    */
   private processStreamEnd(packet: Packet) {
     if ([PacketType.STOP, PacketType.ERROR].includes(packet.obj.type)) {
+      // Close any remaining open sections (especially the last one)
+      while (this.indicesStarted.length > 0) {
+        const ind = this.indicesStarted.shift()!;
+        console.log(`[MessageProcessor] Stream ended. Synthesizing section_end for ind=${ind}`);
+        const synthetic = getSynteticPacket(ind, PacketType.SECTION_END);
+        this.processPacket(synthetic);
+      }
       this._isComplete = true;
     }
   }
@@ -248,7 +295,9 @@ export class MessageProcessor {
   private extractToolCall(packets: Packet[]): ToolCallMetadata | null {
     // Look for search tool packets
     const searchToolStart = packets.find(
-      (p) => p.obj.type === PacketType.SEARCH_TOOL_START,
+      (p) =>
+        p.obj.type === PacketType.SEARCH_TOOL_START ||
+        p.obj.type === PacketType.SEARCH_TOOL_START_V3,
     );
 
     if (!searchToolStart) {
@@ -260,7 +309,10 @@ export class MessageProcessor {
     const processedDocs: Record<string, any> = {};
 
     for (const packet of packets) {
-      if (packet.obj.type === PacketType.SEARCH_TOOL_DELTA) {
+      if (
+        packet.obj.type === PacketType.SEARCH_TOOL_DELTA ||
+        packet.obj.type === PacketType.SEARCH_TOOL_DOCUMENTS_DELTA
+      ) {
         const delta = packet.obj as any;
         if (delta.documents && Array.isArray(delta.documents)) {
           delta.documents.forEach((doc: any) => {

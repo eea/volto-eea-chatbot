@@ -105,35 +105,35 @@ describe('AIMessage', () => {
         messageId: 1,
         message: 'Hello [1] details',
         type: 'assistant',
-        citations: { "1": "doc1", "2": "doc2", "3": "doc3", "4": "doc4" },
+        citations: { 1: 'doc1', 2: 'doc2', 3: 'doc3', 4: 'doc4' },
         documents: [
           {
             document_id: 'doc1',
             semantic_identifier: 'Source 1',
             link: 'https://example.com/1',
             source_type: 'web',
-            index: "1",
+            index: '1',
           },
           {
             document_id: 'doc2',
             semantic_identifier: 'Source 2',
             link: 'https://example.com/2',
             source_type: 'web',
-            index: "2",
+            index: '2',
           },
           {
             document_id: 'doc3',
             semantic_identifier: 'Source 3',
             link: 'https://example.com/3',
             source_type: 'web',
-            index: "3",
+            index: '3',
           },
           {
             document_id: 'doc4',
             semantic_identifier: 'Source 4',
             link: 'https://example.com/4',
             source_type: 'web',
-            index: "4",
+            index: '4',
           },
         ],
         displayPackets: [0],
@@ -143,11 +143,11 @@ describe('AIMessage', () => {
             packets: [
               {
                 ind: 0,
-                obj: { type: 'message_start', content: 'Hello [1] details' }
-              }
-            ]
-          }
-        ]
+                obj: { type: 'message_start', content: 'Hello [1] details' },
+              },
+            ],
+          },
+        ],
       },
       libs: {
         remarkGfm: {},
@@ -181,7 +181,9 @@ describe('AIMessage', () => {
     });
 
     // Find "See all sources" button (sources.length > 3)
-    const showAllBtn = component.root.findByProps({ className: 'source show-all-sources-btn' });
+    const showAllBtn = component.root.findByProps({
+      className: 'source show-all-sources-btn',
+    });
     expect(showAllBtn).toBeDefined();
 
     // Click button to open the sidebar

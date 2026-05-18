@@ -137,9 +137,7 @@ describe('MultiToolRenderer', () => {
     const toolGroups = [
       {
         ind: 1,
-        packets: [
-          { ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } },
-        ],
+        packets: [{ ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } }],
       },
     ];
 
@@ -155,8 +153,10 @@ describe('MultiToolRenderer', () => {
       );
     });
 
-    const header = component.root.findByProps({ className: 'tools-collapsed-header' });
-    
+    const header = component.root.findByProps({
+      className: 'tools-collapsed-header',
+    });
+
     // Test onClick (toggleExpanded)
     act(() => {
       header.props.onClick();
@@ -182,9 +182,7 @@ describe('MultiToolRenderer', () => {
     const toolGroups = [
       {
         ind: 1,
-        packets: [
-          { ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } },
-        ],
+        packets: [{ ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } }],
       },
     ];
 
@@ -196,7 +194,11 @@ describe('MultiToolRenderer', () => {
         <MultiToolRenderer
           toolGroups={toolGroups}
           showTools={[PacketType.SEARCH_TOOL_START]}
-          message={{ ...defaultMessage, isComplete: true, isFinalMessageComing: true }}
+          message={{
+            ...defaultMessage,
+            isComplete: true,
+            isFinalMessageComing: true,
+          }}
           libs={defaultLibs}
           onAllToolsDisplayed={onAllToolsDisplayed}
         />,
@@ -237,4 +239,3 @@ describe('MultiToolRenderer', () => {
     expect(component.toJSON()).toMatchSnapshot();
   });
 });
-

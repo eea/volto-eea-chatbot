@@ -13,6 +13,7 @@ interface UseChatControllerProps {
   enableQgen?: boolean;
   qgenAsistantId?: number;
   deepResearch?: string;
+  onyxVersion?: '2' | '3';
 }
 
 interface RelatedQuestion {
@@ -21,14 +22,42 @@ interface RelatedQuestion {
 
 // Extract JSON array from related questions response
 function extractRelatedQuestions(str: string): RelatedQuestion[] {
-  if (str.toLowerCase().includes('no_response')) {
-    throw new Error('Related questions were not generated properly');
+  if (!str || str.toLowerCase().includes('no_response')) {
+    return [];
   }
 
+  // Try to parse as JSON first if it looks like JSON
+  const trimmed = str.trim();
+  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      const items = Array.isArray(parsed) ? parsed : parsed.questions || [];
+      if (Array.isArray(items)) {
+        return items
+          .map((item) => {
+            if (typeof item === 'string') return { question: item };
+            if (item && typeof item === 'object' && item.question)
+              return { question: item.question };
+            return null;
+          })
+          .filter((i): i is RelatedQuestion => i !== null);
+      }
+    } catch (e) {
+      // Fallback to line parsing
+    }
+  }
+
+  // Fallback: split by lines and clean up common list formats
   return str
     .split('\n')
-    .filter((line) => line.trim())
-    .map((question) => ({ question }));
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line) => {
+      // Remove leading numbers or bullets like "1. ", "- ", "* ", etc.
+      const cleaned = line.replace(/^[\d\.\-\*\s]+/, '').trim();
+      return cleaned ? { question: cleaned } : null;
+    })
+    .filter((i): i is RelatedQuestion => i !== null);
 }
 
 // Fetch related questions using the qgen assistant
@@ -36,12 +65,16 @@ async function fetchRelatedQuestions(
   query: string,
   answer: string,
   qgenAsistantId: number,
+  onyxVersion: '2' | '3' = '2',
 ): Promise<RelatedQuestion[]> {
   try {
+    console.log(`[RQ] Creating session for assistant ${qgenAsistantId} (Onyx v${onyxVersion})`);
     const chatSessionId = await createChatSession(
       qgenAsistantId,
       `Q: ${query}`,
+      true,
     );
+    console.log(`[RQ] Session created: ${chatSessionId}`);
 
     const params = {
       message: `Question: ${query}\nAnswer:\n${answer}`,
@@ -49,23 +82,35 @@ async function fetchRelatedQuestions(
       fileDescriptors: [],
       parentMessageId: null,
       chatSessionId,
-      promptId: 0,
       filters: null,
       selectedDocumentIds: [],
       use_agentic_search: false,
       regenerate: false,
+      onyxVersion,
     };
+
+    if (onyxVersion === '3') {
+      console.log('[Onyx v3] Sending RQ prompt:', params.message);
+    }
 
     let result = '';
     for await (const packets of sendMessage(params, true)) {
       for (const packet of packets) {
-        if (packet.obj.type === PacketType.MESSAGE_DELTA) {
-          result += packet.obj.content;
+        if (onyxVersion === '3') {
+          // console.log('[Onyx v3] RQ Packet:', packet);
+        }
+        if (
+          packet.obj.type === PacketType.MESSAGE_DELTA ||
+          packet.obj.type === PacketType.MESSAGE_START
+        ) {
+          result += (packet.obj as any).content || '';
         }
       }
     }
-
-    return extractRelatedQuestions(result);
+    console.log(`[RQ] Final response string: "${result}"`);
+    const extracted = extractRelatedQuestions(result);
+    console.log(`[RQ] Extracted ${extracted.length} questions`);
+    return extracted;
   } catch (error) {
     console.error('Error fetching related questions:', error);
     return [];
@@ -77,6 +122,7 @@ export function useChatController({
   enableQgen = false,
   qgenAsistantId,
   deepResearch,
+  onyxVersion = '2',
 }: UseChatControllerProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
@@ -229,6 +275,7 @@ export function useChatController({
             regenerate: false,
             filters: null,
             selectedDocumentIds: [],
+            onyxVersion,
           },
           assistantNodeId,
           userNodeId,
@@ -250,6 +297,7 @@ export function useChatController({
   );
 
   const onFetchRelatedQuestions = useCallback(async () => {
+    console.log('[RQ] onFetchRelatedQuestions triggered');
     const latestAssistantMessage = messages
       .filter((m) => m.type === 'assistant')
       .pop();
@@ -259,6 +307,7 @@ export function useChatController({
       qgenAsistantId &&
       latestAssistantMessage?.type === 'assistant'
     ) {
+      console.log(`[RQ] Criteria met: assistantNodeId=${latestAssistantMessage.nodeId}, qgenAssistant=${qgenAsistantId}`);
       if (isDeepResearchEnabled) {
         setMessages((prev) => {
           return prev.map((m) =>
@@ -284,6 +333,7 @@ export function useChatController({
             userMessage.message,
             latestAssistantMessage.message,
             qgenAsistantId,
+            onyxVersion,
           );
         }
       } catch (error) {
@@ -299,7 +349,7 @@ export function useChatController({
         setIsFetchingRelatedQuestions(false);
       }
     }
-  }, [messages, enableQgen, qgenAsistantId, isDeepResearchEnabled]);
+  }, [messages, enableQgen, qgenAsistantId, isDeepResearchEnabled, onyxVersion]);
 
   const clearChat = useCallback(() => {
     setMessages([]);

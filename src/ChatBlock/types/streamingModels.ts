@@ -51,6 +51,13 @@ export enum PacketType {
   MESSAGE_END_ID_INFO = 'message_end_id_info',
 
   ERROR = 'error',
+
+  // Onyx v3 replacements
+  SEARCH_TOOL_START_V3 = 'search_tool_start',
+  SEARCH_TOOL_QUERIES_DELTA = 'search_tool_queries_delta',
+  SEARCH_TOOL_DOCUMENTS_DELTA = 'search_tool_documents_delta',
+  CITATION_INFO = 'citation_info',
+  REASONING_DONE = 'reasoning_done',
 }
 
 // Basic Message Packets
@@ -174,12 +181,44 @@ export interface ErrorObj extends BaseObj {
   error: string;
 }
 
+// Onyx v3 Specific Packets
+export interface SearchToolStartV3 extends BaseObj {
+  type: PacketType.SEARCH_TOOL_START_V3;
+  is_internet_search?: boolean;
+}
+
+export interface SearchToolQueriesDelta extends BaseObj {
+  type: PacketType.SEARCH_TOOL_QUERIES_DELTA;
+  queries: string[];
+}
+
+export interface SearchToolDocumentsDelta extends BaseObj {
+  type: PacketType.SEARCH_TOOL_DOCUMENTS_DELTA;
+  documents: OnyxDocument[];
+}
+
+export interface CitationInfo extends BaseObj {
+  type: PacketType.CITATION_INFO;
+  citation_number: number;
+  document_id: string;
+}
+
+export interface ReasoningDone extends BaseObj {
+  type: PacketType.REASONING_DONE;
+}
+
 export type ChatObj = MessageStart | MessageDelta | MessageEnd;
 export type StopObj = Stop;
 export type SectionEndObj = SectionEnd;
 
 // Specific tool objects
-export type SearchToolObj = SearchToolStart | SearchToolDelta | SectionEnd;
+export type SearchToolObj =
+  | SearchToolStart
+  | SearchToolDelta
+  | SearchToolStartV3
+  | SearchToolQueriesDelta
+  | SearchToolDocumentsDelta
+  | SectionEnd;
 export type ImageGenerationToolObj =
   | ImageGenerationToolStart
   | ImageGenerationToolDelta
@@ -196,6 +235,7 @@ export type ReasoningObj =
   | ReasoningStart
   | ReasoningDelta
   | ReasoningEnd
+  | ReasoningDone
   | SectionEnd;
 export type CitationObj =
   | CitationStart
@@ -212,7 +252,12 @@ export type ObjTypes =
   | SectionEndObj
   | CitationObj
   | ErrorObj
-  | MessageEndIdInfo;
+  | MessageEndIdInfo
+  | SearchToolStartV3
+  | SearchToolQueriesDelta
+  | SearchToolDocumentsDelta
+  | CitationInfo
+  | ReasoningDone;
 
 // Packet wrapper for streaming objects
 export interface Packet {

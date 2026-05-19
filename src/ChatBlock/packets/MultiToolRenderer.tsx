@@ -19,7 +19,7 @@ interface MultiToolRendererProps {
 
 export function MultiToolRenderer({
   toolGroups,
-  showTools = [PacketType.SEARCH_TOOL_START],
+  showTools = [PacketType.SEARCH_TOOL_START, PacketType.REASONING_START],
   message,
   libs,
   onAllToolsDisplayed,
@@ -28,22 +28,33 @@ export function MultiToolRenderer({
   const { isFinalMessageComing = false, isComplete = false } = message;
 
   // Filter tool groups based on allowed tool types
-  const filteredToolGroups = useMemo(
-    () =>
-      toolGroups.filter((group) =>
-        group.packets?.some((packet) =>
-          showTools?.includes(packet.obj.type as PacketType),
-        ),
+  const filteredToolGroups = useMemo(() => {
+    const expandedShowTools = [...(showTools || [])];
+    if (showTools?.includes(PacketType.SEARCH_TOOL_START)) {
+      expandedShowTools.push(
+        PacketType.SEARCH_TOOL_START_V3,
+        PacketType.SEARCH_TOOL_QUERIES_DELTA,
+        PacketType.SEARCH_TOOL_DOCUMENTS_DELTA,
+        PacketType.SEARCH_TOOL_DELTA,
+      );
+    }
+    if (showTools?.includes(PacketType.REASONING_START)) {
+      expandedShowTools.push(
+        PacketType.REASONING_DELTA,
+        PacketType.REASONING_DONE,
+        PacketType.REASONING_END as any,
+      );
+    }
+    return toolGroups.filter((group) =>
+      group.packets?.some((packet) =>
+        expandedShowTools.includes(packet.obj.type as PacketType),
       ),
-    [toolGroups, showTools],
-  );
+    );
+  }, [toolGroups, showTools]);
 
   // Manage tool display timing
-  const { allToolsDisplayed, handleToolComplete } = useToolDisplayTiming(
-    filteredToolGroups,
-    isFinalMessageComing,
-    isComplete,
-  );
+  const { allToolsDisplayed, handleToolComplete, toolStates } =
+    useToolDisplayTiming(filteredToolGroups, isFinalMessageComing, isComplete);
 
   // Notify parent when all tools are displayed
   useEffect(() => {
@@ -64,27 +75,29 @@ export function MultiToolRenderer({
 
   if (filteredToolGroups.length === 0) return null;
 
-  const isStreaming = !allToolsDisplayed;
+  const isOverallStreaming = !allToolsDisplayed;
 
   const count = filteredToolGroups.length;
 
-  const ariaLabel = `${count} ${isStreaming ? 'processing' : 'completed'} ${
-    count === 1 ? 'step' : 'steps'
-  }, ${isExpanded ? 'expanded' : 'collapsed'}`;
+  const ariaLabel = `${count} ${
+    isOverallStreaming ? 'processing' : 'completed'
+  } ${count === 1 ? 'step' : 'steps'}, ${isExpanded ? 'expanded' : 'collapsed'}`;
 
   return (
     <div
       className={cx('multi-tool-renderer', {
-        streaming: isStreaming,
-        complete: !isStreaming,
+        streaming: isOverallStreaming,
+        complete: !isOverallStreaming,
       })}
     >
       {/* Header */}
-      <div className={cx({ 'tools-container collapsed-view': isStreaming })}>
+      <div
+        className={cx({ 'tools-container collapsed-view': isOverallStreaming })}
+      >
         <div
           className={cx({
-            'tools-collapsed-header': isStreaming,
-            'tools-summary-header': !isStreaming,
+            'tools-collapsed-header': isOverallStreaming,
+            'tools-summary-header': !isOverallStreaming,
           })}
           onClick={toggleExpanded}
           role="button"
@@ -109,21 +122,25 @@ export function MultiToolRenderer({
         {/* Tools List */}
         <div
           className={cx({
-            'tools-collapsed-list': isStreaming,
-            'tools-expanded-content': !isStreaming,
-            expanded: isExpanded && isStreaming,
-            visible: isExpanded && !isStreaming,
+            'tools-collapsed-list': isOverallStreaming,
+            'tools-expanded-content': !isOverallStreaming,
+            expanded: isExpanded && isOverallStreaming,
+            visible: isExpanded && !isOverallStreaming,
           })}
         >
-          <div className={cx({ 'tools-list': isStreaming })}>
+          <div className={cx({ 'tools-list': isOverallStreaming })}>
             <div>
               {filteredToolGroups.map((toolGroup, index) => {
                 const isLastItem = index === filteredToolGroups.length - 1;
+                const toolState = toolStates.get(toolGroup.ind);
+                const isToolCompleted = toolState?.isCompleted;
 
                 return (
                   <div
                     key={toolGroup.ind}
-                    className={cx({ 'tool-collaps ed-wrapper': isStreaming })}
+                    className={cx({
+                      'tool-collapsed-wrapper': isOverallStreaming,
+                    })}
                   >
                     <RendererComponent
                       packets={toolGroup.packets}
@@ -143,32 +160,46 @@ export function MultiToolRenderer({
                         ) : (
                           <span
                             className={cx({
-                              'tool-icon-dot': isStreaming,
-                              'tool-icon-default': !isStreaming,
+                              'tool-icon-dot': isOverallStreaming,
+                              'tool-icon-default': !isOverallStreaming,
                             })}
                           />
                         );
 
-                        // Streaming: collapsed view (status only)
-                        if (isStreaming) {
-                          return (
-                            <div
-                              className={cx('tool-item-collapsed', {
-                                active: isLastItem,
-                                completed: !isLastItem,
-                              })}
-                            >
-                              <div className="tool-collapsed-icon">
-                                {finalIcon}
-                              </div>
-                              <span className="tool-collapsed-status">
-                                {status}
-                              </span>
-                            </div>
+                        // If tool is not completed and we are overall streaming, show collapsed view
+                        // EXCEPT for reasoning and search which we want to see while they stream/progress
+                        if (isOverallStreaming && !isToolCompleted) {
+                          const isDetailedTool = toolGroup.packets.some(
+                            (p) =>
+                              p.obj.type === PacketType.REASONING_START ||
+                              p.obj.type === PacketType.REASONING_DELTA ||
+                              p.obj.type === PacketType.SEARCH_TOOL_START ||
+                              p.obj.type === PacketType.SEARCH_TOOL_START_V3 ||
+                              p.obj.type === PacketType.SEARCH_TOOL_DELTA ||
+                              p.obj.type === PacketType.SEARCH_TOOL_QUERIES_DELTA ||
+                              p.obj.type === PacketType.SEARCH_TOOL_DOCUMENTS_DELTA,
                           );
+
+                          if (!isDetailedTool || !content) {
+                            return (
+                              <div
+                                className={cx('tool-item-collapsed', {
+                                  active: isLastItem,
+                                  completed: isToolCompleted,
+                                })}
+                              >
+                                <div className="tool-collapsed-icon">
+                                  {finalIcon}
+                                </div>
+                                <span className="tool-collapsed-status">
+                                  {status}
+                                </span>
+                              </div>
+                            );
+                          }
                         }
 
-                        // Complete: expanded view (full content)
+                        // Expanded view (full content) - used for completed tools or when overall complete
                         return (
                           <div className="tool-item-expanded">
                             <div className="tool-connector-line" />

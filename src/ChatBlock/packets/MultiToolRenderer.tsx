@@ -166,37 +166,26 @@ export function MultiToolRenderer({
                           />
                         );
 
-                        // If tool is not completed and we are overall streaming, show collapsed view
-                        // EXCEPT for reasoning and search which we want to see while they stream/progress
-                        if (isOverallStreaming && !isToolCompleted) {
-                          const isDetailedTool = toolGroup.packets.some(
-                            (p) =>
-                              p.obj.type === PacketType.REASONING_START ||
-                              p.obj.type === PacketType.REASONING_DELTA ||
-                              p.obj.type === PacketType.SEARCH_TOOL_START ||
-                              p.obj.type === PacketType.SEARCH_TOOL_START_V3 ||
-                              p.obj.type === PacketType.SEARCH_TOOL_DELTA ||
-                              p.obj.type === PacketType.SEARCH_TOOL_QUERIES_DELTA ||
-                              p.obj.type === PacketType.SEARCH_TOOL_DOCUMENTS_DELTA,
-                          );
-
-                          if (!isDetailedTool || !content) {
-                            return (
-                              <div
-                                className={cx('tool-item-collapsed', {
-                                  active: isLastItem,
-                                  completed: isToolCompleted,
-                                })}
-                              >
-                                <div className="tool-collapsed-icon">
-                                  {finalIcon}
-                                </div>
-                                <span className="tool-collapsed-status">
-                                  {status}
-                                </span>
+                        // Phase 1: While streaming, show only collapsed status titles
+                        // All tools (including reasoning and search) display only
+                        // their high-level title during active tool execution.
+                        // Full details are revealed in Phase 2 (allToolsDisplayed).
+                        if (isOverallStreaming) {
+                          return (
+                            <div
+                              className={cx('tool-item-collapsed', {
+                                active: isLastItem,
+                                completed: isToolCompleted,
+                              })}
+                            >
+                              <div className="tool-collapsed-icon">
+                                {finalIcon}
                               </div>
-                            );
-                          }
+                              <span className="tool-collapsed-status">
+                                {status}
+                              </span>
+                            </div>
+                          );
                         }
 
                         // Expanded view (full content) - used for completed tools or when overall complete

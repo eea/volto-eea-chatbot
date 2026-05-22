@@ -264,7 +264,9 @@ export function AIMessage({
   const sources = useMemo(
     () =>
       Object.values(citations).map((doc_id) => {
-        const doc = documents?.find((doc: any) => doc.document_id === doc_id);
+        const doc = documents?.find(
+          (doc: any) => doc.document_id === doc_id || doc.link === doc_id,
+        );
         return {
           ...(doc || {}),
           index: inverseMap[doc_id],

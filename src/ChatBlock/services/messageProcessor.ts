@@ -35,11 +35,16 @@ export class MessageProcessor {
   private _citations = new Map<number, string>();
   private _isComplete: boolean = false;
   private _isFinalMessageComing: boolean = false;
+  public onyxVersion: string;
+  private _hasCitationInfo: boolean = false;
 
   constructor(
     private nodeId: number,
     private parentNodeId: number | null,
-  ) {}
+    onyxVersion: string = '2',
+  ) {
+    this.onyxVersion = onyxVersion;
+  }
 
   /**
    * Add new packets to the processor
@@ -211,16 +216,21 @@ export class MessageProcessor {
 
       // If we have final_documents and no citations yet, create a fallback mapping
       // This ensures the Sources tab shows up in v3 when citation_info is missing
+      // In Onyx 3, this fallback is cleared on the first citation_info packet
       if (
         packet.obj.type === PacketType.MESSAGE_START &&
         data.final_documents &&
         this._citations.size === 0
       ) {
-        data.final_documents.forEach((doc: OnyxDocument, index: number) => {
-          if (doc.document_id) {
-            this._citations.set(index + 1, doc.document_id);
-          }
-        });
+        if (this.onyxVersion === '3' && this._hasCitationInfo) {
+          // If we already received real citations in v3, skip fallback
+        } else {
+          data.final_documents.forEach((doc: OnyxDocument, index: number) => {
+            if (doc.document_id) {
+              this._citations.set(index + 1, doc.document_id);
+            }
+          });
+        }
       }
     }
   }
@@ -233,10 +243,49 @@ export class MessageProcessor {
     if (packet.obj.type === PacketType.CITATION_INFO) {
       const citationInfo = packet.obj as any;
       if (citationInfo.citation_number && citationInfo.document_id) {
-        this._citations.set(
-          citationInfo.citation_number,
-          citationInfo.document_id,
-        );
+        if (this.onyxVersion === '3') {
+          // Onyx v3: citation_info.document_id is a URL.
+          // On first citation_info, discard fallback citations built from
+          // final_documents so we only keep actually-cited sources.
+          if (!this._hasCitationInfo) {
+            this._hasCitationInfo = true;
+            this._citations.clear();
+          }
+
+          const citationUrl = citationInfo.document_id;
+          this._citations.set(citationInfo.citation_number, citationUrl);
+
+          // Try to match the citation URL to an existing search-result document
+          // by its `link` field for rich metadata (blurb, updated_at, etc.).
+          // If no match exists, create a lightweight document from the URL.
+          if (!this.documentMap.has(citationUrl)) {
+            const existingDoc = this._documents.find(
+              (doc) => doc.link === citationUrl,
+            );
+
+            if (existingDoc) {
+              // Re-index under the URL key so AIMessage lookup by doc_id works
+              this.documentMap.set(citationUrl, existingDoc);
+            } else {
+              this.documentMap.set(citationUrl, {
+                document_id: citationUrl,
+                semantic_identifier: this.titleFromUrl(citationUrl),
+                link: citationUrl,
+                blurb: '',
+                source_type: 'web',
+                updated_at: null,
+                match_highlights: [],
+              });
+            }
+            this._documents = Array.from(this.documentMap.values());
+          }
+        } else {
+          // Onyx v2: store as-is (document_id is an internal doc ID)
+          this._citations.set(
+            citationInfo.citation_number,
+            citationInfo.document_id,
+          );
+        }
       }
       return;
     }
@@ -249,6 +298,23 @@ export class MessageProcessor {
         this._citations.set(citation.citation_num, citation.document_id);
       }
     });
+  }
+
+  /**
+   * Extract a human-readable title from a URL path.
+   * e.g. "https://example.com/news/my-article" → "my-article"
+   */
+  private titleFromUrl(urlStr: string): string {
+    try {
+      const url = new URL(urlStr);
+      const parts = url.pathname.split('/').filter(Boolean);
+      if (parts.length > 0) {
+        return parts[parts.length - 1];
+      }
+      return url.hostname;
+    } catch {
+      return urlStr;
+    }
   }
 
   /**

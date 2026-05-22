@@ -34,7 +34,7 @@ export function useChatStreaming({
       // Reset previous processor state
       setIsStreaming(true);
       abortControllerRef.current = new AbortController();
-      processorRef.current = new MessageProcessor(nodeId, parentNodeId);
+      processorRef.current = new MessageProcessor(nodeId, parentNodeId, params.onyxVersion || '2');
 
       try {
         for await (const packets of sendMessage({

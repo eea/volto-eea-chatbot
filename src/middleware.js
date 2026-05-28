@@ -186,12 +186,12 @@ async function send_onyx_request(
     options.body = JSON.stringify(req.body);
   }
 
-  console.log('[Middleware] Sending request to Onyx:', {
-    url,
-    method: req.method,
-    hasBody: !!req.body,
-    body: JSON.stringify(req.body, null, 2),
-  });
+  // console.log('[Middleware] Sending request to Onyx:', {
+  //   url,
+  //   method: req.method,
+  //   hasBody: !!req.body,
+  //   body: JSON.stringify(req.body, null, 2),
+  // });
 
   const mock_file = is_related_question
     ? process.env.MOCK_LLM_FILE_PATH_RQ
@@ -220,12 +220,12 @@ async function send_onyx_request(
     log(`Fetching ${url}`);
     const response = await fetch(url, options, req.body);
 
-    console.log('[Middleware] Received response from Onyx:', {
-      url,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers.raw(),
-    });
+    // console.log('[Middleware] Received response from Onyx:', {
+    //   url,
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   headers: response.headers.raw(),
+    // });
 
     if (process.env.DUMP_LLM_FILE_PATH && !is_related_question) {
       const filePath = process.env.DUMP_LLM_FILE_PATH;

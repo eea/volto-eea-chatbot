@@ -316,7 +316,11 @@ describe('isPathAllowed', () => {
 
   it('strips query strings before comparison', () => {
     expect(
-      isPathAllowed('/persona?include_deleted=false', 'GET', ALLOWED_PROXY_PATHS),
+      isPathAllowed(
+        '/persona?include_deleted=false',
+        'GET',
+        ALLOWED_PROXY_PATHS,
+      ),
     ).toBe(true);
     expect(
       isPathAllowed('/persona/25?fields=name', 'GET', ALLOWED_PROXY_PATHS),
@@ -324,9 +328,9 @@ describe('isPathAllowed', () => {
   });
 
   it('rejects non-numeric persona IDs', () => {
-    expect(
-      isPathAllowed('/persona/abc', 'GET', ALLOWED_PROXY_PATHS),
-    ).toBe(false);
+    expect(isPathAllowed('/persona/abc', 'GET', ALLOWED_PROXY_PATHS)).toBe(
+      false,
+    );
   });
 });
 

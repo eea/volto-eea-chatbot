@@ -1,4 +1,5 @@
 import middleware from './middleware';
+import { isPathAllowed } from '../middleware';
 
 jest.mock('./generative');
 
@@ -65,5 +66,40 @@ describe('halloumi middleware', () => {
 
     process.env.LLMGW_TOKEN = origToken;
     process.env.LLMGW_URL = origUrl;
+  });
+});
+
+describe('halloumi path allowlist', () => {
+  // Mirror of ALLOWED_HALLOUMI_PATHS from middleware.js
+  const ALLOWED_HALLOUMI_PATHS = [
+    { path: '/generate', methods: ['POST'] },
+    { path: '/classify', methods: ['POST'] },
+  ];
+
+  it('allows /generate with POST', () => {
+    expect(isPathAllowed('/generate', 'POST', ALLOWED_HALLOUMI_PATHS)).toBe(
+      true,
+    );
+  });
+
+  it('allows /classify with POST', () => {
+    expect(isPathAllowed('/classify', 'POST', ALLOWED_HALLOUMI_PATHS)).toBe(
+      true,
+    );
+  });
+
+  it('rejects /generate with wrong method', () => {
+    expect(isPathAllowed('/generate', 'GET', ALLOWED_HALLOUMI_PATHS)).toBe(
+      false,
+    );
+  });
+
+  it('rejects disallowed paths', () => {
+    expect(isPathAllowed('/admin/config', 'POST', ALLOWED_HALLOUMI_PATHS)).toBe(
+      false,
+    );
+    expect(
+      isPathAllowed('/../../etc/passwd', 'POST', ALLOWED_HALLOUMI_PATHS),
+    ).toBe(false);
   });
 });

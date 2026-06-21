@@ -1,5 +1,5 @@
 // Mock superagent
-import middleware from './middleware';
+import middleware, { isPathAllowed, ALLOWED_PROXY_PATHS } from './middleware';
 
 jest.mock('superagent', () => ({
   post: jest.fn().mockReturnValue({
@@ -233,5 +233,117 @@ describe('src/middleware', () => {
     expect(fs.createWriteStream).toHaveBeenCalledWith(
       '/tmp/dumped_response.jsonl',
     );
+  });
+
+  it('rejects disallowed paths with 404', async () => {
+    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.url = '/_da/admin/users/delete';
+    req.method = 'POST';
+
+    await middleware(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.send).toHaveBeenCalledWith({ error: 'Not Found' });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects allowed path with wrong HTTP method', async () => {
+    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.url = '/_da/persona';
+    req.method = 'DELETE';
+
+    await middleware(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.send).toHaveBeenCalledWith({ error: 'Not Found' });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects path traversal attempts', async () => {
+    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.url = '/_da/../../etc/passwd';
+    req.method = 'GET';
+
+    await middleware(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.send).toHaveBeenCalledWith({ error: 'Not Found' });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('isPathAllowed', () => {
+  it('allows all defined _da proxy paths with correct methods', () => {
+    expect(isPathAllowed('/persona', 'GET', ALLOWED_PROXY_PATHS)).toBe(true);
+    expect(isPathAllowed('/persona/25', 'GET', ALLOWED_PROXY_PATHS)).toBe(true);
+    expect(
+      isPathAllowed('/chat/create-chat-session', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/chat/send-message', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/chat/send-chat-message', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed(
+        '/chat/create-chat-message-feedback',
+        'POST',
+        ALLOWED_PROXY_PATHS,
+      ),
+    ).toBe(true);
+  });
+
+  it('rejects allowed paths with wrong methods', () => {
+    expect(isPathAllowed('/persona', 'POST', ALLOWED_PROXY_PATHS)).toBe(false);
+    expect(
+      isPathAllowed('/chat/send-message', 'GET', ALLOWED_PROXY_PATHS),
+    ).toBe(false);
+  });
+
+  it('rejects disallowed paths', () => {
+    expect(
+      isPathAllowed('/admin/users/delete', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(false);
+    expect(isPathAllowed('/../../etc/passwd', 'GET', ALLOWED_PROXY_PATHS)).toBe(
+      false,
+    );
+    expect(isPathAllowed('/api/debug', 'GET', ALLOWED_PROXY_PATHS)).toBe(false);
+  });
+
+  it('strips query strings before comparison', () => {
+    expect(
+      isPathAllowed(
+        '/persona?include_deleted=false',
+        'GET',
+        ALLOWED_PROXY_PATHS,
+      ),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/persona/25?fields=name', 'GET', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+  });
+
+  it('rejects non-numeric persona IDs', () => {
+    expect(isPathAllowed('/persona/abc', 'GET', ALLOWED_PROXY_PATHS)).toBe(
+      false,
+    );
+  });
+});
+
+describe('isPathAllowed with _rq paths', () => {
+  it('allows related question paths via shared allowlist', () => {
+    expect(
+      isPathAllowed('/chat/create-chat-session', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/chat/send-message', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/chat/send-chat-message', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
   });
 });

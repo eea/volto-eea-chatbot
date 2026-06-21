@@ -9,6 +9,7 @@ describe('halloumi middleware', () => {
   beforeEach(() => {
     req = {
       url: '/_ha/generate',
+      method: 'POST',
       body: {
         sources: ['source1', 'source2'],
         answer: 'test answer',

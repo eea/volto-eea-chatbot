@@ -289,7 +289,7 @@ export default async function middleware(req, res, next) {
 
   const reqUrl = `${process.env.ONYX_URL || ''}/api${path}`;
 
-  const api_key = process.env.ONYX_API_KEY;
+  const api_key = process.env.ONYX_API_KEY; //betterleaks:allow
   if (!api_key) {
     res.statusCode = 500;
     res.statusMessage = MSG_INVALID_CONFIGURATION;
@@ -300,7 +300,7 @@ export default async function middleware(req, res, next) {
   try {
     await send_onyx_request(req, res, {
       url: reqUrl,
-      api_key: api_key,
+      api_key: api_key, //betterleaks:allow
       is_related_question,
     });
   } catch (error) {

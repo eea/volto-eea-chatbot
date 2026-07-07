@@ -7,7 +7,7 @@ const DeepResearchToggle = ({ mode, enabled, onChange }) => {
 
   if (mode === 'always_on') {
     return (
-      <div className="ais-deep-research ais-deep-research-right">
+      <div className="ais-deep-research">
         <small className="ais-deep-research-label">
           <FormattedMessage
             id="Deep research on"
@@ -19,7 +19,7 @@ const DeepResearchToggle = ({ mode, enabled, onChange }) => {
   }
 
   return (
-    <div className="ais-deep-research ais-deep-research-right">
+    <div className="ais-deep-research">
       <Checkbox
         toggle
         checked={enabled}

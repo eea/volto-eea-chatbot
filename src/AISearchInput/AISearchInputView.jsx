@@ -99,16 +99,26 @@ const AISearchInputView = ({ data }) => {
         error={error}
       />
 
-      <DeepResearchToggle
-        mode={data.deepResearch}
-        enabled={deepResearchEnabled}
-        onChange={setDeepResearchEnabled}
-      />
-
-      {data.examplePromptsEnabled && data.examplePrompts && (
-        <PromptChips
-          prompts={data.examplePrompts}
-          onSelect={handleChipSelect}
+      {(data.examplePromptsEnabled && data.examplePrompts) ||
+      data.deepResearch !== 'unavailable' ? (
+        <div className="ais-controls-row">
+          {data.examplePromptsEnabled && data.examplePrompts && (
+            <PromptChips
+              prompts={data.examplePrompts}
+              onSelect={handleChipSelect}
+            />
+          )}
+          <DeepResearchToggle
+            mode={data.deepResearch}
+            enabled={deepResearchEnabled}
+            onChange={setDeepResearchEnabled}
+          />
+        </div>
+      ) : (
+        <DeepResearchToggle
+          mode={data.deepResearch}
+          enabled={deepResearchEnabled}
+          onChange={setDeepResearchEnabled}
         />
       )}
 

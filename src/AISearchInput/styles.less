@@ -154,34 +154,18 @@
     font-size: 0.8rem;
   }
 
-  // --- Deep research toggle (Row 3, right-aligned) ---
-  .ais-deep-research {
+  // --- Controls row: chips (left) + deep research toggle (right) ---
+  .ais-controls-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-end;
+    gap: 0.5rem;
   }
 
-  .ais-deep-research-label {
-    font-size: 0.8rem;
-    opacity: 0.8;
-  }
-
-  // Semantic UI Checkbox color inheritance
-  :global(.ais-deep-research .ui.checkbox) {
-    color: inherit;
-
-    :global(.icon)::before {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    &.checked :global(.icon)::before {
-      background-color: currentColor;
-    }
-  }
-
-  // --- Prompt chips (Row 4) ---
+  // --- Prompt chips ---
   .ais-prompt-chips {
     display: flex;
+    flex: 1;
     flex-wrap: wrap;
     gap: 0.5rem;
 
@@ -203,6 +187,32 @@
         outline: 2px solid currentColor;
         outline-offset: 2px;
       }
+    }
+  }
+
+  // --- Deep research toggle (right-aligned) ---
+  .ais-deep-research {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .ais-deep-research-label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+
+  // Semantic UI Checkbox color inheritance
+  :global(.ais-deep-research .ui.checkbox) {
+    color: inherit;
+
+    :global(.icon)::before {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    &.checked :global(.icon)::before {
+      background-color: currentColor;
     }
   }
 

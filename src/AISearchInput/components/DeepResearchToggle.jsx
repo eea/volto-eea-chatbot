@@ -1,5 +1,4 @@
 import React from 'react';
-import { Checkbox } from 'semantic-ui-react';
 import { FormattedMessage } from 'react-intl';
 
 const DeepResearchToggle = ({ mode, enabled, onChange }) => {
@@ -20,14 +19,15 @@ const DeepResearchToggle = ({ mode, enabled, onChange }) => {
 
   return (
     <div className="ais-deep-research">
-      <Checkbox
-        toggle
-        checked={enabled}
-        label={
-          <FormattedMessage id="Deep research" defaultMessage="Deep research" />
-        }
-        onChange={(_, { checked }) => onChange(checked)}
-      />
+      <label className="ais-toggle">
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        <span className="ais-toggle-slider" />
+        <FormattedMessage id="Deep research" defaultMessage="Deep research" />
+      </label>
     </div>
   );
 };

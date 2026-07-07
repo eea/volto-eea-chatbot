@@ -203,6 +203,53 @@
     opacity: 0.8;
   }
 
+  // Custom toggle switch
+  .ais-toggle {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    gap: 0.4rem;
+
+    input {
+      display: none;
+    }
+
+    .ais-toggle-slider {
+      position: relative;
+      display: inline-block;
+      width: 2rem;
+      height: 1rem;
+      border: 1px solid currentColor;
+      border-radius: 1rem;
+      background-color: rgba(currentColor, 0.15);
+      transition: background-color 0.2s;
+
+      &::before {
+        position: absolute;
+        top: 50%;
+        left: 2px;
+        display: block;
+        width: calc(1rem - 4px);
+        height: calc(1rem - 4px);
+        border-radius: 50%;
+        background-color: currentColor;
+        content: '';
+        transform: translateY(-50%);
+        transition: transform 0.2s;
+      }
+    }
+
+    input:checked ~ .ais-toggle-slider {
+      border-color: @green-4;
+      background-color: @green-4;
+
+      &::before {
+        transform: translateX(calc(1rem - 4px)) translateY(-50%);
+      }
+    }
+  }
+
   // --- Disclaimer (Row 5) ---
   .ais-disclaimer {
     margin-top: 0.25rem;

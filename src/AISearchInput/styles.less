@@ -203,25 +203,6 @@
     opacity: 0.8;
   }
 
-  // Semantic UI Toggle checkbox - styled for dark/light backgrounds
-  :global(.ais-deep-research .ui.toggle.checkbox) {
-    :global(.box),
-    :global(label)::before {
-      border-color: rgba(255, 255, 255, 0.5);
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-
-    &.checked :global(.box),
-    &.checked :global(label)::before {
-      border-color: @green-4;
-      background-color: @green-4;
-    }
-
-    :global(label) {
-      color: inherit;
-    }
-  }
-
   // --- Disclaimer (Row 5) ---
   .ais-disclaimer {
     margin-top: 0.25rem;

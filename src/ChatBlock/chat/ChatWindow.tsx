@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
+import { useHistory } from 'react-router-dom';
 import type { Persona } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { Button, Form, Segment, Checkbox } from 'semantic-ui-react';
 import { injectLazyLibs } from '@plone/volto/helpers/Loadable';
@@ -50,6 +51,8 @@ interface ChatWindowProps {
   maxContextSegments?: number;
   onyxVersion?: '2' | '3';
   isPlaywrightTest?: boolean;
+  initialQuery?: string | null;
+  initialDeepResearch?: string | null;
   [key: string]: any;
 }
 
@@ -61,6 +64,8 @@ function ChatWindow({
   placeholderPrompt = 'Ask a question',
   isEditMode,
   isPlaywrightTest,
+  initialQuery,
+  initialDeepResearch,
   ...data
 }: ChatWindowProps) {
   const {
@@ -124,6 +129,7 @@ function ChatWindow({
 
   const [showLandingPage, setShowLandingPage] = useState(true);
 
+  const history = useHistory();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const chatWindowRef = useRef(null);
   const chatWindowEndRef = useRef(null);
@@ -131,6 +137,23 @@ function ChatWindow({
   useEffect(() => {
     setShowLandingPage(messages.length === 0);
   }, [messages]);
+
+  // Set deep research state from URL parameter
+  useEffect(() => {
+    if (initialDeepResearch !== null && initialDeepResearch !== undefined) {
+      const enabled = initialDeepResearch.toLowerCase() === 'true';
+      setIsDeepResearchEnabled(enabled);
+    }
+  }, []);
+
+  // Auto-submit query from URL parameter on mount
+  useEffect(() => {
+    if (initialQuery && messages.length === 0 && !isStreaming) {
+      onSubmit({ message: initialQuery });
+      setShowLandingPage(false);
+      history.replace(window.location.pathname);
+    }
+  }, []);
 
   const handleStarterPromptChoice = useCallback(
     (message: string) => {

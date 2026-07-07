@@ -13,6 +13,8 @@ function ChatBlockView(props) {
   );
 
   const isPlaywrightTest = query.playwright === 'yes';
+  const initialQuery = query.query || null;
+  const initialDeepResearch = query.deepResearch || null;
 
   useEffect(() => {
     if (isPlaywrightTest) {
@@ -29,6 +31,8 @@ function ChatBlockView(props) {
       isEditMode={isEditMode}
       isPlaywrightTest={isPlaywrightTest}
       block_id={id}
+      initialQuery={initialQuery}
+      initialDeepResearch={initialDeepResearch}
       {...data}
     />
   ) : (

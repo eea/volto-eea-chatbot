@@ -11,4 +11,48 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
+#. Default: "AI Search Input"
+#: AISearchInput/messages
+msgid "AI Search Input"
+msgstr ""
 
+#. Default: "Ask your question..."
+#: AISearchInput/components/SearchInput
+#: AISearchInput/messages
+msgid "Ask your question..."
+msgstr ""
+
+#. Default: "Assistant page is not configured. Please contact the site administrator."
+#: AISearchInput/AISearchInputView
+#: AISearchInput/messages
+msgid "Assistant page is not configured. Please contact the site administrator."
+msgstr ""
+
+#. Default: "Deep research"
+#: AISearchInput/components/DeepResearchToggle
+#: AISearchInput/messages
+msgid "Deep research"
+msgstr ""
+
+#. Default: "Deep research on"
+#: AISearchInput/components/DeepResearchToggle
+#: AISearchInput/messages
+msgid "Deep research on"
+msgstr ""
+
+#. Default: "Invalid assistant page URL."
+#: AISearchInput/AISearchInputView
+#: AISearchInput/messages
+msgid "Invalid assistant page URL."
+msgstr ""
+
+#. Default: "Submit question"
+#: AISearchInput/components/SearchInput
+#: AISearchInput/messages
+msgid "Submit question"
+msgstr ""
+
+#. Default: "This assistant uses AI. Responses may contain inaccuracies."
+#: AISearchInput/messages
+msgid "This assistant uses AI. Responses may contain inaccuracies."
+msgstr ""

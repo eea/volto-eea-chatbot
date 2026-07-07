@@ -1,4 +1,5 @@
 import installChatBlock from './ChatBlock';
+import installAISearchInputBlock from './AISearchInput';
 import loadable from '@loadable/component';
 
 const applyConfig = (config) => {
@@ -40,6 +41,7 @@ const applyConfig = (config) => {
   };
 
   installChatBlock(config);
+  installAISearchInputBlock(config);
 
   return config;
 };

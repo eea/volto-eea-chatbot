@@ -14,12 +14,20 @@ jest.mock('superagent', () => ({
 }));
 
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
-  ChatWindow: ({ persona, isEditMode, block_id }) => (
+  ChatWindow: ({
+    persona,
+    isEditMode,
+    block_id,
+    initialQuery,
+    initialDeepResearch,
+  }) => (
     <div
       data-testid="chat-window"
       data-persona={persona?.id}
       data-edit-mode={String(isEditMode)}
       data-block-id={block_id}
+      data-initial-query={initialQuery || ''}
+      data-initial-deep-research={initialDeepResearch || ''}
     >
       ChatWindow
     </div>
@@ -102,5 +110,56 @@ describe('ChatBlockView', () => {
     });
 
     expect(window.__EEA_CHATBOT_TEST_CONFIG__).toBeUndefined();
+  });
+
+  it('passes initialQuery from URL param to ChatWindow', () => {
+    const props = {
+      ...defaultProps,
+      assistantData: { id: 42, name: 'My Assistant' },
+      location: { search: '?query=hello+world' },
+    };
+    render(<ChatBlockView {...props} />);
+    expect(screen.getByTestId('chat-window')).toHaveAttribute(
+      'data-initial-query',
+      'hello world',
+    );
+  });
+
+  it('passes initialDeepResearch from URL param to ChatWindow', () => {
+    const props = {
+      ...defaultProps,
+      assistantData: { id: 42, name: 'My Assistant' },
+      location: { search: '?query=test&deepResearch=true' },
+    };
+    render(<ChatBlockView {...props} />);
+    expect(screen.getByTestId('chat-window')).toHaveAttribute(
+      'data-initial-deep-research',
+      'true',
+    );
+  });
+
+  it('passes empty initialQuery when no query param', () => {
+    const props = {
+      ...defaultProps,
+      assistantData: { id: 42, name: 'My Assistant' },
+      location: { search: '' },
+    };
+    render(<ChatBlockView {...props} />);
+    expect(screen.getByTestId('chat-window')).toHaveAttribute(
+      'data-initial-query',
+      '',
+    );
+  });
+
+  it('passes both query and deepResearch params together', () => {
+    const props = {
+      ...defaultProps,
+      assistantData: { id: 42, name: 'My Assistant' },
+      location: { search: '?query=my+question&deepResearch=false' },
+    };
+    render(<ChatBlockView {...props} />);
+    const chatWindow = screen.getByTestId('chat-window');
+    expect(chatWindow).toHaveAttribute('data-initial-query', 'my question');
+    expect(chatWindow).toHaveAttribute('data-initial-deep-research', 'false');
   });
 });

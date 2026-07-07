@@ -11,9 +11,9 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
 
 jest.mock('@eeacms/volto-eea-chatbot/icons/sparkle.svg', () => 'sparkle');
 
-jest.mock('@plone/volto/components', () => ({
-  SlateViewer: ({ value }) => (
-    <div data-testid="slate-viewer">{JSON.stringify(value)}</div>
+jest.mock('@plone/volto-slate/editor/render', () => ({
+  serializeNodes: (nodes) => (
+    <div data-testid="slate-content">{JSON.stringify(nodes)}</div>
   ),
 }));
 
@@ -33,10 +33,10 @@ describe('IntroHeader', () => {
     expect(screen.getByText('My Title')).toBeInTheDocument();
   });
 
-  it('renders intro text via SlateViewer', () => {
+  it('renders intro text via serializeNodes', () => {
     const introText = [{ type: 'p', children: [{ text: 'Hello' }] }];
     render(<IntroHeader introText={introText} />);
-    expect(screen.getByTestId('slate-viewer')).toBeInTheDocument();
+    expect(screen.getByTestId('slate-content')).toBeInTheDocument();
   });
 
   it('renders nothing when all props are empty', () => {

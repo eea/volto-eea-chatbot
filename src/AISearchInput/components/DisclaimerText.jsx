@@ -1,14 +1,10 @@
 import React from 'react';
-import { SlateViewer } from '@plone/volto/components';
+import { serializeNodes } from '@plone/volto-slate/editor/render';
 
 const DisclaimerText = ({ disclaimerText }) => {
   if (!disclaimerText) return null;
 
-  return (
-    <div className="ais-disclaimer">
-      <SlateViewer value={disclaimerText} />
-    </div>
-  );
+  return <div className="ais-disclaimer">{serializeNodes(disclaimerText)}</div>;
 };
 
 export default DisclaimerText;

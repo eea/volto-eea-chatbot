@@ -1,7 +1,7 @@
 import React from 'react';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import SparkleIcon from '@eeacms/volto-eea-chatbot/icons/sparkle.svg';
-import { SlateViewer } from '@plone/volto/components';
+import { serializeNodes } from '@plone/volto-slate/editor/render';
 
 const IntroHeader = ({ showIcon, blockTitle, introText }) => {
   if (!showIcon && !blockTitle && !introText) return null;
@@ -13,7 +13,9 @@ const IntroHeader = ({ showIcon, blockTitle, introText }) => {
       )}
       <div className="ais-intro-content">
         {blockTitle && <span className="ais-block-title">{blockTitle}</span>}
-        {introText && <SlateViewer value={introText} />}
+        {introText && (
+          <div className="ais-intro-slate">{serializeNodes(introText)}</div>
+        )}
       </div>
     </div>
   );

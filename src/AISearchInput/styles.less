@@ -2,10 +2,25 @@
 // Uses EEA Design System tokens
 
 @import '@eeacms/volto-design-tokens/src/colors';
-@import '@eeacms/volto-design-tokens/src/sizes';
 @import '@eeacms/volto-design-tokens/src/shapes';
 @import '@eeacms/volto-design-tokens/src/borders';
 @import '@eeacms/volto-design-tokens/src/fonts';
+
+// Spacing tokens from @eeacms/volto-design-tokens/src/sizes
+// (imported manually to avoid @1px Semantic UI dependency)
+@spacer: 4px;
+@space-025: @spacer * 0.25;
+@space-05: @spacer * 0.5;
+@space-1: @spacer * 1;
+@space-2: @spacer * 2;
+@space-3: @spacer * 3;
+@space-4: @spacer * 4;
+@space-5: @spacer * 5;
+@space-6: @spacer * 6;
+@space-8: @spacer * 8;
+
+// Size tokens
+@size-10: 120px;
 
 .ais-search-input {
   display: flex;

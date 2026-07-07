@@ -39,3 +39,5 @@ chatbot_tests/**/__pycache__/
 .env.chatbot_tests.local
 htmlcov/
 .coverage
+reference/
+specs/

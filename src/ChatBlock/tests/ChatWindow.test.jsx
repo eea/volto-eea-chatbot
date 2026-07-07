@@ -17,6 +17,11 @@ jest.mock('@eeacms/volto-matomo/utils', () => ({
   trackEvent: jest.fn(),
 }));
 
+const mockHistory = { push: jest.fn(), replace: jest.fn() };
+jest.mock('react-router-dom', () => ({
+  useHistory: () => mockHistory,
+}));
+
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hooks', () => ({
   useChatController: jest.fn(() => ({
     onSubmit: jest.fn(),
@@ -270,5 +275,179 @@ describe('ChatWindow', () => {
 
     const { container } = render(<ChatWindowWrapped persona={mockPersona} />);
     expect(container.querySelector('.loader')).toBeInTheDocument();
+  });
+
+  // Auto-submit from URL parameter tests
+  it('initialQuery triggers auto-submit on mount', () => {
+    const mockOnSubmit = jest.fn();
+    const mockSetIsDeepResearchEnabled = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
+      isDeepResearchEnabled: false,
+    });
+
+    jest.spyOn(window, 'location', 'get').mockReturnValue({
+      pathname: '/assistant-page',
+    });
+
+    render(
+      <ChatWindowWrapped persona={mockPersona} initialQuery="auto question" />,
+    );
+
+    expect(mockOnSubmit).toHaveBeenCalledWith({ message: 'auto question' });
+  });
+
+  it('initialDeepResearch sets deep research toggle state', () => {
+    const mockOnSubmit = jest.fn();
+    const mockSetIsDeepResearchEnabled = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
+      isDeepResearchEnabled: false,
+    });
+
+    jest.spyOn(window, 'location', 'get').mockReturnValue({
+      pathname: '/assistant-page',
+    });
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialQuery="test"
+        initialDeepResearch="true"
+      />,
+    );
+
+    expect(mockSetIsDeepResearchEnabled).toHaveBeenCalledWith(true);
+  });
+
+  it('URL is cleaned after auto-submit via history.replace', () => {
+    const mockOnSubmit = jest.fn();
+    const mockSetIsDeepResearchEnabled = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
+      isDeepResearchEnabled: false,
+    });
+
+    jest.spyOn(window, 'location', 'get').mockReturnValue({
+      pathname: '/assistant-page',
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} initialQuery="clean me" />);
+
+    expect(mockHistory.replace).toHaveBeenCalledWith('/assistant-page');
+  });
+
+  it('no auto-submit if messages already exist', () => {
+    const mockOnSubmit = jest.fn();
+    const mockSetIsDeepResearchEnabled = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [
+        {
+          messageId: 1,
+          message: 'Existing message',
+          type: 'user',
+          packets: [],
+          files: [],
+          toolCall: null,
+          parentNodeId: null,
+          nodeId: 1,
+        },
+      ],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
+      isDeepResearchEnabled: false,
+    });
+
+    jest.spyOn(window, 'location', 'get').mockReturnValue({
+      pathname: '/assistant-page',
+    });
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialQuery="should not submit"
+      />,
+    );
+
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('no auto-submit if streaming is in progress', () => {
+    const mockOnSubmit = jest.fn();
+    const mockSetIsDeepResearchEnabled = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: true,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
+      isDeepResearchEnabled: false,
+    });
+
+    jest.spyOn(window, 'location', 'get').mockReturnValue({
+      pathname: '/assistant-page',
+    });
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialQuery="should not submit"
+      />,
+    );
+
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('initialDeepResearch=false sets toggle to false', () => {
+    const mockOnSubmit = jest.fn();
+    const mockSetIsDeepResearchEnabled = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
+      isDeepResearchEnabled: true,
+    });
+
+    jest.spyOn(window, 'location', 'get').mockReturnValue({
+      pathname: '/assistant-page',
+    });
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialQuery="test"
+        initialDeepResearch="false"
+      />,
+    );
+
+    expect(mockSetIsDeepResearchEnabled).toHaveBeenCalledWith(false);
   });
 });

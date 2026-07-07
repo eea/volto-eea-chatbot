@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import SidebarPortal from '@plone/volto/components/manage/Sidebar/SidebarPortal';
 import BlockDataForm from '@plone/volto/components/manage/Form/BlockDataForm';
 
@@ -7,8 +8,12 @@ import { AISearchInputSchema } from './schema';
 
 const AISearchInputEdit = (props) => {
   const { onChangeBlock, block, data } = props;
+  const intl = useIntl();
 
-  const schema = React.useMemo(() => AISearchInputSchema({ data }), [data]);
+  const schema = React.useMemo(
+    () => AISearchInputSchema({ intl, data }),
+    [data, intl],
+  );
 
   return (
     <div>

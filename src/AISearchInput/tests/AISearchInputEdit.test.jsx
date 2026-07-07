@@ -4,6 +4,12 @@ import '@testing-library/jest-dom';
 
 import AISearchInputEdit from '@eeacms/volto-eea-chatbot/AISearchInput/AISearchInputEdit';
 
+jest.mock('react-intl', () => ({
+  useIntl: () => ({
+    formatMessage: ({ defaultMessage }) => defaultMessage,
+  }),
+}));
+
 jest.mock('@eeacms/volto-eea-chatbot/AISearchInput/AISearchInputView', () => ({
   __esModule: true,
   default: ({ isEditMode }) => (

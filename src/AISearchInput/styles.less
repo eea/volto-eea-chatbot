@@ -203,16 +203,22 @@
     opacity: 0.8;
   }
 
-  // Semantic UI Checkbox color inheritance
-  :global(.ais-deep-research .ui.checkbox) {
-    color: inherit;
-
-    :global(.icon)::before {
-      background-color: rgba(255, 255, 255, 0.2);
+  // Semantic UI Toggle checkbox - styled for dark/light backgrounds
+  :global(.ais-deep-research .ui.toggle.checkbox) {
+    :global(.box),
+    :global(label)::before {
+      border-color: rgba(255, 255, 255, 0.5);
+      background-color: rgba(255, 255, 255, 0.3);
     }
 
-    &.checked :global(.icon)::before {
-      background-color: currentColor;
+    &.checked :global(.box),
+    &.checked :global(label)::before {
+      border-color: @green-4;
+      background-color: @green-4;
+    }
+
+    :global(label) {
+      color: inherit;
     }
   }
 

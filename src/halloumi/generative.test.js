@@ -196,7 +196,7 @@ describe('halloumiGenerativeAPI via real fetch', () => {
     const model = {
       name: 'test-model',
       apiUrl: 'http://test.com/api',
-      apiKey: 'test-key',
+      apiKey: 'test-key', //betterleaks:allow
     };
     const prompt = {
       prompt: 'test prompt',

@@ -16,8 +16,8 @@ The rag-fact-checker's `/halloumi/generate` endpoint is a drop-in replacement fo
 
 ## Configuration
 
-| Environment Variable | Default | Description |
-|---|---|---|
+| Environment Variable   | Default                 | Description                              |
+| ---------------------- | ----------------------- | ---------------------------------------- |
 | `RAG_FACT_CHECKER_URL` | `http://localhost:8000` | Base URL of the rag-fact-checker service |
 
 ## Original Halloumi

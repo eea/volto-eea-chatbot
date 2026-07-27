@@ -40,7 +40,7 @@ The **Volto Chatbot** block allows the integration of an AI-powered chatbot into
 | `enableShowTotalFailMessage` | Show total failure message.                                                     | Boolean  | `false`                          |
 | `showAssistantTitle`         | Display or hide the assistant's title in the chat interface.                    | Boolean  | `true`                           |
 | `showAssistantDescription`   | Display or hide the assistant's description in the chat interface.              | Boolean  | `true`                           |
-| `qualityCheck`               | Show Halloumi-based automated quality check.                                    | Dropdown | `Disabled`                       |
+| `qualityCheck`               | Show automated fact-checking of AI answers against source documents.            | Dropdown | `Disabled`                       |
 | `onDemandInputToggle`        | Sets the default state of the fact-check AI toggle.                             | Boolean  | `true`                           |
 | `showTools`                  | Show or hide tools in the chat interface.                                       | Array    | `["internal_search_tool_start"]` |
 | `scrollToInput`              | Automatically scroll the page to focus on the chat input when interacting.      | Boolean  | `false`                          |
@@ -131,19 +131,10 @@ This document lists the environment variables used in the Volto Chatbot project.
 - `JEST_USE_SETUP`
   Used in Jest configuration. When set to 'ON', it enables a specific Jest setup.
 
-- `LLMGW_URL`
-  The URL for the LLM Gateway service.
-
-- `LLMGW_TOKEN`
-  The token for authenticating with the LLM Gateway service.
+- `RAG_FACT_CHECKER_URL`
+  The base URL for the rag-fact-checker service (default: `http://localhost:8000`).
 
 ### Development-specific environment variables
-
-- `MOCK_HALLOUMI_FILE_PATH`
-  When set, this specifies the absolute path to the JSON file containing the mocked Halloumi response. Setting this variable enables mocking of Halloumi API calls.
-
-- `DUMP_HALLOUMI_FILE_PATH`
-  When set, the Halloumi response will be dumped to the specified absolute file path for debugging or to create new mock files.
 
 - `MOCK_LLM_FILE_PATH`
   When set, this specifies the absolute path to the JSONL file containing the mocked Onyx stream response. Setting this variable enables mocking of Onyx LLM calls.

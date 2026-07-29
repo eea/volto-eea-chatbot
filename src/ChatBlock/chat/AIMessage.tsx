@@ -283,7 +283,24 @@ export function AIMessage({
     qualityCheckContext,
   );
 
-  const stableContextSources = useDeepCompareMemoize(contextSources);
+  // Deduplicate sources by text content. The streaming backend often sends
+  // the same document in multiple packets (MESSAGE_START, SEARCH_TOOL_DELTA,
+  // etc.), resulting in 40+ copies of the same text. Dedup keeps the first
+  // occurrence, preserving order. Critical: texts must remain identical
+  // between frontend (span highlighting) and backend (evidence spans).
+  const dedupedSources = useMemo(() => {
+    const seen = new Set<string>();
+    return contextSources.filter((src: any) => {
+      const key = src.halloumiContext || src.halloumiSource?.text || '';
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        return true;
+      }
+      return false;
+    });
+  }, [contextSources]);
+
+  const stableContextSources = useDeepCompareMemoize(dedupedSources);
 
   const doQualityControl =
     messageDisplayed &&

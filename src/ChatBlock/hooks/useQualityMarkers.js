@@ -48,7 +48,16 @@ export function useQualityMarkers(
 
   React.useEffect(() => {
     async function handler() {
-      const textSources = sources.map(({ halloumiContext }) => halloumiContext);
+      // Prefer structured sources (with title metadata) over plain text.
+      // Fall back to halloumiContext strings for backward compatibility.
+      const firstSource = sources[0];
+      const hasStructuredSources =
+        firstSource && typeof firstSource.halloumiSource === 'object';
+
+      const halloumiSources = hasStructuredSources
+        ? sources.map(({ halloumiSource }) => halloumiSource)
+        : sources.map(({ halloumiContext }) => halloumiContext);
+
       if (sources.length === 0) {
         setHalloumiResponse(empty(message, FAILURE_RATIONALE));
         return;
@@ -59,7 +68,7 @@ export function useQualityMarkers(
       try {
         const feedback = await fetchHalloumi(
           message,
-          textSources,
+          halloumiSources,
           maxContextSegments,
         );
         const body = await feedback.json();

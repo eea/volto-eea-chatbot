@@ -126,7 +126,11 @@ function getContextSources(
 
   return qualityCheckContext === 'citations'
     ? sources.map((doc: any) => {
-        const text = documentIdToText[doc.document_id] || '';
+        // Prefer content from tool packets (may have enriched text),
+        // but fall back to doc.content from final_documents.
+        // Without this fallback, sources sent to the fact-checker are
+        // empty strings when tool packets don't carry full content.
+        const text = documentIdToText[doc.document_id] || doc.content || '';
         const cleanedText = text.replace(/\u00A0/g, ' ');
         return {
           ...doc,

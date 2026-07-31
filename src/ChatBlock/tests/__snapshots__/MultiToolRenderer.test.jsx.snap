@@ -48,6 +48,7 @@ exports[`MultiToolRenderer renders multiple tool groups 1`] = `
         <div>
           <div
             className="tool-collapsed-wrapper"
+            data-state="pending"
           >
             <div
               className="tool-item-expanded"
@@ -99,10 +100,12 @@ exports[`MultiToolRenderer renders multiple tool groups 1`] = `
             </div>
           </div>
           <div
+            aria-current="step"
             className="tool-collapsed-wrapper"
+            data-state="active"
           >
             <div
-              className="tool-item-expanded"
+              className="tool-item-expanded active"
             >
               <div
                 className="tool-connector-line"
@@ -204,7 +207,9 @@ exports[`MultiToolRenderer renders non-detailed tool collapsed view when streami
       >
         <div>
           <div
+            aria-current="step"
             className="tool-collapsed-wrapper"
+            data-state="active"
           >
             <div
               className="tool-item-collapsed active"
@@ -217,7 +222,7 @@ exports[`MultiToolRenderer renders non-detailed tool collapsed view when streami
                 />
               </div>
               <span
-                className="tool-collapsed-status"
+                className="tool-status tool-collapsed-status"
               >
                 Generating images...
               </span>
@@ -277,10 +282,12 @@ exports[`MultiToolRenderer renders search tool groups 1`] = `
       >
         <div>
           <div
+            aria-current="step"
             className="tool-collapsed-wrapper"
+            data-state="active"
           >
             <div
-              className="tool-item-expanded"
+              className="tool-item-expanded active"
             >
               <div
                 className="tool-connector-line"

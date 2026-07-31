@@ -33,6 +33,7 @@ export class MessageProcessor {
   private _errorContent: string = '';
   private _documents: OnyxDocument[] = [];
   private _citations = new Map<number, string>();
+  private _citationsAreFallback: boolean = false;
   private _isComplete: boolean = false;
   private _isFinalMessageComing: boolean = false;
 
@@ -208,20 +209,28 @@ export class MessageProcessor {
 
     if (newDocuments) {
       this._documents = Array.from(this.documentMap.values());
+    }
 
-      // If we have final_documents and no citations yet, create a fallback mapping
-      // This ensures the Sources tab shows up in v3 when citation_info is missing
-      if (
-        packet.obj.type === PacketType.MESSAGE_START &&
-        data.final_documents &&
-        this._citations.size === 0
-      ) {
-        data.final_documents.forEach((doc: OnyxDocument, index: number) => {
-          if (doc.document_id) {
-            this._citations.set(index + 1, doc.document_id);
-          }
-        });
-      }
+    // If we have final_documents and no citations yet, create a fallback mapping
+    // This ensures the Sources tab shows up in v3 when citation_info is missing
+    if (
+      packet.obj.type === PacketType.MESSAGE_START &&
+      data.final_documents &&
+      this._citations.size === 0
+    ) {
+      data.final_documents.forEach((doc: OnyxDocument, index: number) => {
+        if (doc.document_id) {
+          this._citations.set(index + 1, doc.document_id);
+        }
+      });
+      this._citationsAreFallback = this._citations.size > 0;
+    }
+  }
+
+  private clearFallbackCitations(): void {
+    if (this._citationsAreFallback) {
+      this._citations.clear();
+      this._citationsAreFallback = false;
     }
   }
 
@@ -233,6 +242,7 @@ export class MessageProcessor {
     if (packet.obj.type === PacketType.CITATION_INFO) {
       const citationInfo = packet.obj as any;
       if (citationInfo.citation_number && citationInfo.document_id) {
+        this.clearFallbackCitations();
         this._citations.set(
           citationInfo.citation_number,
           citationInfo.document_id,
@@ -244,7 +254,14 @@ export class MessageProcessor {
       return;
     }
     const citationDelta = packet.obj as CitationDelta;
-    citationDelta.citations?.forEach((citation: StreamingCitation) => {
+    const explicitCitations = (citationDelta.citations || []).filter(
+      (citation: StreamingCitation) =>
+        citation.citation_num != null && Boolean(citation.document_id),
+    );
+    if (explicitCitations.length > 0) {
+      this.clearFallbackCitations();
+    }
+    explicitCitations.forEach((citation: StreamingCitation) => {
       if (!this._citations.has(citation.citation_num)) {
         this._citations.set(citation.citation_num, citation.document_id);
       }
@@ -397,6 +414,7 @@ export class MessageProcessor {
     this._errorContent = '';
     this._documents = [];
     this._citations.clear();
+    this._citationsAreFallback = false;
     this._isComplete = false;
     this._isFinalMessageComing = false;
   }

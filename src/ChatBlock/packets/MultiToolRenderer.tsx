@@ -133,7 +133,14 @@ export function MultiToolRenderer({
               {filteredToolGroups.map((toolGroup, index) => {
                 const isLastItem = index === filteredToolGroups.length - 1;
                 const toolState = toolStates.get(toolGroup.ind);
-                const isToolCompleted = toolState?.isCompleted;
+                const isToolCompleted = toolState?.isCompleted === true;
+                const isToolActive =
+                  isOverallStreaming && !isToolCompleted && isLastItem;
+                const toolDisplayState = isToolActive
+                  ? 'active'
+                  : isToolCompleted
+                    ? 'completed'
+                    : 'pending';
 
                 return (
                   <div
@@ -141,6 +148,8 @@ export function MultiToolRenderer({
                     className={cx({
                       'tool-collapsed-wrapper': isOverallStreaming,
                     })}
+                    data-state={toolDisplayState}
+                    aria-current={isToolActive ? 'step' : undefined}
                   >
                     <RendererComponent
                       packets={toolGroup.packets}
@@ -158,12 +167,7 @@ export function MultiToolRenderer({
                         const finalIcon = icon ? (
                           React.createElement(icon, { size: 14 })
                         ) : (
-                          <span
-                            className={cx({
-                              'tool-icon-dot': isOverallStreaming,
-                              'tool-icon-default': !isOverallStreaming,
-                            })}
-                          />
+                          <span className="tool-icon-dot" />
                         );
 
                         // If tool is not completed and we are overall streaming, show collapsed view
@@ -184,14 +188,14 @@ export function MultiToolRenderer({
                             return (
                               <div
                                 className={cx('tool-item-collapsed', {
-                                  active: isLastItem,
+                                  active: isToolActive,
                                   completed: isToolCompleted,
                                 })}
                               >
                                 <div className="tool-collapsed-icon">
                                   {finalIcon}
                                 </div>
-                                <span className="tool-collapsed-status">
+                                <span className="tool-status tool-collapsed-status">
                                   {status}
                                 </span>
                               </div>
@@ -199,9 +203,14 @@ export function MultiToolRenderer({
                           }
                         }
 
-                        // Expanded view (full content) - used for completed tools or when overall complete
+                        // Detailed view for streaming reasoning/search tools and completed tools
                         return (
-                          <div className="tool-item-expanded">
+                          <div
+                            className={cx('tool-item-expanded', {
+                              active: isToolActive,
+                              completed: isToolCompleted,
+                            })}
+                          >
                             <div className="tool-connector-line" />
 
                             <div className="tool-item-row">

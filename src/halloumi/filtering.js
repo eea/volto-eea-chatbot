@@ -4,13 +4,13 @@ import fetch from 'node-fetch';
 const log = debug('halloumi');
 
 const LLMGW_URL = process.env.LLMGW_URL;
-const LLMGW_API_KEY = process.env.LLMGW_TOKEN;
+const LLMGW_API_KEY = process.env.LLMGW_TOKEN; //betterleaks:allow
 const MIN_CONTEXT_SENTENCES_FOR_FILTERING = 75;
 
 const filterModel = {
   name: 'Inhouse-LLM/gpt-oss-120b',
   apiUrl: `${LLMGW_URL}/chat/completions`,
-  apiKey: LLMGW_API_KEY,
+  apiKey: LLMGW_API_KEY, //betterleaks:allow
 };
 
 export async function callLLM(apiUrl, apiKey, requestBody, { ip } = {}) {

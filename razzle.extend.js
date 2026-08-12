@@ -1,5 +1,10 @@
 const path = require('path');
-const makeLoaderFinder = require('razzle-dev-utils/makeLoaderFinder');
+let makeLoaderFinder;
+try {
+  makeLoaderFinder = require('@plone/razzle-dev-utils/makeLoaderFinder');
+} catch {
+  makeLoaderFinder = require('razzle-dev-utils/makeLoaderFinder');
+}
 
 const modify = (config, { target, dev }, webpack) => {
   const markedPath = path.dirname(require.resolve('marked'));

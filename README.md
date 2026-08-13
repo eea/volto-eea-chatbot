@@ -116,6 +116,43 @@ Go to http://localhost:3000
 
    For a legacy Volto 17 project, install the package with `yarn` and restart the frontend as usual.
 
+## Quality Checks (Fact-Checking)
+
+When `qualityCheck` is enabled, the chatbot sends AI answers and their source
+documents to a fact-checking backend that extracts claims, verifies each
+against the sources, and returns per-claim verdicts with evidence.
+
+### Backend dependency
+
+The fact-checking feature requires the
+[eea/rag-facts-check](https://github.com/eea/rag-facts-check) service running
+and reachable at the URL configured in `RAG_FACT_CHECKER_URL`.
+
+**Without this backend, quality checks will fail with a connection error.**
+
+The backend exposes a halloumi-compatible endpoint (`POST /halloumi/generate`)
+so the frontend can call it without code changes. It also provides a native
+`POST /check` endpoint with a richer response schema.
+
+### Deploying the backend
+
+```bash
+# Clone and build
+ git clone https://github.com/eea/rag-facts-check.git
+cd rag-facts-check
+docker build -t rag-fact-check .
+
+# Run (requires an LLM endpoint)
+docker run -p 8000:8000 \
+  -e LLM_API_BASE=http://your-llm:4002/v1 \
+  -e LLM_API_KEY=your-key \
+  -e LLM_MODEL=gemma \
+  rag-fact-check
+```
+
+See the [backend README](https://github.com/eea/rag-facts-check#rag-facts-check)
+for full configuration options.
+
 ## Environment Configuration
 
 To properly configure the middleware and authenticate with the Onyx service, ensure that the following environment variables are set:
@@ -132,7 +169,9 @@ This document lists the environment variables used in the Volto Chatbot project.
   Used in Jest configuration. When set to 'ON', it enables a specific Jest setup.
 
 - `RAG_FACT_CHECKER_URL`
-  The base URL for the rag-fact-checker service (default: `http://localhost:8000`).
+  The base URL for the [rag-facts-check](https://github.com/eea/rag-facts-check)
+  fact-checking backend. Required when `qualityCheck` is enabled.
+  Default: `http://localhost:8000`.
 
 ### Development-specific environment variables
 

@@ -81,31 +81,21 @@ function addQualityMarkersPlugin() {
   };
 }
 
-export function addHalloumiContext(doc: any, text: string) {
-  // TODO: CLEAN UP
-  // const updatedDate = doc.updated_at
-  //   ? new Date(doc.updated_at).toLocaleString('en-GB', {
-  //       year: 'numeric',
-  //       month: 'long',
-  //       day: '2-digit',
-  //       hour: '2-digit',
-  //       minute: '2-digit',
-  //     })
-  //   : '';
-
-  // const docIndex = doc.index ? `DOCUMENT ${doc.index}: ` : '';
-  // const sources: any = { web: 'Website', file: 'File' };
-
-  // const sourceType = doc.source_type
-  //   ? sources[doc.source_type] || capitalize(doc.source_type)
-  //   : '';
-
-  // const header = `${docIndex}${doc.semantic_identifier}${
-  //   sourceType ? `\nSource: ${sourceType}` : ''
-  // }${updatedDate ? `\nUpdated: ${updatedDate}` : ''}`;
-
-  // return `${header}\n${text}`;
-  return text.replace(/\u00A0/g, ' ');
+/**
+ * Build a structured source object for the fact-checker backend.
+ *
+ * The backend accepts {text, title, source_type} dicts so it can
+ * include document titles in LLM prompts without polluting the raw
+ * text (which would break span-offset matching).
+ */
+export function buildHalloumiSource(doc: any, text: string) {
+  const cleanedText = text.replace(/\u00A0/g, ' ');
+  return {
+    text: cleanedText,
+    title: doc.semantic_identifier || null,
+    source_type: doc.source_type || null,
+    link: doc.link || null,
+  };
 }
 
 function mapToolDocumentsToText(message: any) {
@@ -135,24 +125,36 @@ function getContextSources(
   const documentIdToText = mapToolDocumentsToText(message);
 
   return qualityCheckContext === 'citations'
-    ? sources.map((doc: any) => ({
-        ...doc,
-        id: doc.document_id,
-        text: documentIdToText[doc.document_id] || '',
-        halloumiContext: addHalloumiContext(
-          doc,
-          documentIdToText[doc.document_id] || '',
-        ),
-      }))
+    ? sources.map((doc: any) => {
+        // Prefer content from tool packets (may have enriched text),
+        // but fall back to doc.content from final_documents.
+        // Without this fallback, sources sent to the fact-checker are
+        // empty strings when tool packets don't carry full content.
+        const text = documentIdToText[doc.document_id] || doc.content || '';
+        const cleanedText = text.replace(/\u00A0/g, ' ');
+        return {
+          ...doc,
+          id: doc.document_id,
+          text,
+          // Keep for ClaimSegments span highlighting (plain text)
+          halloumiContext: cleanedText,
+          // Structured source for the fact-checker backend
+          halloumiSource: buildHalloumiSource(doc, text),
+        };
+      })
     : (message.toolCalls || []).reduce(
         (acc: any, cur: any) => [
           ...acc,
-          ...(cur.tool_result || []).map((doc: any) => ({
-            ...doc,
-            id: doc.document_id,
-            text: doc.content,
-            halloumiContext: addHalloumiContext(doc, doc.content),
-          })),
+          ...(cur.tool_result || []).map((doc: any) => {
+            const cleanedText = (doc.content || '').replace(/\u00A0/g, ' ');
+            return {
+              ...doc,
+              id: doc.document_id,
+              text: doc.content,
+              halloumiContext: cleanedText,
+              halloumiSource: buildHalloumiSource(doc, doc.content || ''),
+            };
+          }),
         ], // TODO: make sure we don't add multiple times the same doc
         // TODO: this doesn't have the index for source
         [],
@@ -281,7 +283,24 @@ export function AIMessage({
     qualityCheckContext,
   );
 
-  const stableContextSources = useDeepCompareMemoize(contextSources);
+  // Deduplicate sources by text content. The streaming backend often sends
+  // the same document in multiple packets (MESSAGE_START, SEARCH_TOOL_DELTA,
+  // etc.), resulting in 40+ copies of the same text. Dedup keeps the first
+  // occurrence, preserving order. Critical: texts must remain identical
+  // between frontend (span highlighting) and backend (evidence spans).
+  const dedupedSources = useMemo(() => {
+    const seen = new Set<string>();
+    return contextSources.filter((src: any) => {
+      const key = src.halloumiContext || src.halloumiSource?.text || '';
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        return true;
+      }
+      return false;
+    });
+  }, [contextSources]);
+
+  const stableContextSources = useDeepCompareMemoize(dedupedSources);
 
   const doQualityControl =
     messageDisplayed &&

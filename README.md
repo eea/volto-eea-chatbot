@@ -40,7 +40,7 @@ The **Volto Chatbot** block allows the integration of an AI-powered chatbot into
 | `enableShowTotalFailMessage` | Show total failure message.                                                     | Boolean  | `false`                          |
 | `showAssistantTitle`         | Display or hide the assistant's title in the chat interface.                    | Boolean  | `true`                           |
 | `showAssistantDescription`   | Display or hide the assistant's description in the chat interface.              | Boolean  | `true`                           |
-| `qualityCheck`               | Show Halloumi-based automated quality check.                                    | Dropdown | `Disabled`                       |
+| `qualityCheck`               | Show automated fact-checking of AI answers against source documents.            | Dropdown | `Disabled`                       |
 | `onDemandInputToggle`        | Sets the default state of the fact-check AI toggle.                             | Boolean  | `true`                           |
 | `showTools`                  | Show or hide tools in the chat interface.                                       | Array    | `["internal_search_tool_start"]` |
 | `scrollToInput`              | Automatically scroll the page to focus on the chat input when interacting.      | Boolean  | `false`                          |
@@ -116,6 +116,44 @@ Go to http://localhost:3000
 
    For a legacy Volto 17 project, install the package with `yarn` and restart the frontend as usual.
 
+## Quality Checks (Fact-Checking)
+
+When `qualityCheck` is enabled, the chatbot sends AI answers and their source
+documents to a fact-checking backend that extracts claims, verifies each
+against the sources, and returns per-claim verdicts with evidence.
+
+### Backend dependency
+
+The fact-checking feature requires the
+[eea/rag-facts-check](https://github.com/eea/rag-facts-check) service running
+and reachable at the URL configured in `RAG_FACT_CHECKER_URL`.
+
+**Without this backend, quality checks will fail with a connection error.**
+
+The backend exposes a halloumi-compatible endpoint (`POST /halloumi/generate`)
+so the frontend can call it without code changes. It also provides a native
+`POST /check` endpoint with a richer response schema.
+
+### Deploying the backend
+
+```bash
+# Clone and build
+ git clone https://github.com/eea/rag-facts-check.git
+cd rag-facts-check
+docker build -t rag-fact-check .
+
+# Run (requires an LLM endpoint)
+# Set LLM_API_KEY to your actual API key before running
+docker run -p 8000:8000 \
+  -e LLM_API_BASE=http://your-llm:4002/v1 \
+  -e LLM_API_KEY \
+  -e LLM_MODEL=gemma \
+  rag-fact-check
+```
+
+See the [backend README](https://github.com/eea/rag-facts-check#rag-facts-check)
+for full configuration options.
+
 ## Environment Configuration
 
 To properly configure the middleware and authenticate with the Onyx service, ensure that the following environment variables are set:
@@ -131,19 +169,12 @@ This document lists the environment variables used in the Volto Chatbot project.
 - `JEST_USE_SETUP`
   Used in Jest configuration. When set to 'ON', it enables a specific Jest setup.
 
-- `LLMGW_URL`
-  The URL for the LLM Gateway service.
-
-- `LLMGW_TOKEN`
-  The token for authenticating with the LLM Gateway service.
+- `RAG_FACT_CHECKER_URL`
+  The base URL for the [rag-facts-check](https://github.com/eea/rag-facts-check)
+  fact-checking backend. Required when `qualityCheck` is enabled.
+  Default: `http://localhost:8000`.
 
 ### Development-specific environment variables
-
-- `MOCK_HALLOUMI_FILE_PATH`
-  When set, this specifies the absolute path to the JSON file containing the mocked Halloumi response. Setting this variable enables mocking of Halloumi API calls.
-
-- `DUMP_HALLOUMI_FILE_PATH`
-  When set, the Halloumi response will be dumped to the specified absolute file path for debugging or to create new mock files.
 
 - `MOCK_LLM_FILE_PATH`
   When set, this specifies the absolute path to the JSONL file containing the mocked Onyx stream response. Setting this variable enables mocking of Onyx LLM calls.

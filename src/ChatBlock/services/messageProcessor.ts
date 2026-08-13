@@ -33,6 +33,7 @@ export class MessageProcessor {
   private _errorContent: string = '';
   private _documents: OnyxDocument[] = [];
   private _citations = new Map<number, string>();
+  private _usedFallbackCitations = false;
   private _isComplete: boolean = false;
   private _isFinalMessageComing: boolean = false;
 
@@ -210,7 +211,8 @@ export class MessageProcessor {
       this._documents = Array.from(this.documentMap.values());
 
       // If we have final_documents and no citations yet, create a fallback mapping
-      // This ensures the Sources tab shows up in v3 when citation_info is missing
+      // This ensures the Sources tab shows up in v3 when citation_info is missing.
+      // The fallback is cleared in processCitations() when real citation_info arrives.
       if (
         packet.obj.type === PacketType.MESSAGE_START &&
         data.final_documents &&
@@ -221,6 +223,7 @@ export class MessageProcessor {
             this._citations.set(index + 1, doc.document_id);
           }
         });
+        this._usedFallbackCitations = true;
       }
     }
   }
@@ -231,6 +234,13 @@ export class MessageProcessor {
    */
   private processCitations(packet: Packet) {
     if (packet.obj.type === PacketType.CITATION_INFO) {
+      // First real citation_info arrived — discard the fallback mapping
+      // (which mapped ALL final_documents) and start fresh with actual citations.
+      if (this._usedFallbackCitations) {
+        this._citations.clear();
+        this._usedFallbackCitations = false;
+      }
+
       const citationInfo = packet.obj as any;
       if (citationInfo.citation_number && citationInfo.document_id) {
         this._citations.set(
@@ -397,6 +407,7 @@ export class MessageProcessor {
     this._errorContent = '';
     this._documents = [];
     this._citations.clear();
+    this._usedFallbackCitations = false;
     this._isComplete = false;
     this._isFinalMessageComing = false;
   }

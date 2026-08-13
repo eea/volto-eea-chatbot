@@ -143,9 +143,10 @@ cd rag-facts-check
 docker build -t rag-fact-check .
 
 # Run (requires an LLM endpoint)
+# Set LLM_API_KEY to your actual API key before running
 docker run -p 8000:8000 \
   -e LLM_API_BASE=http://your-llm:4002/v1 \
-  -e LLM_API_KEY=your-key \
+  -e LLM_API_KEY \
   -e LLM_MODEL=gemma \
   rag-fact-check
 ```

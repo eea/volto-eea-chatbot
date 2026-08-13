@@ -110,7 +110,7 @@ describe('MessageProcessor', () => {
     });
   });
 
-  it('should replace fallback citations when explicit citation deltas arrive', () => {
+  it('should accumulate explicit citation deltas alongside fallback citations', () => {
     processor.addPackets([
       {
         ind: 0,
@@ -130,7 +130,13 @@ describe('MessageProcessor', () => {
       },
     ]);
 
-    expect(processor.getMessage().citations).toEqual({ 7: 'doc2' });
+    // Fallback citations persist while explicit deltas accumulate incrementally.
+    // Clearing them on the first delta would lose citations until all deltas arrive.
+    expect(processor.getMessage().citations).toEqual({
+      1: 'doc1',
+      2: 'doc2',
+      7: 'doc2',
+    });
   });
 
   it('should retain fallback citations when citation deltas are invalid', () => {

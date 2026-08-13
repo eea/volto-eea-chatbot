@@ -1604,14 +1604,6 @@ mark {
     }
   }
 
-  .tool-icon-default {
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background-color: currentColor;
-  }
-
   // Content column
   .tool-content {
     flex: 1;
@@ -1623,17 +1615,6 @@ mark {
 
   .tool-status-row {
     display: flex;
-  }
-
-  .tool-status {
-    display: flex;
-    align-items: center;
-    border-radius: 12px;
-    margin-bottom: 0.25rem;
-    color: @teal;
-    font-size: 0.875rem;
-    font-weight: 500;
-    gap: 0.25rem;
   }
 
   .tool-text {
@@ -1650,6 +1631,47 @@ mark {
 // Multi-tool renderer container styles
 .multi-tool-renderer {
   margin-bottom: 1em;
+
+  // Shared tool state styles
+  .tool-icon-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+
+  .tool-status {
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    margin-bottom: 0.25rem;
+    color: @teal;
+    font-size: 0.875rem;
+    font-weight: 500;
+    gap: 0.25rem;
+  }
+
+  .tool-item-expanded.active .tool-icon-circle,
+  .tool-item-collapsed.active .tool-collapsed-icon {
+    color: @teal;
+  }
+
+  .active .tool-status {
+    animation: shimmer 2.5s linear infinite;
+    background: linear-gradient(
+      90deg,
+      @teal 0%,
+      @teal 40%,
+      rgba(0, 179, 174, 0.5) 50%,
+      @teal 60%,
+      @teal 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-size: 200% 100%;
+    -webkit-text-fill-color: transparent;
+  }
 
   // Common header styles for both collapsed and summary headers
   .tools-collapsed-header,
@@ -1766,29 +1788,6 @@ mark {
       }
     }
 
-    &.active {
-      .tool-collapsed-icon {
-        position: relative;
-        color: @teal;
-      }
-
-      .tool-collapsed-status {
-        animation: shimmer 2.5s linear infinite;
-        background: linear-gradient(
-          90deg,
-          @teal 0%,
-          @teal 40%,
-          rgba(0, 179, 174, 0.5) 50%,
-          @teal 60%,
-          @teal 100%
-        );
-        -webkit-background-clip: text;
-        background-clip: text;
-        background-size: 200% 100%;
-        -webkit-text-fill-color: transparent;
-      }
-    }
-
     .tool-collapsed-icon {
       display: flex;
       width: 1rem;
@@ -1798,17 +1797,8 @@ mark {
       justify-content: center;
     }
 
-    .tool-icon-dot {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background-color: currentColor;
-    }
-
     .tool-collapsed-status {
       flex: 1;
-      font-weight: 500;
     }
   }
 

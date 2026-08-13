@@ -330,7 +330,7 @@ exports[`ClaimModal handles perfect score 1`] = `
             <span
               className="score-percentage"
             >
-              10Failed
+              High
             </span>
             <span
               className="score-label"

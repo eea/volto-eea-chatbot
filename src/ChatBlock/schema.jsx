@@ -92,6 +92,7 @@ export function ChatBlockSchema({ assistants, data }) {
           ...(data.qualityCheck && data.qualityCheck !== 'disabled'
             ? [
                 'maxContextSegments',
+                'batchSize',
                 'noSupportDocumentsMessage',
                 'qualityCheckContext',
                 'qualityCheckStages',
@@ -251,6 +252,13 @@ range is from 0 to 100`,
         default: 100,
         description:
           'Optimize quality check performance by grouping sentences into a max number of segments. Set to 0 to disable grouping and instead use one sentence per segment.',
+      },
+      batchSize: {
+        title: 'Batch size',
+        type: 'number',
+        default: 30,
+        description:
+          'Number of claims to verify per LLM call. Higher values mean fewer LLM calls but larger prompts. Set to 1 for sequential per-claim verification.',
       },
       feedbackReasons: {
         title: 'Feedback reasons',

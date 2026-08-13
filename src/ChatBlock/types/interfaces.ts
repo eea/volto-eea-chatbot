@@ -141,6 +141,7 @@ export interface ChatMessageProps {
   enableMatomoTracking?: boolean;
   persona?: number;
   maxContextSegments?: number;
+  batchSize?: number;
   isLastMessage?: boolean;
   className?: string;
   chatWindowRef?: React.RefObject<HTMLDivElement>;

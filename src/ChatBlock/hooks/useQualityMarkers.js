@@ -5,13 +5,18 @@ const Sentry = loadable.lib(
   () => import(/* webpackChunkName: "s_entry-browser" */ '@sentry/browser'), // chunk name avoids ad blockers
 );
 
-async function fetchHalloumi(answer, sources, maxContextSegments) {
+async function fetchHalloumi(answer, sources, maxContextSegments, batchSize) {
   const halloumiResponse = await fetch('/_ha/generate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ answer, sources, maxContextSegments }),
+    body: JSON.stringify({
+      answer,
+      sources,
+      maxContextSegments,
+      ...(batchSize != null && { batch_size: batchSize }),
+    }),
   });
   return halloumiResponse;
 }
@@ -38,6 +43,7 @@ export function useQualityMarkers(
   message,
   sources,
   maxContextSegments = 0,
+  batchSize,
 ) {
   const [halloumiResponse, setHalloumiResponse] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -70,6 +76,7 @@ export function useQualityMarkers(
           message,
           halloumiSources,
           maxContextSegments,
+          batchSize,
         );
         const body = await feedback.json();
         // console.log({ message, sources, body });
@@ -97,6 +104,7 @@ export function useQualityMarkers(
     message,
     sources,
     maxContextSegments,
+    batchSize,
   ]);
 
   if (halloumiResponse !== null) {

@@ -205,6 +205,7 @@ export function AIMessage({
   enableMatomoTracking,
   persona,
   maxContextSegments,
+  batchSize,
   isLastMessage,
   className = '',
   chatWindowEndRef,
@@ -319,6 +320,7 @@ export function AIMessage({
     addCitations(message.message, message),
     stableContextSources,
     maxContextSegments,
+    batchSize,
   );
 
   const claims = markers?.claims || [];

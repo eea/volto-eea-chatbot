@@ -33,7 +33,7 @@ export default async function middleware(req, res, next) {
   }
 
   const body = req.body;
-  const { sources, answer } = body;
+  const { sources, answer, batch_size } = body;
 
   log('Halloumi request body', {
     answer,
@@ -52,6 +52,7 @@ export default async function middleware(req, res, next) {
         answer,
         sources,
         max_context_segments: 0,
+        ...(batch_size != null && { batch_size }),
       }),
     });
 

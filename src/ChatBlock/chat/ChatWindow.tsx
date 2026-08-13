@@ -49,6 +49,7 @@ interface ChatWindowProps {
   enableMatomoTracking?: boolean;
   onDemandInputToggle?: boolean;
   maxContextSegments?: number;
+  batchSize?: number;
   onyxVersion?: '2' | '3';
   isPlaywrightTest?: boolean;
   initialQuery?: string | null;
@@ -89,6 +90,7 @@ function ChatWindow({
     enableMatomoTracking = true,
     onDemandInputToggle = true,
     maxContextSegments = 0,
+    batchSize,
     onyxVersion = '2',
   } = data;
   const [qualityCheckEnabled, setQualityCheckEnabled] = useState(
@@ -231,6 +233,7 @@ function ChatWindow({
                     enableMatomoTracking={enableMatomoTracking}
                     persona={persona.id}
                     maxContextSegments={maxContextSegments}
+                    batchSize={batchSize}
                     isLastMessage={index === messages.length - 1}
                     className={
                       index === messages.length - 1 ? 'most-recent' : ''

@@ -214,6 +214,73 @@ describe('MultiToolRenderer', () => {
     expect(onAllToolsDisplayed).toHaveBeenCalled();
   });
 
+  it('exposes active state for a detailed tool while streaming', () => {
+    const toolGroups = [
+      {
+        ind: 1,
+        packets: [{ ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } }],
+      },
+    ];
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MultiToolRenderer
+          toolGroups={toolGroups}
+          showTools={[PacketType.SEARCH_TOOL_START]}
+          message={defaultMessage}
+          libs={defaultLibs}
+        />,
+      );
+    });
+
+    const activeTool = component.root.findByProps({
+      'data-state': 'active',
+      'aria-current': 'step',
+    });
+    const detailedTool = activeTool.findByProps({
+      className: 'tool-item-expanded active',
+    });
+
+    expect(detailedTool).toBeTruthy();
+  });
+
+  it('exposes completed state for a detailed tool after it finishes', () => {
+    const toolGroups = [
+      {
+        ind: 1,
+        packets: [{ ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } }],
+      },
+    ];
+
+    let component;
+    act(() => {
+      component = renderer.create(
+        <MultiToolRenderer
+          toolGroups={toolGroups}
+          showTools={[PacketType.SEARCH_TOOL_START]}
+          message={defaultMessage}
+          libs={defaultLibs}
+        />,
+      );
+    });
+
+    const rendererComp = component.root.findByType(RendererComponent);
+    act(() => {
+      rendererComp.props.onComplete();
+    });
+
+    const completedTool = component.root.findByProps({
+      'data-state': 'completed',
+    });
+    const detailedTool = completedTool.findByProps({
+      className: 'tool-item-expanded completed',
+    });
+
+    expect(completedTool.props['aria-current']).toBeUndefined();
+    expect(detailedTool).toBeTruthy();
+  });
+
   it('renders non-detailed tool collapsed view when streaming', () => {
     const toolGroups = [
       {
@@ -235,6 +302,18 @@ describe('MultiToolRenderer', () => {
         />,
       );
     });
+
+    const collapsedTool = component.root.findByProps({
+      className: 'tool-item-collapsed active',
+    });
+    expect(
+      collapsedTool.findByProps({
+        className: 'tool-status tool-collapsed-status',
+      }),
+    ).toBeTruthy();
+    expect(
+      collapsedTool.findByProps({ className: 'tool-icon-dot' }),
+    ).toBeTruthy();
 
     expect(component.toJSON()).toMatchSnapshot();
   });

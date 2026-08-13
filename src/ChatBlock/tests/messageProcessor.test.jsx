@@ -71,6 +71,91 @@ describe('MessageProcessor', () => {
     expect(result.citations).toEqual({ 1: 'doc123' });
   });
 
+  it('should replace fallback citations when explicit citation info arrives', () => {
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg1',
+          content: 'Answer',
+          final_documents: [
+            { document_id: 'doc1' },
+            { document_id: 'doc2' },
+            { document_id: 'doc3' },
+          ],
+        },
+      },
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.CITATION_INFO,
+          citation_number: 4,
+          document_id: 'doc2',
+        },
+      },
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.CITATION_INFO,
+          citation_number: 5,
+          document_id: 'doc3',
+        },
+      },
+    ]);
+
+    expect(processor.getMessage().citations).toEqual({
+      4: 'doc2',
+      5: 'doc3',
+    });
+  });
+
+  it('should replace fallback citations when explicit citation deltas arrive', () => {
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg1',
+          content: 'Answer',
+          final_documents: [{ document_id: 'doc1' }, { document_id: 'doc2' }],
+        },
+      },
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.CITATION_DELTA,
+          citations: [{ citation_num: 7, document_id: 'doc2' }],
+        },
+      },
+    ]);
+
+    expect(processor.getMessage().citations).toEqual({ 7: 'doc2' });
+  });
+
+  it('should retain fallback citations when citation deltas are invalid', () => {
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg1',
+          content: 'Answer',
+          final_documents: [{ document_id: 'doc1' }],
+        },
+      },
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.CITATION_DELTA,
+          citations: [{ citation_num: 2, document_id: '' }],
+        },
+      },
+    ]);
+
+    expect(processor.getMessage().citations).toEqual({ 1: 'doc1' });
+  });
+
   it('should process document packets', () => {
     const packets = [
       {
@@ -402,6 +487,35 @@ describe('MessageProcessor', () => {
     const result = processor.getMessage();
     expect(result.documents).toHaveLength(1);
     expect(result.documents[0].document_id).toBe('fd1');
+    expect(result.citations).toEqual({ 1: 'fd1' });
+  });
+
+  it('should create fallback citations when final documents were already collected', () => {
+    const document = {
+      document_id: 'doc1',
+      semantic_identifier: 'Document 1',
+    };
+
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.SEARCH_TOOL_DELTA,
+          documents: [document],
+        },
+      },
+      {
+        ind: 1,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg1',
+          content: 'Answer',
+          final_documents: [document],
+        },
+      },
+    ]);
+
+    expect(processor.getMessage().citations).toEqual({ 1: 'doc1' });
   });
 
   it('should mark complete on ERROR packet', () => {
@@ -434,5 +548,189 @@ describe('MessageProcessor', () => {
     const msg = p.getMessage();
     expect(msg.nodeId).toBe(10);
     expect(msg.parentNodeId).toBe(5);
+  });
+
+  it('should create fallback citations from final_documents when no citations exist', () => {
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg1',
+          content: 'Hello',
+          final_documents: [
+            {
+              document_id: 'doc-a',
+              semantic_identifier: 'Doc A',
+              link: 'http://a.com',
+            },
+            {
+              document_id: 'doc-b',
+              semantic_identifier: 'Doc B',
+              link: 'http://b.com',
+            },
+            {
+              document_id: 'doc-c',
+              semantic_identifier: 'Doc C',
+              link: 'http://c.com',
+            },
+          ],
+        },
+      },
+    ]);
+
+    const result = processor.getMessage();
+    // Fallback maps all final_documents as citations (1-indexed)
+    expect(result.citations).toEqual({
+      1: 'doc-a',
+      2: 'doc-b',
+      3: 'doc-c',
+    });
+  });
+
+  it('should clear fallback citations when real citation_info packets arrive', () => {
+    // MESSAGE_START with final_documents creates fallback citations
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg1',
+          content: 'Answer text',
+          final_documents: [
+            {
+              document_id: 'doc-a',
+              semantic_identifier: 'Doc A',
+              link: 'http://a.com',
+            },
+            {
+              document_id: 'doc-b',
+              semantic_identifier: 'Doc B',
+              link: 'http://b.com',
+            },
+            {
+              document_id: 'doc-c',
+              semantic_identifier: 'Doc C',
+              link: 'http://c.com',
+            },
+            {
+              document_id: 'doc-d',
+              semantic_identifier: 'Doc D',
+              link: 'http://d.com',
+            },
+            {
+              document_id: 'doc-e',
+              semantic_identifier: 'Doc E',
+              link: 'http://e.com',
+            },
+          ],
+        },
+      },
+    ]);
+
+    // Real citation_info packets arrive — only 2 documents were actually cited
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.CITATION_INFO,
+          citation_number: 1,
+          document_id: 'doc-a',
+        },
+      },
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.CITATION_INFO,
+          citation_number: 2,
+          document_id: 'doc-c',
+        },
+      },
+    ]);
+
+    const result = processor.getMessage();
+    // Fallback should be cleared, only real citations remain
+    expect(result.citations).toEqual({
+      1: 'doc-a',
+      2: 'doc-c',
+    });
+  });
+
+  it('should keep fallback citations when no citation_info packets arrive', () => {
+    // Simulate a v3 stream with no citation_info at all
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg1',
+          content: 'Hello',
+          final_documents: [
+            {
+              document_id: 'doc-x',
+              semantic_identifier: 'Doc X',
+              link: 'http://x.com',
+            },
+            {
+              document_id: 'doc-y',
+              semantic_identifier: 'Doc Y',
+              link: 'http://y.com',
+            },
+          ],
+        },
+      },
+      { ind: 1, obj: { type: PacketType.STOP } },
+    ]);
+
+    const result = processor.getMessage();
+    // Fallback stays since no real citations arrived
+    expect(result.citations).toEqual({
+      1: 'doc-x',
+      2: 'doc-y',
+    });
+  });
+
+  it('should reset _usedFallbackCitations flag on reset()', () => {
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg1',
+          content: 'Hello',
+          final_documents: [
+            {
+              document_id: 'doc-a',
+              semantic_identifier: 'Doc A',
+              link: 'http://a.com',
+            },
+          ],
+        },
+      },
+    ]);
+
+    processor.reset();
+
+    // After reset, a new MESSAGE_START should create a fresh fallback
+    processor.addPackets([
+      {
+        ind: 0,
+        obj: {
+          type: PacketType.MESSAGE_START,
+          id: 'msg2',
+          content: 'New',
+          final_documents: [
+            {
+              document_id: 'doc-new',
+              semantic_identifier: 'New Doc',
+              link: 'http://new.com',
+            },
+          ],
+        },
+      },
+    ]);
+
+    const result = processor.getMessage();
+    expect(result.citations).toEqual({ 1: 'doc-new' });
   });
 });

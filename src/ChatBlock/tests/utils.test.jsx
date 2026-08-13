@@ -7,6 +7,7 @@ import {
   debounce,
   useCopyToClipboard,
   convertToPercentage,
+  scoreToLabel,
   createChatMessageFeedback,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 
@@ -167,6 +168,24 @@ describe('utils', () => {
       expect(convertToPercentage(-0.5)).toBe('0%');
       expect(convertToPercentage(1.5)).toBe('0%');
       expect(convertToPercentage(-1)).toBe('0%');
+    });
+  });
+
+  describe('scoreToLabel', () => {
+    it('maps supported claims to High', () => {
+      expect(scoreToLabel(1.0)).toBe('High');
+      expect(scoreToLabel(0.9)).toBe('High');
+      expect(scoreToLabel(0.8)).toBe('High');
+    });
+
+    it('maps not_enough_info claims to Low', () => {
+      expect(scoreToLabel(0.4)).toBe('Low');
+      expect(scoreToLabel(0.5)).toBe('Low');
+      expect(scoreToLabel(0.1)).toBe('Low');
+    });
+
+    it('maps contradicted claims to Failed', () => {
+      expect(scoreToLabel(0.0)).toBe('Failed');
     });
   });
 

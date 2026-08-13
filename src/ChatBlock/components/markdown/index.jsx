@@ -43,6 +43,7 @@ export function components(message, markers, citedSources) {
         const end = child.position.end.offset;
         const claims = markers.claims?.filter(
           (claim) =>
+            !claim.skipped &&
             claim.score !== null &&
             ((start >= claim.startOffset && end <= claim.endOffset) ||
               (start <= claim.endOffset && end >= claim.endOffset) ||

@@ -256,7 +256,7 @@ range is from 0 to 100`,
       batchSize: {
         title: 'Batch size',
         type: 'number',
-        default: 30,
+        default: 20,
         description:
           'Number of claims to verify per LLM call. Higher values mean fewer LLM calls but larger prompts. Set to 1 for sequential per-claim verification.',
       },

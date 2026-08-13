@@ -259,7 +259,7 @@ export class MessageProcessor {
     }
     const citationDelta = packet.obj as CitationDelta;
     citationDelta.citations?.forEach((citation: StreamingCitation) => {
-      if (!this._citations.has(citation.citation_num)) {
+      if (citation.document_id && !this._citations.has(citation.citation_num)) {
         this._citations.set(citation.citation_num, citation.document_id);
       }
     });

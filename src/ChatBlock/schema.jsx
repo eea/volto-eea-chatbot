@@ -1,4 +1,3 @@
-import config from '@plone/volto/registry';
 import { PacketType } from './types/streamingModels';
 
 const ScoreRangeSchema = {
@@ -72,7 +71,6 @@ export function ChatBlockSchema({ assistants, data }) {
         id: 'default',
         title: 'Default',
         fields: [
-          'variation',
           'chatTitle',
           'assistant',
           'qgenAsistantId',
@@ -112,15 +110,11 @@ export function ChatBlockSchema({ assistants, data }) {
       },
     ],
     properties: {
-      variation: {
-        title: 'Presentation',
-        description:
-          'Presentation layout for the chatbot block. Extra presentations can be registered by other addons.',
-        choices: (
-          config.blocks?.blocksConfig?.eeaChatbot?.variations ?? []
-        ).map(({ id, title }) => [id, title]),
-        default: 'classic',
-      },
+      // NOTE: the `variation` field is NOT declared here on purpose. Volto
+      // core injects it automatically in the block sidebar
+      // (withVariationSchemaEnhancer, wired into BlockDataForm) from
+      // blocksConfig.eeaChatbot.variations whenever 2+ variations are
+      // registered. See @plone/volto/helpers/Extensions.
       enableShowTotalFailMessage: {
         title: 'Show total failure message',
         type: 'boolean',

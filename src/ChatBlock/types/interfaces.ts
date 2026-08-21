@@ -82,6 +82,17 @@ export interface MessageRendererProps<T extends Packet = Packet> {
   markers?: any;
   stableContextSources?: any;
   addQualityMarkersPlugin?: any;
+  /**
+   * Extra react-markdown component overrides (e.g. for custom elements
+   * produced by remark/rehype plugins), merged on top of the built-in
+   * mapping. Allows presentations to plug custom components inline in the
+   * message text.
+   */
+  extraMarkdownComponents?: Record<string, React.ComponentType<any>>;
+  /** Extra remark plugins, appended after the built-in ones. */
+  extraRemarkPlugins?: any[];
+  /** Extra rehype plugins, appended after the built-in ones. */
+  extraRehypePlugins?: any[];
   onComplete: () => void;
   animate: boolean;
   stopPacketSeen: boolean;

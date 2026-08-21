@@ -6,13 +6,13 @@ import {
 } from './generative';
 import path from 'path';
 
-jest.mock('node-fetch');
+vi.mock('node-fetch');
 
 describe('halloumiGenerativeAPI reads from mock file', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules(); // Most important - reset modules between test runs
+    vi.resetModules(); // Most important - reset modules between test runs
     process.env = {
       ...originalEnv,
       MOCK_HALLOUMI_FILE_PATH: path.join(__dirname, '../dummy/qa-raw-3.json'),
@@ -21,7 +21,7 @@ describe('halloumiGenerativeAPI reads from mock file', () => {
 
   afterEach(() => {
     process.env = originalEnv; // Restore original env
-    jest.restoreAllMocks(); // Restore all mocks
+    vi.restoreAllMocks(); // Restore all mocks
   });
 
   it('should read from the mock file when MOCK_LLM_CALL is true', async () => {
@@ -107,7 +107,7 @@ describe('halloumiGenerativeAPI with plattScaling', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     process.env = {
       ...originalEnv,
       MOCK_HALLOUMI_FILE_PATH: path.join(__dirname, '../dummy/qa-raw-3.json'),
@@ -116,7 +116,7 @@ describe('halloumiGenerativeAPI with plattScaling', () => {
 
   afterEach(() => {
     process.env = originalEnv;
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('applies platt scaling when model has plattScaling config', async () => {
@@ -145,7 +145,7 @@ describe('halloumiGenerativeAPI via real fetch', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     // Remove mock file path to exercise the fetch path
     process.env = { ...originalEnv };
     delete process.env.MOCK_HALLOUMI_FILE_PATH;
@@ -153,13 +153,13 @@ describe('halloumiGenerativeAPI via real fetch', () => {
 
   afterEach(() => {
     process.env = originalEnv;
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('calls fetch with correct parameters and auth header', async () => {
     // Mock postprocessing to control output and avoid format issues
-    jest.doMock('./postprocessing', () => ({
-      getClaimsFromResponse: jest.fn(() => [
+    vi.doMock('./postprocessing', () => ({
+      getClaimsFromResponse: vi.fn(() => [
         {
           claimId: 1,
           claimString: 'Test claim',
@@ -169,7 +169,7 @@ describe('halloumiGenerativeAPI via real fetch', () => {
           supported: true,
         },
       ]),
-      getTokenProbabilitiesFromLogits: jest.fn(() => [
+      getTokenProbabilitiesFromLogits: vi.fn(() => [
         new Map([
           ['supported', 0.9],
           ['unsupported', 0.1],
@@ -177,8 +177,8 @@ describe('halloumiGenerativeAPI via real fetch', () => {
       ]),
     }));
 
-    const { halloumiGenerativeAPI } = require('./generative');
-    const nodeFetch = require('node-fetch');
+    const { halloumiGenerativeAPI } = await import('./generative');
+    const nodeFetch = (await import('node-fetch')).default;
 
     const mockResponse = {
       choices: [
@@ -222,8 +222,8 @@ describe('halloumiGenerativeAPI via real fetch', () => {
   });
 
   it('calls fetch without auth header when no apiKey', async () => {
-    jest.doMock('./postprocessing', () => ({
-      getClaimsFromResponse: jest.fn(() => [
+    vi.doMock('./postprocessing', () => ({
+      getClaimsFromResponse: vi.fn(() => [
         {
           claimId: 1,
           claimString: 'Test',
@@ -233,7 +233,7 @@ describe('halloumiGenerativeAPI via real fetch', () => {
           supported: true,
         },
       ]),
-      getTokenProbabilitiesFromLogits: jest.fn(() => [
+      getTokenProbabilitiesFromLogits: vi.fn(() => [
         new Map([
           ['supported', 0.8],
           ['unsupported', 0.2],
@@ -241,8 +241,8 @@ describe('halloumiGenerativeAPI via real fetch', () => {
       ]),
     }));
 
-    const { halloumiGenerativeAPI } = require('./generative');
-    const nodeFetch = require('node-fetch');
+    const { halloumiGenerativeAPI } = await import('./generative');
+    const nodeFetch = (await import('node-fetch')).default;
 
     nodeFetch.mockResolvedValueOnce({
       json: () =>
@@ -270,18 +270,18 @@ describe('halloumiGenerativeAPI via real fetch', () => {
   });
 
   it('defaults to 0.5 when token probabilities and claims do not match', async () => {
-    jest.doMock('./postprocessing', () => ({
-      getClaimsFromResponse: jest.fn(() => [
+    vi.doMock('./postprocessing', () => ({
+      getClaimsFromResponse: vi.fn(() => [
         { claimId: 1, claimString: 'Claim 1' },
         { claimId: 2, claimString: 'Claim 2' },
       ]),
-      getTokenProbabilitiesFromLogits: jest.fn(() => [
+      getTokenProbabilitiesFromLogits: vi.fn(() => [
         new Map([['supported', 0.9]]),
       ]),
     }));
 
-    const { halloumiGenerativeAPI } = require('./generative');
-    const nodeFetch = require('node-fetch');
+    const { halloumiGenerativeAPI } = await import('./generative');
+    const nodeFetch = (await import('node-fetch')).default;
 
     nodeFetch.mockResolvedValueOnce({
       json: () =>

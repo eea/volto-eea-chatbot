@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import renderer from 'react-test-renderer';
+import * as luxon from 'luxon';
 
 import '@testing-library/jest-dom';
 import { Provider } from 'react-intl-redux';
@@ -8,9 +9,9 @@ import SourceDetails from '@eeacms/volto-eea-chatbot/ChatBlock/components/Source
 
 const mockStore = configureStore();
 
-jest.mock('@plone/volto/helpers/Loadable/Loadable', () => ({
+vi.mock('@plone/volto/helpers/Loadable/Loadable', () => ({
   injectLazyLibs: () => (Component) => (props) => (
-    <Component {...props} luxon={require('luxon')} />
+    <Component {...props} luxon={luxon} />
   ),
 }));
 

@@ -1,10 +1,10 @@
 // Mock superagent
 import middleware, { isPathAllowed, ALLOWED_PROXY_PATHS } from './middleware';
 
-jest.mock('superagent', () => ({
-  post: jest.fn().mockReturnValue({
-    type: jest.fn().mockReturnValue({
-      send: jest.fn().mockResolvedValue({
+vi.mock('superagent', () => ({
+  post: vi.fn().mockReturnValue({
+    type: vi.fn().mockReturnValue({
+      send: vi.fn().mockResolvedValue({
         headers: { 'set-cookie': ['session=abc; Max-Age=3600'] },
       }),
     }),
@@ -12,33 +12,37 @@ jest.mock('superagent', () => ({
 }));
 
 // Mock node-fetch - use require() to get the mock reference in tests
-jest.mock('node-fetch', () => {
-  const mockPipe = jest.fn();
-  const fn = jest.fn().mockResolvedValue({
+vi.mock('node-fetch', () => {
+  const mockPipe = vi.fn();
+  const fn = vi.fn().mockResolvedValue({
     status: 200,
     headers: {
-      get: jest.fn().mockReturnValue('application/json'),
-      raw: jest.fn().mockReturnValue({}),
+      get: vi.fn().mockReturnValue('application/json'),
+      raw: vi.fn().mockReturnValue({}),
     },
     body: { pipe: mockPipe },
   });
   fn.__mockPipe = mockPipe;
-  return fn;
+  return { default: fn };
 });
 
 // Mock fs with stream callbacks
 const _mockOnCallbacks = {};
-jest.mock('fs', () => {
+vi.mock('fs', () => {
   const mockReadStream = {
-    on: jest.fn((event, cb) => {
+    on: vi.fn((event, cb) => {
       _mockOnCallbacks[event] = cb;
       return mockReadStream;
     }),
   };
+  const mockFs = {
+    createReadStream: vi.fn(() => mockReadStream),
+    createWriteStream: vi.fn(() => ({ write: vi.fn(), end: vi.fn() })),
+    readFileSync: vi.fn(),
+  };
   return {
-    createReadStream: jest.fn(() => mockReadStream),
-    createWriteStream: jest.fn(() => ({ write: jest.fn(), end: jest.fn() })),
-    readFileSync: jest.fn(),
+    ...mockFs,
+    default: mockFs,
   };
 });
 
@@ -46,11 +50,19 @@ describe('src/middleware', () => {
   let req, res, next, nodeFetch;
   const originalEnv = process.env;
 
-  beforeEach(() => {
-    jest.useFakeTimers();
+  beforeEach(async () => {
+    vi.useFakeTimers();
     process.env = { ...originalEnv };
-    nodeFetch = require('node-fetch');
-    nodeFetch.mockClear();
+    nodeFetch = (await import('node-fetch')).default;
+    nodeFetch.mockReset();
+    nodeFetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json'),
+        raw: vi.fn().mockReturnValue({}),
+      },
+      body: { pipe: nodeFetch.__mockPipe },
+    });
     nodeFetch.__mockPipe.mockClear();
 
     // Reset stream callbacks
@@ -64,20 +76,20 @@ describe('src/middleware', () => {
       headers: {},
     };
     res = {
-      send: jest.fn(),
-      set: jest.fn(),
-      setHeader: jest.fn(),
-      write: jest.fn(),
-      end: jest.fn(),
-      status: jest.fn().mockReturnThis(),
+      send: vi.fn(),
+      set: vi.fn(),
+      setHeader: vi.fn(),
+      write: vi.fn(),
+      end: vi.fn(),
+      status: vi.fn().mockReturnThis(),
     };
-    next = jest.fn();
+    next = vi.fn();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     process.env = originalEnv;
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('returns error when ONYX_API_KEY is missing', async () => {
@@ -133,9 +145,7 @@ describe('src/middleware', () => {
       }),
     );
 
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     await middleware(req, res, next);
 
     expect(res.send).toHaveBeenCalledWith({
@@ -150,9 +160,7 @@ describe('src/middleware', () => {
 
     nodeFetch.mockRejectedValueOnce(new Error('No response'));
 
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     await middleware(req, res, next);
 
     expect(res.send).toHaveBeenCalledWith({
@@ -181,7 +189,7 @@ describe('src/middleware', () => {
     req.url = '/_da/chat/create-chat-session';
 
     const middlewarePromise = middleware(req, res, next);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     await middlewarePromise.catch(() => {});
 
     expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'text/plain');
@@ -197,11 +205,11 @@ describe('src/middleware', () => {
     const middlewarePromise = middleware(req, res, next);
 
     // Advance past the 2000ms mock delay
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     await Promise.resolve();
     await Promise.resolve();
 
-    const fs = require('fs');
+    const fs = await import('fs');
     expect(fs.createReadStream).toHaveBeenCalledWith('/tmp/mock.jsonl', {
       encoding: 'utf8',
     });
@@ -216,7 +224,7 @@ describe('src/middleware', () => {
       _mockOnCallbacks.end();
     }
 
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
     await middlewarePromise.catch(() => {});
 
     expect(res.write).toHaveBeenCalled();
@@ -229,7 +237,7 @@ describe('src/middleware', () => {
 
     await middleware(req, res, next);
 
-    const fs = require('fs');
+    const fs = await import('fs');
     expect(fs.createWriteStream).toHaveBeenCalledWith(
       '/tmp/dumped_response.jsonl',
     );

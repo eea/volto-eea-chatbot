@@ -3,11 +3,11 @@ import { useToolDisplayTiming } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/
 
 describe('useToolDisplayTiming', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should initialize with all tools visible when not complete', () => {

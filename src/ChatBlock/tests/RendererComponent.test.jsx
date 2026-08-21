@@ -7,7 +7,7 @@ import {
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 // Mock loadable
-jest.mock('@loadable/component', () => {
+vi.mock('@loadable/component', () => {
   const loadable = (loader) => {
     const MockComponent = (props) => (
       <div data-testid="loadable">{props.children}</div>
@@ -114,7 +114,7 @@ describe('RendererComponent', () => {
     const component = renderer.create(
       <RendererComponent
         packets={[{ ind: 1, obj: { type: 'unknown_type' } }]}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
         animate={false}
         stopPacketSeen={false}
         libs={{ remarkGfm: { default: [] } }}
@@ -129,7 +129,7 @@ describe('RendererComponent', () => {
     const component = renderer.create(
       <RendererComponent
         packets={[]}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
         animate={false}
         stopPacketSeen={false}
         libs={{ remarkGfm: { default: [] } }}

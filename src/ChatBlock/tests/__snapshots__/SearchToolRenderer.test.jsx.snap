@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SearchToolRenderer handles empty packets array 1`] = `
+exports[`SearchToolRenderer > handles empty packets array 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -15,7 +15,7 @@ exports[`SearchToolRenderer handles empty packets array 1`] = `
 </div>
 `;
 
-exports[`SearchToolRenderer handles web results with favicon 1`] = `
+exports[`SearchToolRenderer > handles web results with favicon 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -46,7 +46,7 @@ exports[`SearchToolRenderer handles web results with favicon 1`] = `
           <div
             className="query-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -60,16 +60,18 @@ exports[`SearchToolRenderer handles web results with favicon 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -95,7 +97,7 @@ exports[`SearchToolRenderer handles web results with favicon 1`] = `
           <div
             className="result-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -113,7 +115,7 @@ exports[`SearchToolRenderer handles web results with favicon 1`] = `
                   onError={[Function]}
                   src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://example.com&size=128"
                   style={
-                    Object {
+                    {
                       "height": "16px",
                       "objectFit": "contain",
                       "width": "16px",
@@ -134,7 +136,7 @@ exports[`SearchToolRenderer handles web results with favicon 1`] = `
 </div>
 `;
 
-exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
+exports[`SearchToolRenderer > removes duplicate documents by document_id 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -165,7 +167,7 @@ exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
           <div
             className="query-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -179,16 +181,18 @@ exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -214,7 +218,7 @@ exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
           <div
             className="result-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -229,16 +233,18 @@ exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -249,7 +255,7 @@ exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
           <div
             className="result-item"
             style={
-              Object {
+              {
                 "animationDelay": "30ms",
               }
             }
@@ -264,16 +270,18 @@ exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -288,7 +296,7 @@ exports[`SearchToolRenderer removes duplicate documents by document_id 1`] = `
 </div>
 `;
 
-exports[`SearchToolRenderer removes duplicate queries 1`] = `
+exports[`SearchToolRenderer > removes duplicate queries 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -319,7 +327,7 @@ exports[`SearchToolRenderer removes duplicate queries 1`] = `
           <div
             className="query-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -333,16 +341,18 @@ exports[`SearchToolRenderer removes duplicate queries 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -353,7 +363,7 @@ exports[`SearchToolRenderer removes duplicate queries 1`] = `
           <div
             className="query-item"
             style={
-              Object {
+              {
                 "animationDelay": "30ms",
               }
             }
@@ -367,16 +377,18 @@ exports[`SearchToolRenderer removes duplicate queries 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -409,7 +421,7 @@ exports[`SearchToolRenderer removes duplicate queries 1`] = `
 </div>
 `;
 
-exports[`SearchToolRenderer renders empty state when no queries 1`] = `
+exports[`SearchToolRenderer > renders empty state when no queries 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -426,7 +438,7 @@ exports[`SearchToolRenderer renders empty state when no queries 1`] = `
 </div>
 `;
 
-exports[`SearchToolRenderer renders searching state for internal documents 1`] = `
+exports[`SearchToolRenderer > renders searching state for internal documents 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -457,7 +469,7 @@ exports[`SearchToolRenderer renders searching state for internal documents 1`] =
           <div
             className="query-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -471,16 +483,18 @@ exports[`SearchToolRenderer renders searching state for internal documents 1`] =
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -513,7 +527,7 @@ exports[`SearchToolRenderer renders searching state for internal documents 1`] =
 </div>
 `;
 
-exports[`SearchToolRenderer renders searching state for internet search 1`] = `
+exports[`SearchToolRenderer > renders searching state for internet search 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -544,7 +558,7 @@ exports[`SearchToolRenderer renders searching state for internet search 1`] = `
           <div
             className="query-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -558,16 +572,18 @@ exports[`SearchToolRenderer renders searching state for internet search 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -600,7 +616,7 @@ exports[`SearchToolRenderer renders searching state for internet search 1`] = `
 </div>
 `;
 
-exports[`SearchToolRenderer renders with search results 1`] = `
+exports[`SearchToolRenderer > renders with search results 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -631,7 +647,7 @@ exports[`SearchToolRenderer renders with search results 1`] = `
           <div
             className="query-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -645,16 +661,18 @@ exports[`SearchToolRenderer renders with search results 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>
@@ -680,7 +698,7 @@ exports[`SearchToolRenderer renders with search results 1`] = `
           <div
             className="result-item"
             style={
-              Object {
+              {
                 "animationDelay": "0ms",
               }
             }
@@ -695,16 +713,18 @@ exports[`SearchToolRenderer renders with search results 1`] = `
                 <svg
                   className="icon"
                   dangerouslySetInnerHTML={
-                    Object {
-                      "__html": undefined,
+                    {
+                      "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
                     }
                   }
-                  fill="currentColor"
+                  fill="none"
                   height={16}
                   stroke="currentColor"
-                  viewBox=""
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                   width={16}
-                  xmlns=""
+                  xmlns="http://www.w3.org/2000/svg"
                 />
               </div>
               <span>

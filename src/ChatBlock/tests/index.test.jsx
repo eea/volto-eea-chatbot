@@ -3,17 +3,17 @@ import '@testing-library/jest-dom';
 import installChatBlock from '@eeacms/volto-eea-chatbot/ChatBlock/index';
 
 // Mock @plone/volto/components
-jest.mock('@plone/volto/components', () => ({
+vi.mock('@plone/volto/components', () => ({
   SidebarPortal: () => null,
 }));
 
 // Mock other dependencies
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView', () => () => (
-  <div>ChatBlockView</div>
-));
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockEdit', () => () => (
-  <div>ChatBlockEdit</div>
-));
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView', () => ({
+  default: () => <div>ChatBlockView</div>,
+}));
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockEdit', () => ({
+  default: () => <div>ChatBlockEdit</div>,
+}));
 
 describe('ChatBlock installation', () => {
   let mockConfig;

@@ -4,7 +4,7 @@ import { MultiToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/M
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 import { RendererComponent } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/RendererComponent';
 
-jest.mock('@loadable/component', () => {
+vi.mock('@loadable/component', () => {
   const loadable = () => {
     const MockComponent = ({ children }) => (
       <div data-testid="loadable">{children}</div>
@@ -20,13 +20,19 @@ jest.mock('@loadable/component', () => {
 });
 
 // Mock SVGIcon
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => {
-  return ({ name, size }) => <span data-icon={name} data-size={size} />;
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => {
+  return {
+    default: ({ name, size }) => <span data-icon={name} data-size={size} />,
+  };
 });
 
 // Mock SVG imports
-jest.mock('@eeacms/volto-eea-chatbot/icons/done.svg', () => 'done-icon');
-jest.mock('@eeacms/volto-eea-chatbot/icons/chevron.svg', () => 'chevron-icon');
+vi.mock('@eeacms/volto-eea-chatbot/icons/done.svg', () => ({
+  default: 'done-icon',
+}));
+vi.mock('@eeacms/volto-eea-chatbot/icons/chevron.svg', () => ({
+  default: 'chevron-icon',
+}));
 
 describe('MultiToolRenderer', () => {
   const defaultMessage = {
@@ -164,17 +170,17 @@ describe('MultiToolRenderer', () => {
 
     // Test onKeyDown with Enter
     act(() => {
-      header.props.onKeyDown({ key: 'Enter', preventDefault: jest.fn() });
+      header.props.onKeyDown({ key: 'Enter', preventDefault: vi.fn() });
     });
 
     // Test onKeyDown with Space
     act(() => {
-      header.props.onKeyDown({ key: ' ', preventDefault: jest.fn() });
+      header.props.onKeyDown({ key: ' ', preventDefault: vi.fn() });
     });
 
     // Test onKeyDown with another key
     act(() => {
-      header.props.onKeyDown({ key: 'a', preventDefault: jest.fn() });
+      header.props.onKeyDown({ key: 'a', preventDefault: vi.fn() });
     });
   });
 
@@ -186,7 +192,7 @@ describe('MultiToolRenderer', () => {
       },
     ];
 
-    const onAllToolsDisplayed = jest.fn();
+    const onAllToolsDisplayed = vi.fn();
 
     let component;
     act(() => {

@@ -6,15 +6,15 @@ import RelatedQuestions from '@eeacms/volto-eea-chatbot/ChatBlock/components/Rel
 import { trackEvent } from '@eeacms/volto-matomo/utils';
 
 // Mock @eeacms/volto-matomo/utils
-jest.mock('@eeacms/volto-matomo/utils', () => ({
-  trackEvent: jest.fn(),
+vi.mock('@eeacms/volto-matomo/utils', () => ({
+  trackEvent: vi.fn(),
 }));
 
 describe('RelatedQuestions', () => {
-  const mockOnChoice = jest.fn();
+  const mockOnChoice = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders nothing when no related questions', () => {

@@ -1,5 +1,5 @@
-To run tests:
+To run the add-on tests with Vitest:
 
-```
-env RAZZLE_JEST_CONFIG=src/addons/volto-eea-chatbot/jest-addon.config.js yarn test src/addons/volto-eea-chatbot/src/
-```
+```sh
++pnpm test
++```

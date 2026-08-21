@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`UserMessage renders user message with basic text 1`] = `
+exports[`UserMessage > renders user message with basic text 1`] = `
 <div
   className="comment "
 >
@@ -10,16 +10,18 @@ exports[`UserMessage renders user message with basic text 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={20}
       stroke="white"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={20}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div>
@@ -30,7 +32,7 @@ exports[`UserMessage renders user message with basic text 1`] = `
 </div>
 `;
 
-exports[`UserMessage renders user message with custom className 1`] = `
+exports[`UserMessage > renders user message with custom className 1`] = `
 <div
   className="comment most-recent"
 >
@@ -40,16 +42,18 @@ exports[`UserMessage renders user message with custom className 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={20}
       stroke="white"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={20}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div>
@@ -60,7 +64,7 @@ exports[`UserMessage renders user message with custom className 1`] = `
 </div>
 `;
 
-exports[`UserMessage renders user message without className 1`] = `
+exports[`UserMessage > renders user message without className 1`] = `
 <div
   className="comment "
 >
@@ -70,16 +74,18 @@ exports[`UserMessage renders user message without className 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={20}
       stroke="white"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={20}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div>

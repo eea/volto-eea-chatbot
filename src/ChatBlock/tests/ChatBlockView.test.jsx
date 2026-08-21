@@ -5,15 +5,15 @@ import '@testing-library/jest-dom';
 import ChatBlockView from '@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView';
 
 // Mock withOnyxData to transparently pass props through
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hocs/withOnyxData', () => {
-  return (_callback) => (Component) => Component;
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/hocs/withOnyxData', () => {
+  return { default: (_callback) => (Component) => Component };
 });
 
-jest.mock('superagent', () => ({
-  get: jest.fn().mockReturnValue({ type: jest.fn().mockReturnThis() }),
+vi.mock('superagent', () => ({
+  get: vi.fn().mockReturnValue({ type: vi.fn().mockReturnThis() }),
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
   ChatWindow: ({
     persona,
     isEditMode,

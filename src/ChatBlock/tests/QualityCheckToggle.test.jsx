@@ -4,10 +4,10 @@ import '@testing-library/jest-dom';
 import QualityCheckToggle from '@eeacms/volto-eea-chatbot/ChatBlock/components/QualityCheckToggle';
 
 describe('QualityCheckToggle', () => {
-  const mockSetEnabled = jest.fn();
+  const mockSetEnabled = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders correctly', () => {

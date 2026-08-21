@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`MessageTextRenderer animates through packets with timer ticks 1`] = `
+exports[`MessageTextRenderer > animates through packets with timer ticks 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -23,7 +23,7 @@ exports[`MessageTextRenderer animates through packets with timer ticks 1`] = `
 </div>
 `;
 
-exports[`MessageTextRenderer renders blinking dot when no content and no packets 1`] = `
+exports[`MessageTextRenderer > renders blinking dot when no content and no packets 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -40,7 +40,7 @@ exports[`MessageTextRenderer renders blinking dot when no content and no packets
 </div>
 `;
 
-exports[`MessageTextRenderer renders message content without animation 1`] = `
+exports[`MessageTextRenderer > renders message content without animation 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -63,7 +63,7 @@ exports[`MessageTextRenderer renders message content without animation 1`] = `
 </div>
 `;
 
-exports[`MessageTextRenderer renders with addQualityMarkersPlugin prop 1`] = `
+exports[`MessageTextRenderer > renders with addQualityMarkersPlugin prop 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -86,7 +86,7 @@ exports[`MessageTextRenderer renders with addQualityMarkersPlugin prop 1`] = `
 </div>
 `;
 
-exports[`MessageTextRenderer renders with no remarkGfm 1`] = `
+exports[`MessageTextRenderer > renders with no remarkGfm 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -109,7 +109,7 @@ exports[`MessageTextRenderer renders with no remarkGfm 1`] = `
 </div>
 `;
 
-exports[`MessageTextRenderer renders with remarkGfm plugin when available 1`] = `
+exports[`MessageTextRenderer > renders with remarkGfm plugin when available 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -132,7 +132,7 @@ exports[`MessageTextRenderer renders with remarkGfm plugin when available 1`] = 
 </div>
 `;
 
-exports[`MessageTextRenderer resets packet count when packets array shrinks 1`] = `
+exports[`MessageTextRenderer > resets packet count when packets array shrinks 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -149,7 +149,7 @@ exports[`MessageTextRenderer resets packet count when packets array shrinks 1`] 
 </div>
 `;
 
-exports[`MessageTextRenderer shows cursor when stream is not complete 1`] = `
+exports[`MessageTextRenderer > shows cursor when stream is not complete 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -172,7 +172,7 @@ exports[`MessageTextRenderer shows cursor when stream is not complete 1`] = `
 </div>
 `;
 
-exports[`MessageTextRenderer starts animation with 1 packet initially when animate=true 1`] = `
+exports[`MessageTextRenderer > starts animation with 1 packet initially when animate=true 1`] = `
 <div
   data-testid="renderer-result"
 >

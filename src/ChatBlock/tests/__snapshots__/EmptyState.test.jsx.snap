@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`EmptyState renders nothing when no starter messages and no starter prompts 1`] = `
+exports[`EmptyState > renders nothing when no starter messages and no starter prompts 1`] = `
 <div
   className="empty-state"
 >
@@ -10,7 +10,7 @@ exports[`EmptyState renders nothing when no starter messages and no starter prom
 </div>
 `;
 
-exports[`EmptyState renders with enableStarterPrompts and starterPrompts 1`] = `
+exports[`EmptyState > renders with enableStarterPrompts and starterPrompts 1`] = `
 <div
   className="empty-state"
 >
@@ -42,7 +42,7 @@ exports[`EmptyState renders with enableStarterPrompts and starterPrompts 1`] = `
 </div>
 `;
 
-exports[`EmptyState renders with showAssistantPrompts and persona starter messages 1`] = `
+exports[`EmptyState > renders with showAssistantPrompts and persona starter messages 1`] = `
 <div
   className="empty-state"
 >
@@ -74,7 +74,7 @@ exports[`EmptyState renders with showAssistantPrompts and persona starter messag
 </div>
 `;
 
-exports[`EmptyState renders without starterPromptsHeading 1`] = `
+exports[`EmptyState > renders without starterPromptsHeading 1`] = `
 <div
   className="empty-state"
 >

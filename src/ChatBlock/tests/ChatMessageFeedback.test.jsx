@@ -2,9 +2,8 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ChatMessageFeedback from '@eeacms/volto-eea-chatbot/ChatBlock/components/ChatMessageFeedback';
 
-jest.mock(
-  '@eeacms/volto-eea-chatbot/ChatBlock/components/FeedbackModal',
-  () => (props) => {
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/FeedbackModal', () => ({
+  default: (props) => {
     const { modalOpen, onClose, onToast } = props;
 
     return modalOpen ? (
@@ -21,26 +20,22 @@ jest.mock(
       </div>
     ) : null;
   },
-);
+}));
 
-jest.mock(
-  '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon',
-  () =>
-    ({ name }) => <img src={name} alt="icon" />,
-);
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
+  default: ({ name }) => <img src={name} alt="icon" />,
+}));
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/markdown', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/markdown', () => ({
   SVGIcon: ({ name }) => <img src={name} alt="icon" />,
 }));
 
-jest.mock(
-  '@eeacms/volto-eea-chatbot/icons/thumbs-up.svg',
-  () => 'thumbs-up.svg',
-);
-jest.mock(
-  '@eeacms/volto-eea-chatbot/icons/thumbs-down.svg',
-  () => 'thumbs-down.svg',
-);
+vi.mock('@eeacms/volto-eea-chatbot/icons/thumbs-up.svg', () => ({
+  default: 'thumbs-up.svg',
+}));
+vi.mock('@eeacms/volto-eea-chatbot/icons/thumbs-down.svg', () => ({
+  default: 'thumbs-down.svg',
+}));
 
 describe('ChatMessageFeedback', () => {
   const defaultProps = {

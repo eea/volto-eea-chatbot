@@ -1,13 +1,13 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`RendererComponent renders fallback for empty packets 1`] = `
+exports[`RendererComponent > renders fallback for empty packets 1`] = `
 <div>
   <span />
   <span />
 </div>
 `;
 
-exports[`RendererComponent renders fallback for unrecognized packets 1`] = `
+exports[`RendererComponent > renders fallback for unrecognized packets 1`] = `
 <div>
   <span />
   <span />

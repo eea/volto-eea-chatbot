@@ -17,7 +17,7 @@ describe('EmptyState', () => {
       userSession: { token: '1234' },
       intl: { locale: 'en', messages: {} },
     });
-    onChoiceMock = jest.fn();
+    onChoiceMock = vi.fn();
   });
 
   function renderComponent(props) {

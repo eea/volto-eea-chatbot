@@ -6,11 +6,11 @@ import { SourceChip } from '@eeacms/volto-eea-chatbot/ChatBlock/components/Sourc
 
 describe('SourceChip', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders with title only', () => {
@@ -29,7 +29,7 @@ describe('SourceChip', () => {
   });
 
   it('renders with remove button when onRemove is provided', () => {
-    const onRemove = jest.fn();
+    const onRemove = vi.fn();
     const component = renderer.create(
       <SourceChip title="Test Source" onRemove={onRemove} />,
     );
@@ -38,7 +38,7 @@ describe('SourceChip', () => {
   });
 
   it('calls onClick when clicked', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(<SourceChip title="Test Source" onClick={onClick} />);
 
     fireEvent.click(screen.getByRole('button'));
@@ -46,8 +46,8 @@ describe('SourceChip', () => {
   });
 
   it('calls onRemove when remove button is clicked', () => {
-    const onRemove = jest.fn();
-    const onClick = jest.fn();
+    const onRemove = vi.fn();
+    const onClick = vi.fn();
     render(
       <SourceChip title="Test Source" onRemove={onRemove} onClick={onClick} />,
     );
@@ -60,7 +60,7 @@ describe('SourceChip', () => {
   });
 
   it('calls onRemove when Enter key is pressed on remove button', () => {
-    const onRemove = jest.fn();
+    const onRemove = vi.fn();
     render(<SourceChip title="Test Source" onRemove={onRemove} />);
 
     const removeButton = screen.getByRole('button', { name: /Remove/i });
@@ -70,7 +70,7 @@ describe('SourceChip', () => {
   });
 
   it('does not call onRemove when other keys are pressed', () => {
-    const onRemove = jest.fn();
+    const onRemove = vi.fn();
     render(<SourceChip title="Test Source" onRemove={onRemove} />);
 
     const removeButton = screen.getByRole('button', { name: /Remove/i });
@@ -93,7 +93,7 @@ describe('SourceChip', () => {
     expect(button).toHaveClass('animate-in');
 
     act(() => {
-      jest.advanceTimersByTime(300);
+      vi.advanceTimersByTime(300);
     });
 
     expect(button).not.toHaveClass('animate-in');

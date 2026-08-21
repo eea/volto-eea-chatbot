@@ -6,11 +6,11 @@ import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingM
 
 describe('SearchToolRenderer', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   const mockChildRenderer = (result) => (
@@ -39,7 +39,7 @@ describe('SearchToolRenderer', () => {
           },
         },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       animate: false,
       children: mockChildRenderer,
     };
@@ -68,7 +68,7 @@ describe('SearchToolRenderer', () => {
           },
         },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       animate: false,
       children: mockChildRenderer,
     };
@@ -105,7 +105,7 @@ describe('SearchToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       animate: false,
       children: mockChildRenderer,
     };
@@ -129,7 +129,7 @@ describe('SearchToolRenderer', () => {
           },
         },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       animate: false,
       children: mockChildRenderer,
     };
@@ -158,7 +158,7 @@ describe('SearchToolRenderer', () => {
           },
         },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       animate: false,
       children: mockChildRenderer,
     };
@@ -192,7 +192,7 @@ describe('SearchToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       animate: false,
       children: mockChildRenderer,
     };
@@ -232,7 +232,7 @@ describe('SearchToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       animate: false,
       children: mockChildRenderer,
     };
@@ -248,7 +248,7 @@ describe('SearchToolRenderer', () => {
   it('handles empty packets array', () => {
     const props = {
       packets: [],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       animate: false,
       children: mockChildRenderer,
     };
@@ -259,7 +259,7 @@ describe('SearchToolRenderer', () => {
   });
 
   it('calls onComplete after animation delay when animate is true', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const props = {
       packets: [
         { ind: 1, obj: { type: PacketType.SEARCH_TOOL_START } },
@@ -287,7 +287,7 @@ describe('SearchToolRenderer', () => {
 
     // Advance timers for the animation duration
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onComplete).toHaveBeenCalled();

@@ -17,7 +17,7 @@ describe('ImageToolRenderer', () => {
       packets: [
         { ind: 1, obj: { type: PacketType.IMAGE_GENERATION_TOOL_START } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -47,7 +47,7 @@ describe('ImageToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -82,7 +82,7 @@ describe('ImageToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -110,7 +110,7 @@ describe('ImageToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -138,7 +138,7 @@ describe('ImageToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -150,7 +150,7 @@ describe('ImageToolRenderer', () => {
   it('handles empty packets array', () => {
     const props = {
       packets: [],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -160,7 +160,7 @@ describe('ImageToolRenderer', () => {
   });
 
   it('calls onComplete when section end is received', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const props = {
       packets: [
         { ind: 1, obj: { type: PacketType.IMAGE_GENERATION_TOOL_START } },

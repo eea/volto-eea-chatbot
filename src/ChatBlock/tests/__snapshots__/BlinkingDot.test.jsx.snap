@@ -1,24 +1,24 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`BlinkingDot applies custom className 1`] = `
+exports[`BlinkingDot > applies custom className 1`] = `
 <span
   className="blinking-dot "
 />
 `;
 
-exports[`BlinkingDot applies custom size 1`] = `
+exports[`BlinkingDot > applies custom size 1`] = `
 <span
   className="blinking-dot "
 />
 `;
 
-exports[`BlinkingDot renders blinking dot when active 1`] = `
+exports[`BlinkingDot > renders blinking dot when active 1`] = `
 <span
   className="blinking-dot "
 />
 `;
 
-exports[`BlinkingDot renders inactive dot when not active 1`] = `
+exports[`BlinkingDot > renders inactive dot when not active 1`] = `
 <span
   className="blinking-dot "
 />

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`UserActionsToolbar handles empty message gracefully 1`] = `
+exports[`UserActionsToolbar > handles empty message gracefully 1`] = `
 <div
   className="message-actions"
 >
@@ -13,22 +13,24 @@ exports[`UserActionsToolbar handles empty message gracefully 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={25}
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={25}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </button>
 </div>
 `;
 
-exports[`UserActionsToolbar handles undefined message gracefully 1`] = `
+exports[`UserActionsToolbar > handles undefined message gracefully 1`] = `
 <div
   className="message-actions"
 >
@@ -41,22 +43,24 @@ exports[`UserActionsToolbar handles undefined message gracefully 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={25}
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={25}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </button>
 </div>
 `;
 
-exports[`UserActionsToolbar renders toolbar with copy button 1`] = `
+exports[`UserActionsToolbar > renders toolbar with copy button 1`] = `
 <div
   className="message-actions"
 >
@@ -69,22 +73,24 @@ exports[`UserActionsToolbar renders toolbar with copy button 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={25}
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={25}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </button>
 </div>
 `;
 
-exports[`UserActionsToolbar renders toolbar with feedback when enabled 1`] = `
+exports[`UserActionsToolbar > renders toolbar with feedback when enabled 1`] = `
 <div
   className="message-actions"
 >
@@ -97,16 +103,18 @@ exports[`UserActionsToolbar renders toolbar with feedback when enabled 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={25}
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={25}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </button>
   <button
@@ -118,16 +126,18 @@ exports[`UserActionsToolbar renders toolbar with feedback when enabled 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={25}
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={25}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </button>
   <button
@@ -139,22 +149,24 @@ exports[`UserActionsToolbar renders toolbar with feedback when enabled 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M17 14V2M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={25}
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={25}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </button>
 </div>
 `;
 
-exports[`UserActionsToolbar renders with custom className 1`] = `
+exports[`UserActionsToolbar > renders with custom className 1`] = `
 <div
   className="message-actions custom-toolbar"
 >
@@ -167,16 +179,18 @@ exports[`UserActionsToolbar renders with custom className 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={25}
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={25}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </button>
 </div>

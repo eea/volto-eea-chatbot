@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { ClaimSegments } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimSegments';
 
 // Mock semantic-ui-react
-jest.mock('semantic-ui-react', () => ({
+vi.mock('semantic-ui-react', () => ({
   Tab: ({ panes, activeIndex }) => (
     <div data-testid="tab">
       <div data-testid="tab-menu">
@@ -30,7 +30,7 @@ jest.mock('semantic-ui-react', () => ({
 }));
 
 // Mock RenderClaimView
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/RenderClaimView',
   () => ({
     RenderClaimView: () => (
@@ -121,7 +121,7 @@ describe('ClaimSegments', () => {
   it('handles missing segments in segments object', () => {
     // Suppress console.warn for this test
     const originalWarn = console.warn;
-    console.warn = jest.fn();
+    console.warn = vi.fn();
 
     const props = {
       ...defaultProps,

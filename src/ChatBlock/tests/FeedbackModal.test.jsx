@@ -3,19 +3,19 @@ import '@testing-library/jest-dom';
 import FeedbackModal from '@eeacms/volto-eea-chatbot/ChatBlock/components/FeedbackModal';
 import * as lib from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/utils');
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/utils');
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('FeedbackModal', () => {
   const baseProps = {
     modalOpen: true,
-    onClose: jest.fn(),
-    setToast: jest.fn(),
-    onToast: jest.fn(),
-    setIsToastActive: jest.fn(),
+    onClose: vi.fn(),
+    setToast: vi.fn(),
+    onToast: vi.fn(),
+    setIsToastActive: vi.fn(),
     message: { messageId: '1234' },
     feedbackReasons: ['Reason 1', 'Reason 2'],
   };

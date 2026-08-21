@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import { useQualityMarkers } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useQualityMarkers';
 
 // Mock loadable before importing the hook
-jest.mock('@loadable/component', () => {
+vi.mock('@loadable/component', () => {
   const loadable = () => {
     const MockComponent = ({ children }) => null;
     return MockComponent;
@@ -11,7 +11,7 @@ jest.mock('@loadable/component', () => {
   loadable.lib = () => {
     const MockLibComponent = () => null;
     MockLibComponent.load = () =>
-      Promise.resolve({ captureException: jest.fn() });
+      Promise.resolve({ captureException: vi.fn() });
     return MockLibComponent;
   };
   return { __esModule: true, default: loadable };
@@ -19,11 +19,11 @@ jest.mock('@loadable/component', () => {
 
 describe('useQualityMarkers', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('returns null markers when doQualityControl is false', () => {

@@ -10,7 +10,7 @@ describe('DeepResearchToggle', () => {
       <DeepResearchToggle
         mode="unavailable"
         enabled={false}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
       />,
     );
     expect(container.innerHTML).toBe('');
@@ -18,53 +18,41 @@ describe('DeepResearchToggle', () => {
 
   it('renders nothing for undefined mode', () => {
     const { container } = render(
-      <DeepResearchToggle enabled={false} onChange={jest.fn()} />,
+      <DeepResearchToggle enabled={false} onChange={vi.fn()} />,
     );
     expect(container.innerHTML).toBe('');
   });
 
   it('renders static label for always_on', () => {
     render(
-      <DeepResearchToggle
-        mode="always_on"
-        enabled={true}
-        onChange={jest.fn()}
-      />,
+      <DeepResearchToggle mode="always_on" enabled={true} onChange={vi.fn()} />,
     );
     expect(screen.getByText('Deep research on')).toBeInTheDocument();
   });
 
   it('does not render checkbox for always_on', () => {
     render(
-      <DeepResearchToggle
-        mode="always_on"
-        enabled={true}
-        onChange={jest.fn()}
-      />,
+      <DeepResearchToggle mode="always_on" enabled={true} onChange={vi.fn()} />,
     );
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 
   it('renders checkbox for user_on', () => {
     render(
-      <DeepResearchToggle mode="user_on" enabled={true} onChange={jest.fn()} />,
+      <DeepResearchToggle mode="user_on" enabled={true} onChange={vi.fn()} />,
     );
     expect(screen.getByRole('checkbox')).toBeInTheDocument();
   });
 
   it('renders checkbox for user_off', () => {
     render(
-      <DeepResearchToggle
-        mode="user_off"
-        enabled={false}
-        onChange={jest.fn()}
-      />,
+      <DeepResearchToggle mode="user_off" enabled={false} onChange={vi.fn()} />,
     );
     expect(screen.getByRole('checkbox')).toBeInTheDocument();
   });
 
   it('checkbox calls onChange with true when toggled on', () => {
-    const mockOnChange = jest.fn();
+    const mockOnChange = vi.fn();
     render(
       <DeepResearchToggle
         mode="user_on"
@@ -77,7 +65,7 @@ describe('DeepResearchToggle', () => {
   });
 
   it('checkbox calls onChange with false when toggled off', () => {
-    const mockOnChange = jest.fn();
+    const mockOnChange = vi.fn();
     render(
       <DeepResearchToggle
         mode="user_on"

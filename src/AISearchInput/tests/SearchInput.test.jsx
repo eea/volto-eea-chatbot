@@ -4,19 +4,21 @@ import '@testing-library/jest-dom';
 
 import SearchInput from '@eeacms/volto-eea-chatbot/AISearchInput/components/SearchInput';
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
   __esModule: true,
   default: () => <svg data-testid="send-icon" />,
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/icons/send.svg', () => 'send');
+vi.mock('@eeacms/volto-eea-chatbot/icons/send.svg', () => ({
+  default: 'send',
+}));
 
 describe('SearchInput', () => {
   const defaultProps = {
     placeholderText: 'Ask...',
-    onSubmit: jest.fn(),
+    onSubmit: vi.fn(),
     value: '',
-    onChange: jest.fn(),
+    onChange: vi.fn(),
     error: null,
   };
 
@@ -35,21 +37,21 @@ describe('SearchInput', () => {
   });
 
   it('Enter key triggers onSubmit', () => {
-    const mockOnSubmit = jest.fn();
+    const mockOnSubmit = vi.fn();
     render(<SearchInput {...defaultProps} onSubmit={mockOnSubmit} />);
     fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Enter' });
     expect(mockOnSubmit).toHaveBeenCalled();
   });
 
   it('button click triggers onSubmit', () => {
-    const mockOnSubmit = jest.fn();
+    const mockOnSubmit = vi.fn();
     render(<SearchInput {...defaultProps} onSubmit={mockOnSubmit} />);
     fireEvent.click(screen.getByRole('button'));
     expect(mockOnSubmit).toHaveBeenCalled();
   });
 
   it('onChange is called on input change', () => {
-    const mockOnChange = jest.fn();
+    const mockOnChange = vi.fn();
     render(<SearchInput {...defaultProps} onChange={mockOnChange} />);
     fireEvent.change(screen.getByRole('textbox'), {
       target: { value: 'hello' },
@@ -75,7 +77,7 @@ describe('SearchInput', () => {
   });
 
   it('does not trigger onSubmit for Enter with shiftKey', () => {
-    const mockOnSubmit = jest.fn();
+    const mockOnSubmit = vi.fn();
     render(<SearchInput {...defaultProps} onSubmit={mockOnSubmit} />);
     fireEvent.keyDown(screen.getByRole('textbox'), {
       key: 'Enter',

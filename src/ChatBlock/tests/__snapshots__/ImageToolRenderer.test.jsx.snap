@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ImageToolRenderer handles empty packets array 1`] = `
+exports[`ImageToolRenderer > handles empty packets array 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -30,7 +30,7 @@ exports[`ImageToolRenderer handles empty packets array 1`] = `
 </div>
 `;
 
-exports[`ImageToolRenderer handles image without revised_prompt 1`] = `
+exports[`ImageToolRenderer > handles image without revised_prompt 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -70,7 +70,7 @@ exports[`ImageToolRenderer handles image without revised_prompt 1`] = `
 </div>
 `;
 
-exports[`ImageToolRenderer handles image without shape (defaults to square) 1`] = `
+exports[`ImageToolRenderer > handles image without shape (defaults to square) 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -115,7 +115,7 @@ exports[`ImageToolRenderer handles image without shape (defaults to square) 1`] 
 </div>
 `;
 
-exports[`ImageToolRenderer renders complete state with images 1`] = `
+exports[`ImageToolRenderer > renders complete state with images 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -160,7 +160,7 @@ exports[`ImageToolRenderer renders complete state with images 1`] = `
 </div>
 `;
 
-exports[`ImageToolRenderer renders generating state when not complete 1`] = `
+exports[`ImageToolRenderer > renders generating state when not complete 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -190,7 +190,7 @@ exports[`ImageToolRenderer renders generating state when not complete 1`] = `
 </div>
 `;
 
-exports[`ImageToolRenderer renders multiple images 1`] = `
+exports[`ImageToolRenderer > renders multiple images 1`] = `
 <div
   data-testid="renderer-result"
 >

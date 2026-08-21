@@ -3,14 +3,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { components } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown';
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimModal',
   () => ({
     ClaimModal: ({ text }) => <span data-testid="claim-modal">{text}</span>,
   }),
 );
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/Citation',
   () => ({
     Citation: ({ value, children }) => (
@@ -19,7 +19,7 @@ jest.mock(
   }),
 );
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/utils', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/utils', () => ({
   transformEmailsToLinks: (text) => [text],
 }));
 
@@ -233,7 +233,7 @@ describe('markdown components()', () => {
     });
 
     it('opens link in new tab on click', () => {
-      const openSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
       const A = comps.a;
       render(
         <A node={{}} href="https://example.com">
@@ -246,7 +246,7 @@ describe('markdown components()', () => {
     });
 
     it('handles click without href gracefully', () => {
-      const openSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
       const A = comps.a;
       render(<A node={{}}>No href</A>);
       fireEvent.click(screen.getByText('No href'));

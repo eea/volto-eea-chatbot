@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`AIMessage renders AI message with content 1`] = `
+exports[`AIMessage > renders AI message with content 1`] = `
 <div
   className="comment "
 >
@@ -10,16 +10,18 @@ exports[`AIMessage renders AI message with content 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={20}
       stroke="white"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={20}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div
@@ -56,7 +58,7 @@ exports[`AIMessage renders AI message with content 1`] = `
 </div>
 `;
 
-exports[`AIMessage renders AI message with feedback options 1`] = `
+exports[`AIMessage > renders AI message with feedback options 1`] = `
 <div
   className="comment "
 >
@@ -66,16 +68,18 @@ exports[`AIMessage renders AI message with feedback options 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={20}
       stroke="white"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={20}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div
@@ -112,7 +116,7 @@ exports[`AIMessage renders AI message with feedback options 1`] = `
 </div>
 `;
 
-exports[`AIMessage renders AI message with sources 1`] = `
+exports[`AIMessage > renders AI message with sources 1`] = `
 <div
   className="comment "
 >
@@ -122,16 +126,18 @@ exports[`AIMessage renders AI message with sources 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={20}
       stroke="white"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={20}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div
@@ -168,7 +174,7 @@ exports[`AIMessage renders AI message with sources 1`] = `
 </div>
 `;
 
-exports[`AIMessage renders empty AI message 1`] = `
+exports[`AIMessage > renders empty AI message 1`] = `
 <div
   className="comment "
 >
@@ -178,16 +184,18 @@ exports[`AIMessage renders empty AI message 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height={20}
       stroke="white"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width={20}
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div

@@ -4,16 +4,16 @@ import '@testing-library/jest-dom';
 
 import AISearchInputView from '@eeacms/volto-eea-chatbot/AISearchInput/AISearchInputView';
 
-const mockHistory = { push: jest.fn(), replace: jest.fn() };
-jest.mock('react-router-dom', () => ({
+const mockHistory = { push: vi.fn(), replace: vi.fn() };
+vi.mock('react-router-dom', () => ({
   useHistory: () => mockHistory,
 }));
 
-jest.mock('@eeacms/volto-matomo/utils', () => ({
-  trackEvent: jest.fn(),
+vi.mock('@eeacms/volto-matomo/utils', () => ({
+  trackEvent: vi.fn(),
 }));
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/AISearchInput/components/IntroHeader',
   () => ({
     __esModule: true,
@@ -27,7 +27,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/AISearchInput/components/SearchInput',
   () => ({
     __esModule: true,
@@ -59,7 +59,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/AISearchInput/components/DeepResearchToggle',
   () => ({
     __esModule: true,
@@ -81,7 +81,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/AISearchInput/components/PromptChips',
   () => ({
     __esModule: true,
@@ -101,7 +101,7 @@ jest.mock(
   }),
 );
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/AISearchInput/components/DisclaimerText',
   () => ({
     __esModule: true,
@@ -113,13 +113,14 @@ jest.mock(
 );
 
 // Mock the styles import
-jest.mock('@eeacms/volto-eea-chatbot/AISearchInput/styles.less', () => ({}));
+vi.mock('@eeacms/volto-eea-chatbot/AISearchInput/styles.less', () => ({}));
 
-describe('AISearchInputView', () => {
-  const mockTrackEvent = require('@eeacms/volto-matomo/utils').trackEvent;
+describe('AISearchInputView', async () => {
+  const mockTrackEvent = (await import('@eeacms/volto-matomo/utils'))
+    .trackEvent;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockHistory.push.mockReset();
     mockHistory.replace.mockReset();
     // Reset window.location mock

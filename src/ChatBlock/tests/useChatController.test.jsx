@@ -5,21 +5,21 @@ import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/use
 import { createChatSession } from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
 
 // Mock the streaming service with configurable sendMessage behavior
-const mockSendMessage = jest.fn(async function* () {
+const mockSendMessage = vi.fn(async function* () {
   yield [];
 });
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService',
   () => ({
     sendMessage: (...args) => mockSendMessage(...args),
-    createChatSession: jest.fn().mockResolvedValue('session-123'),
+    createChatSession: vi.fn().mockResolvedValue('session-123'),
   }),
 );
 
 describe('useChatController', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     mockSendMessage.mockImplementation(async function* () {
       yield [];
     });
@@ -133,9 +133,7 @@ describe('useChatController', () => {
   it('handles session creation error gracefully', async () => {
     createChatSession.mockRejectedValue(new Error('Session creation failed'));
 
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
@@ -320,9 +318,7 @@ describe('useChatController', () => {
 
     const { result } = renderHook(() => useChatController({ personaId: 1 }));
 
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await act(async () => {
       await result.current.onSubmit({ message: 'Trigger error' });
@@ -435,9 +431,7 @@ describe('useChatController', () => {
       await result.current.onSubmit({ message: 'Hello' });
     });
 
-    const consoleSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await act(async () => {
       await result.current.onFetchRelatedQuestions();

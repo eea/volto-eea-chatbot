@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Citation should render the component with link 1`] = `
+exports[`Citation > should render the component with link 1`] = `
 <a
   href="https://www.example.com"
   onClick={[Function]}
@@ -14,7 +14,7 @@ exports[`Citation should render the component with link 1`] = `
 </a>
 `;
 
-exports[`Citation should render the component without link 1`] = `
+exports[`Citation > should render the component without link 1`] = `
 <span
   className="chat-citation"
   onBlur={[Function]}

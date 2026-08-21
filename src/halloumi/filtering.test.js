@@ -6,7 +6,7 @@ import {
   excludeClaimSentences,
   excludeContextSentences,
 } from './filtering';
-jest.mock('node-fetch');
+vi.mock('node-fetch');
 
 describe('parseExcludeIndices', () => {
   it('parses single indices', () => {

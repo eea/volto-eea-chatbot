@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ClaimSegments filters out sources without matching snippets 1`] = `
+exports[`ClaimSegments > filters out sources without matching snippets 1`] = `
 <div
   className="chat-window"
 >
@@ -42,16 +42,18 @@ exports[`ClaimSegments filters out sources without matching snippets 1`] = `
             <svg
               className="icon source-icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
             <div
               className="source-card-details"
@@ -100,7 +102,7 @@ exports[`ClaimSegments filters out sources without matching snippets 1`] = `
 </div>
 `;
 
-exports[`ClaimSegments handles empty segmentIds 1`] = `
+exports[`ClaimSegments > handles empty segmentIds 1`] = `
 <div
   className="chat-window"
 >
@@ -117,7 +119,7 @@ exports[`ClaimSegments handles empty segmentIds 1`] = `
 </div>
 `;
 
-exports[`ClaimSegments handles missing segments in segments object 1`] = `
+exports[`ClaimSegments > handles missing segments in segments object 1`] = `
 <div
   className="chat-window"
 >
@@ -159,16 +161,18 @@ exports[`ClaimSegments handles missing segments in segments object 1`] = `
             <svg
               className="icon source-icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
             <div
               className="source-card-details"
@@ -195,16 +199,18 @@ exports[`ClaimSegments handles missing segments in segments object 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="16"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="16"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </a>
         </div>
@@ -239,7 +245,7 @@ exports[`ClaimSegments handles missing segments in segments object 1`] = `
 </div>
 `;
 
-exports[`ClaimSegments handles null segmentIds 1`] = `
+exports[`ClaimSegments > handles null segmentIds 1`] = `
 <div
   className="chat-window"
 >
@@ -256,7 +262,7 @@ exports[`ClaimSegments handles null segmentIds 1`] = `
 </div>
 `;
 
-exports[`ClaimSegments renders source without link 1`] = `
+exports[`ClaimSegments > renders source without link 1`] = `
 <div
   className="chat-window"
 >
@@ -298,16 +304,18 @@ exports[`ClaimSegments renders source without link 1`] = `
             <svg
               className="icon source-icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
             <div
               className="source-card-details"
@@ -356,7 +364,7 @@ exports[`ClaimSegments renders source without link 1`] = `
 </div>
 `;
 
-exports[`ClaimSegments renders with basic props 1`] = `
+exports[`ClaimSegments > renders with basic props 1`] = `
 <div
   className="chat-window"
 >
@@ -398,16 +406,18 @@ exports[`ClaimSegments renders with basic props 1`] = `
             <svg
               className="icon source-icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
             <div
               className="source-card-details"
@@ -434,16 +444,18 @@ exports[`ClaimSegments renders with basic props 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="16"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="16"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </a>
         </div>
@@ -485,7 +497,7 @@ exports[`ClaimSegments renders with basic props 1`] = `
 </div>
 `;
 
-exports[`ClaimSegments renders with file source type icon 1`] = `
+exports[`ClaimSegments > renders with file source type icon 1`] = `
 <div
   className="chat-window"
 >
@@ -527,16 +539,18 @@ exports[`ClaimSegments renders with file source type icon 1`] = `
             <svg
               className="icon source-icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
             <div
               className="source-card-details"
@@ -563,16 +577,18 @@ exports[`ClaimSegments renders with file source type icon 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="16"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="16"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </a>
         </div>
@@ -607,7 +623,7 @@ exports[`ClaimSegments renders with file source type icon 1`] = `
 </div>
 `;
 
-exports[`ClaimSegments renders with multiple sources 1`] = `
+exports[`ClaimSegments > renders with multiple sources 1`] = `
 <div
   className="chat-window"
 >
@@ -665,16 +681,18 @@ exports[`ClaimSegments renders with multiple sources 1`] = `
             <svg
               className="icon source-icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
             <div
               className="source-card-details"
@@ -701,16 +719,18 @@ exports[`ClaimSegments renders with multiple sources 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="16"
               stroke="currentColor"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="16"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </a>
         </div>

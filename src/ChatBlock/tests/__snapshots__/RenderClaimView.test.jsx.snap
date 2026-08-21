@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`RenderClaimView handles empty segments array 1`] = `
+exports[`RenderClaimView > handles empty segments array 1`] = `
 <div
   className="citation-text-container"
 >
@@ -16,7 +16,7 @@ exports[`RenderClaimView handles empty segments array 1`] = `
 </div>
 `;
 
-exports[`RenderClaimView handles segment ending with newline 1`] = `
+exports[`RenderClaimView > handles segment ending with newline 1`] = `
 <div
   className="citation-text-container"
 >
@@ -48,7 +48,7 @@ M
 </div>
 `;
 
-exports[`RenderClaimView handles segments with sourceStartIndex offset 1`] = `
+exports[`RenderClaimView > handles segments with sourceStartIndex offset 1`] = `
 <div
   className="citation-text-container"
 >
@@ -79,7 +79,7 @@ exports[`RenderClaimView handles segments with sourceStartIndex offset 1`] = `
 </div>
 `;
 
-exports[`RenderClaimView handles text with newlines 1`] = `
+exports[`RenderClaimView > handles text with newlines 1`] = `
 <div
   className="citation-text-container"
 >
@@ -111,7 +111,7 @@ exports[`RenderClaimView handles text with newlines 1`] = `
 </div>
 `;
 
-exports[`RenderClaimView renders plain text without segments 1`] = `
+exports[`RenderClaimView > renders plain text without segments 1`] = `
 <div
   className="citation-text-container"
 >
@@ -127,7 +127,7 @@ exports[`RenderClaimView renders plain text without segments 1`] = `
 </div>
 `;
 
-exports[`RenderClaimView renders text with a single segment 1`] = `
+exports[`RenderClaimView > renders text with a single segment 1`] = `
 <div
   className="citation-text-container"
 >
@@ -163,7 +163,7 @@ exports[`RenderClaimView renders text with a single segment 1`] = `
 </div>
 `;
 
-exports[`RenderClaimView renders text with multiple segments 1`] = `
+exports[`RenderClaimView > renders text with multiple segments 1`] = `
 <div
   className="citation-text-container"
 >
@@ -214,7 +214,7 @@ exports[`RenderClaimView renders text with multiple segments 1`] = `
 </div>
 `;
 
-exports[`RenderClaimView sorts segments by startOffset 1`] = `
+exports[`RenderClaimView > sorts segments by startOffset 1`] = `
 <div
   className="citation-text-container"
 >

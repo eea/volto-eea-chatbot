@@ -128,7 +128,7 @@ This document lists the environment variables used in the Volto Chatbot project.
 - `ONYX_API_KEY`
   The API key for authenticating with the Onyx service. This is the recommended authentication method.
 
-- `JEST_USE_SETUP`
+- `VITEST_USE_SETUP`
   Used in Jest configuration. When set to 'ON', it enables a specific Jest setup.
 
 - `LLMGW_URL`

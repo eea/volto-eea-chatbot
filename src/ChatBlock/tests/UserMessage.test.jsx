@@ -9,10 +9,12 @@ import { UserMessage } from '@eeacms/volto-eea-chatbot/ChatBlock/chat/UserMessag
 const mockStore = configureStore();
 
 // Mock loadable components
-jest.mock('@loadable/component', () => {
-  return () => {
-    const MockComponent = ({ children }) => <div>{children}</div>;
-    return MockComponent;
+vi.mock('@loadable/component', () => {
+  return {
+    default: () => {
+      const MockComponent = ({ children }) => <div>{children}</div>;
+      return MockComponent;
+    },
   };
 });
 

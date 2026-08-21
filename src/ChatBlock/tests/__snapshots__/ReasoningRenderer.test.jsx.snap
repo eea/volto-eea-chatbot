@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ReasoningRenderer concatenates multiple reasoning deltas 1`] = `
+exports[`ReasoningRenderer > concatenates multiple reasoning deltas 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -25,7 +25,7 @@ exports[`ReasoningRenderer concatenates multiple reasoning deltas 1`] = `
 </div>
 `;
 
-exports[`ReasoningRenderer renders empty content when no packets 1`] = `
+exports[`ReasoningRenderer > renders empty content when no packets 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -38,7 +38,7 @@ exports[`ReasoningRenderer renders empty content when no packets 1`] = `
 </div>
 `;
 
-exports[`ReasoningRenderer renders thinking status when reasoning has started 1`] = `
+exports[`ReasoningRenderer > renders thinking status when reasoning has started 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -63,7 +63,7 @@ exports[`ReasoningRenderer renders thinking status when reasoning has started 1`
 </div>
 `;
 
-exports[`ReasoningRenderer renders with REASONING_END packet type 1`] = `
+exports[`ReasoningRenderer > renders with REASONING_END packet type 1`] = `
 <div
   data-testid="renderer-result"
 >

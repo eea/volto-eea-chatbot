@@ -1,7 +1,7 @@
 import middleware from './middleware';
 import { isPathAllowed } from '../middleware';
 
-jest.mock('./generative');
+vi.mock('./generative');
 
 describe('halloumi middleware', () => {
   let req, res, next;
@@ -19,15 +19,15 @@ describe('halloumi middleware', () => {
       ip: '127.0.0.1',
     };
     res = {
-      send: jest.fn(),
-      set: jest.fn(),
-      status: jest.fn().mockReturnThis(),
+      send: vi.fn(),
+      set: vi.fn(),
+      status: vi.fn().mockReturnThis(),
     };
-    next = jest.fn();
+    next = vi.fn();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('returns error when LLMGW_TOKEN is missing', async () => {
@@ -84,9 +84,9 @@ describe('halloumi middleware - dynamic import', () => {
   });
 
   const buildRes = () => ({
-    send: jest.fn(),
-    set: jest.fn(),
-    status: jest.fn().mockReturnThis(),
+    send: vi.fn(),
+    set: vi.fn(),
+    status: vi.fn().mockReturnThis(),
   });
 
   it('sends response on successful getVerifyClaimResponse', async () => {
@@ -95,22 +95,22 @@ describe('halloumi middleware - dynamic import', () => {
     process.env.LLMGW_TOKEN = 'test-token'; //betterleaks:allow
     process.env.LLMGW_URL = 'http://test-url';
 
-    jest.resetModules();
+    vi.resetModules();
 
-    const mockGetVerifyClaimResponse = jest
+    const mockGetVerifyClaimResponse = vi
       .fn()
       .mockResolvedValue({ claims: [], segments: {} });
 
-    jest.setMock('./generative', {
+    vi.doMock('./generative', () => ({
       getVerifyClaimResponse: mockGetVerifyClaimResponse,
-    });
+    }));
 
-    const middlewareMod = require('./middleware').default;
+    const middlewareMod = (await import('./middleware')).default;
 
     const req = buildReq();
     const res = buildRes();
 
-    await middlewareMod(req, res, jest.fn());
+    await middlewareMod(req, res, vi.fn());
 
     expect(mockGetVerifyClaimResponse).toHaveBeenCalled();
     expect(res.set).toHaveBeenCalledWith('Content-Type', 'application/json');
@@ -126,22 +126,22 @@ describe('halloumi middleware - dynamic import', () => {
     process.env.LLMGW_TOKEN = 'test-token'; //betterleaks:allow
     process.env.LLMGW_URL = 'http://test-url';
 
-    jest.resetModules();
+    vi.resetModules();
 
-    const mockGetVerifyClaimResponse = jest
+    const mockGetVerifyClaimResponse = vi
       .fn()
       .mockRejectedValue(new Error('LLM error'));
 
-    jest.setMock('./generative', {
+    vi.doMock('./generative', () => ({
       getVerifyClaimResponse: mockGetVerifyClaimResponse,
-    });
+    }));
 
-    const middlewareMod = require('./middleware').default;
+    const middlewareMod = (await import('./middleware')).default;
 
     const req = buildReq();
     const res = buildRes();
 
-    await middlewareMod(req, res, jest.fn());
+    await middlewareMod(req, res, vi.fn());
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith(

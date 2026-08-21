@@ -24,7 +24,7 @@ describe('FetchToolRenderer', () => {
           },
         },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -53,7 +53,7 @@ describe('FetchToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -74,7 +74,7 @@ describe('FetchToolRenderer', () => {
           },
         },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -100,7 +100,7 @@ describe('FetchToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -121,7 +121,7 @@ describe('FetchToolRenderer', () => {
           },
         },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -133,7 +133,7 @@ describe('FetchToolRenderer', () => {
   it('handles empty packets array', () => {
     const props = {
       packets: [],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -143,7 +143,7 @@ describe('FetchToolRenderer', () => {
   });
 
   it('calls onComplete when section end is received', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const props = {
       packets: [
         { ind: 1, obj: { type: PacketType.FETCH_TOOL_START, queries: [] } },

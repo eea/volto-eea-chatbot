@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { ClaimModal } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimModal';
 
 // Mock semantic-ui-react Modal
-jest.mock('semantic-ui-react', () => ({
+vi.mock('semantic-ui-react', () => ({
   Modal: ({ children, trigger, className }) => (
     <div className={className} data-testid="modal">
       <div data-testid="trigger">{trigger}</div>
@@ -18,7 +18,7 @@ jest.mock('semantic-ui-react', () => ({
 }));
 
 // Mock ClaimSegments
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimSegments',
   () => ({
     ClaimSegments: () => <div data-testid="claim-segments">ClaimSegments</div>,

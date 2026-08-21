@@ -4,13 +4,13 @@ import '@testing-library/jest-dom';
 
 import AISearchInputEdit from '@eeacms/volto-eea-chatbot/AISearchInput/AISearchInputEdit';
 
-jest.mock('react-intl', () => ({
+vi.mock('react-intl', () => ({
   useIntl: () => ({
     formatMessage: ({ defaultMessage }) => defaultMessage,
   }),
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/AISearchInput/AISearchInputView', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/AISearchInput/AISearchInputView', () => ({
   __esModule: true,
   default: ({ isEditMode }) => (
     <div data-testid="aisearch-input-view" data-edit-mode={String(isEditMode)}>
@@ -19,19 +19,19 @@ jest.mock('@eeacms/volto-eea-chatbot/AISearchInput/AISearchInputView', () => ({
   ),
 }));
 
-jest.mock('@plone/volto/components/manage/Sidebar/SidebarPortal', () => ({
+vi.mock('@plone/volto/components/manage/Sidebar/SidebarPortal', () => ({
   __esModule: true,
   default: ({ selected, children }) =>
     selected ? <div data-testid="sidebar-portal">{children}</div> : null,
 }));
 
-jest.mock('@plone/volto/components/manage/Form/BlockDataForm', () => ({
+vi.mock('@plone/volto/components/manage/Form/BlockDataForm', () => ({
   __esModule: true,
   default: ({ title }) => <div data-testid="block-data-form">{title}</div>,
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/AISearchInput/schema', () => ({
-  AISearchInputSchema: jest.fn(() => ({
+vi.mock('@eeacms/volto-eea-chatbot/AISearchInput/schema', () => ({
+  AISearchInputSchema: vi.fn(() => ({
     title: 'AI Search Input',
     properties: {},
     fieldsets: [{ id: 'default', title: 'Default', fields: [] }],
@@ -40,13 +40,13 @@ jest.mock('@eeacms/volto-eea-chatbot/AISearchInput/schema', () => ({
 }));
 
 // Mock styles
-jest.mock('@eeacms/volto-eea-chatbot/AISearchInput/styles.less', () => ({}));
+vi.mock('@eeacms/volto-eea-chatbot/AISearchInput/styles.less', () => ({}));
 
 describe('AISearchInputEdit', () => {
   const defaultProps = {
     block: 'block-uuid-1',
     data: {},
-    onChangeBlock: jest.fn(),
+    onChangeBlock: vi.fn(),
     selected: false,
   };
 

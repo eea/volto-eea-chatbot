@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SourceDetails should render the component with doc type 1`] = `
+exports[`SourceDetails > should render the component with doc type 1`] = `
 <div
   className="source"
 >
@@ -26,16 +26,18 @@ exports[`SourceDetails should render the component with doc type 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height="16"
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width="16"
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div
@@ -48,7 +50,7 @@ exports[`SourceDetails should render the component with doc type 1`] = `
 </div>
 `;
 
-exports[`SourceDetails should render the component with link type 1`] = `
+exports[`SourceDetails > should render the component with link type 1`] = `
 <a
   className="source source-link"
   href="https://www.example.com"
@@ -72,16 +74,18 @@ exports[`SourceDetails should render the component with link type 1`] = `
     <svg
       className="icon"
       dangerouslySetInnerHTML={
-        Object {
-          "__html": undefined,
+        {
+          "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
         }
       }
-      fill="currentColor"
+      fill="none"
       height="16"
       stroke="currentColor"
-      viewBox=""
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
       width="16"
-      xmlns=""
+      xmlns="http://www.w3.org/2000/svg"
     />
   </div>
   <div

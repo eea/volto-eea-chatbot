@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`CustomToolRenderer handles delta without data 1`] = `
+exports[`CustomToolRenderer > handles delta without data 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -45,7 +45,7 @@ exports[`CustomToolRenderer handles delta without data 1`] = `
 </div>
 `;
 
-exports[`CustomToolRenderer handles delta without response_type 1`] = `
+exports[`CustomToolRenderer > handles delta without response_type 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -92,7 +92,7 @@ exports[`CustomToolRenderer handles delta without response_type 1`] = `
 </div>
 `;
 
-exports[`CustomToolRenderer handles empty packets array 1`] = `
+exports[`CustomToolRenderer > handles empty packets array 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -127,7 +127,7 @@ exports[`CustomToolRenderer handles empty packets array 1`] = `
 </div>
 `;
 
-exports[`CustomToolRenderer renders complete state 1`] = `
+exports[`CustomToolRenderer > renders complete state 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -179,7 +179,7 @@ exports[`CustomToolRenderer renders complete state 1`] = `
 </div>
 `;
 
-exports[`CustomToolRenderer renders complex nested data correctly 1`] = `
+exports[`CustomToolRenderer > renders complex nested data correctly 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -240,7 +240,7 @@ exports[`CustomToolRenderer renders complex nested data correctly 1`] = `
 </div>
 `;
 
-exports[`CustomToolRenderer renders running state when not complete 1`] = `
+exports[`CustomToolRenderer > renders running state when not complete 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -275,7 +275,7 @@ exports[`CustomToolRenderer renders running state when not complete 1`] = `
 </div>
 `;
 
-exports[`CustomToolRenderer renders with multiple deltas 1`] = `
+exports[`CustomToolRenderer > renders with multiple deltas 1`] = `
 <div
   data-testid="renderer-result"
 >
@@ -345,7 +345,7 @@ exports[`CustomToolRenderer renders with multiple deltas 1`] = `
 </div>
 `;
 
-exports[`CustomToolRenderer uses default tool name when not provided 1`] = `
+exports[`CustomToolRenderer > uses default tool name when not provided 1`] = `
 <div
   data-testid="renderer-result"
 >

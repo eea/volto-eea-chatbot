@@ -5,17 +5,17 @@ import { sendMessage } from '@eeacms/volto-eea-chatbot/ChatBlock/services/stream
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 // Mock the streaming service
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService',
   () => ({
-    sendMessage: jest.fn(),
-    createChatSession: jest.fn(),
+    sendMessage: vi.fn(),
+    createChatSession: vi.fn(),
   }),
 );
 
 describe('useChatStreaming', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('initializes with correct default state', () => {
@@ -39,8 +39,8 @@ describe('useChatStreaming', () => {
       yield packets;
     });
 
-    const onMessageUpdate = jest.fn();
-    const onComplete = jest.fn();
+    const onMessageUpdate = vi.fn();
+    const onComplete = vi.fn();
 
     const { result } = renderHook(() =>
       useChatStreaming({ onMessageUpdate, onComplete }),
@@ -71,7 +71,7 @@ describe('useChatStreaming', () => {
       throw new Error('Stream failed');
     });
 
-    const onError = jest.fn();
+    const onError = vi.fn();
 
     const { result } = renderHook(() => useChatStreaming({ onError }));
 
@@ -142,7 +142,7 @@ describe('useChatStreaming', () => {
       throw error;
     });
 
-    const onError = jest.fn();
+    const onError = vi.fn();
 
     const { result } = renderHook(() => useChatStreaming({ onError }));
 

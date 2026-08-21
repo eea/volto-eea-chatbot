@@ -12,7 +12,7 @@ describe('PromptChips', () => {
       { label: 'Chip 3' },
     ];
     const { container } = render(
-      <PromptChips prompts={prompts} onSelect={jest.fn()} />,
+      <PromptChips prompts={prompts} onSelect={vi.fn()} />,
     );
     const buttons = container.querySelectorAll('button.ais-chip');
     expect(buttons).toHaveLength(3);
@@ -21,14 +21,14 @@ describe('PromptChips', () => {
   it('each chip is a button element', () => {
     const prompts = [{ label: 'Chip' }];
     const { container } = render(
-      <PromptChips prompts={prompts} onSelect={jest.fn()} />,
+      <PromptChips prompts={prompts} onSelect={vi.fn()} />,
     );
     const button = container.querySelector('button.ais-chip');
     expect(button.tagName).toBe('BUTTON');
   });
 
   it('click triggers onSelect with message', () => {
-    const mockOnSelect = jest.fn();
+    const mockOnSelect = vi.fn();
     const prompts = [{ label: 'Label', message: 'Actual message' }];
     render(<PromptChips prompts={prompts} onSelect={mockOnSelect} />);
     fireEvent.click(screen.getByText('Label'));
@@ -36,7 +36,7 @@ describe('PromptChips', () => {
   });
 
   it('falls back to label when no message', () => {
-    const mockOnSelect = jest.fn();
+    const mockOnSelect = vi.fn();
     const prompts = [{ label: 'Just label' }];
     render(<PromptChips prompts={prompts} onSelect={mockOnSelect} />);
     fireEvent.click(screen.getByText('Just label'));
@@ -45,20 +45,20 @@ describe('PromptChips', () => {
 
   it('renders nothing for empty array', () => {
     const { container } = render(
-      <PromptChips prompts={[]} onSelect={jest.fn()} />,
+      <PromptChips prompts={[]} onSelect={vi.fn()} />,
     );
     expect(container.innerHTML).toBe('');
   });
 
   it('renders nothing for null prompts', () => {
     const { container } = render(
-      <PromptChips prompts={null} onSelect={jest.fn()} />,
+      <PromptChips prompts={null} onSelect={vi.fn()} />,
     );
     expect(container.innerHTML).toBe('');
   });
 
   it('renders nothing for undefined prompts', () => {
-    const { container } = render(<PromptChips onSelect={jest.fn()} />);
+    const { container } = render(<PromptChips onSelect={vi.fn()} />);
     expect(container.innerHTML).toBe('');
   });
 });

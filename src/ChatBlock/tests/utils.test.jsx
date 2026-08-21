@@ -49,15 +49,15 @@ describe('utils', () => {
 
   describe('debounce', () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('calls the function immediately on first call', () => {
-      const callable = jest.fn();
+      const callable = vi.fn();
       const clickSignal = { current: null };
 
       debounce(callable, clickSignal);
@@ -66,7 +66,7 @@ describe('utils', () => {
     });
 
     it('prevents multiple calls within debounce period', () => {
-      const callable = jest.fn();
+      const callable = vi.fn();
       const clickSignal = { current: null };
 
       debounce(callable, clickSignal);
@@ -77,13 +77,13 @@ describe('utils', () => {
     });
 
     it('allows call after debounce period', () => {
-      const callable = jest.fn();
+      const callable = vi.fn();
       const clickSignal = { current: null };
 
       debounce(callable, clickSignal);
       expect(callable).toHaveBeenCalledTimes(1);
 
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       debounce(callable, clickSignal);
       expect(callable).toHaveBeenCalledTimes(2);
@@ -92,16 +92,16 @@ describe('utils', () => {
 
   describe('useCopyToClipboard', () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       Object.assign(navigator, {
         clipboard: {
-          writeText: jest.fn().mockResolvedValue(undefined),
+          writeText: vi.fn().mockResolvedValue(undefined),
         },
       });
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('returns initial state as not copied', () => {
@@ -130,14 +130,14 @@ describe('utils', () => {
       expect(result.current[0]).toBe(true);
 
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       expect(result.current[0]).toBe(false);
     });
 
     it('handles clipboard write failure', async () => {
-      navigator.clipboard.writeText = jest.fn().mockRejectedValue(new Error());
+      navigator.clipboard.writeText = vi.fn().mockRejectedValue(new Error());
 
       const { result } = renderHook(() => useCopyToClipboard('test'));
 
@@ -172,11 +172,11 @@ describe('utils', () => {
 
   describe('createChatMessageFeedback', () => {
     beforeEach(() => {
-      global.fetch = jest.fn();
+      global.fetch = vi.fn();
     });
 
     afterEach(() => {
-      jest.resetAllMocks();
+      vi.resetAllMocks();
     });
 
     it('sends positive feedback correctly', async () => {

@@ -2,20 +2,19 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HalloumiFeedback from '@eeacms/volto-eea-chatbot/ChatBlock/components/HalloumiFeedback';
 
-jest.mock(
-  '@eeacms/volto-eea-chatbot/ChatBlock/components/Spinner',
-  () => () => <div data-testid="spinner">Loading...</div>,
-);
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Spinner', () => ({
+  default: () => <div data-testid="spinner">Loading...</div>,
+}));
 
-jest.mock(
-  '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon',
-  () =>
-    ({ name }) => <img src={name} alt="icon" />,
-);
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
+  default: ({ name }) => <img src={name} alt="icon" />,
+}));
 
-jest.mock('@eeacms/volto-eea-chatbot/icons/glasses.svg', () => 'glasses.svg');
+vi.mock('@eeacms/volto-eea-chatbot/icons/glasses.svg', () => ({
+  default: 'glasses.svg',
+}));
 
-jest.mock('@plone/volto-slate/editor/render', () => ({
+vi.mock('@plone/volto-slate/editor/render', () => ({
   serializeNodes: (nodes) => {
     const visitTextNodes = (node) => {
       if (Array.isArray(node)) return node.map(visitTextNodes).join('');
@@ -36,7 +35,7 @@ describe('HalloumiFeedback', () => {
     markers: { claims: [{ score: 50, rationale: 'Some rationale' }] },
     score: 75,
     scoreColor: 'green',
-    onManualVerify: jest.fn(),
+    onManualVerify: vi.fn(),
     showVerifyClaimsButton: false,
     sources: [],
   };

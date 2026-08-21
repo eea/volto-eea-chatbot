@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ClaimModal handles claim with markdown formatting 1`] = `
+exports[`ClaimModal > handles claim with markdown formatting 1`] = `
 <div
   className="claim-modal claim-green-400"
   data-testid="modal"
@@ -32,16 +32,18 @@ exports[`ClaimModal handles claim with markdown formatting 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="white"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </div>
           <span
@@ -56,7 +58,7 @@ exports[`ClaimModal handles claim with markdown formatting 1`] = `
           “
           <span
             dangerouslySetInnerHTML={
-              Object {
+              {
                 "__html": "Bold claim with italic and <sup>1</sup>",
               }
             }
@@ -94,7 +96,7 @@ exports[`ClaimModal handles claim with markdown formatting 1`] = `
             <div
               className="score-progress-fill"
               style={
-                Object {
+                {
                   "width": "85%",
                 }
               }
@@ -126,7 +128,7 @@ exports[`ClaimModal handles claim with markdown formatting 1`] = `
 </div>
 `;
 
-exports[`ClaimModal handles empty text array 1`] = `
+exports[`ClaimModal > handles empty text array 1`] = `
 <div
   className="claim-modal claim-green-400"
   data-testid="modal"
@@ -156,16 +158,18 @@ exports[`ClaimModal handles empty text array 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="white"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </div>
           <span
@@ -180,7 +184,7 @@ exports[`ClaimModal handles empty text array 1`] = `
           “
           <span
             dangerouslySetInnerHTML={
-              Object {
+              {
                 "__html": "<b></b>This is a claim about something important.",
               }
             }
@@ -218,7 +222,7 @@ exports[`ClaimModal handles empty text array 1`] = `
             <div
               className="score-progress-fill"
               style={
-                Object {
+                {
                   "width": "85%",
                 }
               }
@@ -250,7 +254,7 @@ exports[`ClaimModal handles empty text array 1`] = `
 </div>
 `;
 
-exports[`ClaimModal handles perfect score 1`] = `
+exports[`ClaimModal > handles perfect score 1`] = `
 <div
   className="claim-modal claim-green-500"
   data-testid="modal"
@@ -282,16 +286,18 @@ exports[`ClaimModal handles perfect score 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="white"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </div>
           <span
@@ -306,7 +312,7 @@ exports[`ClaimModal handles perfect score 1`] = `
           “
           <span
             dangerouslySetInnerHTML={
-              Object {
+              {
                 "__html": "This is a claim about <b>something important</b>.",
               }
             }
@@ -344,7 +350,7 @@ exports[`ClaimModal handles perfect score 1`] = `
             <div
               className="score-progress-fill"
               style={
-                Object {
+                {
                   "width": "100%",
                 }
               }
@@ -376,7 +382,7 @@ exports[`ClaimModal handles perfect score 1`] = `
 </div>
 `;
 
-exports[`ClaimModal handles zero score 1`] = `
+exports[`ClaimModal > handles zero score 1`] = `
 <div
   className="claim-modal claim-red-500"
   data-testid="modal"
@@ -408,16 +414,18 @@ exports[`ClaimModal handles zero score 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="white"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </div>
           <span
@@ -432,7 +440,7 @@ exports[`ClaimModal handles zero score 1`] = `
           “
           <span
             dangerouslySetInnerHTML={
-              Object {
+              {
                 "__html": "This is a claim about <b>something important</b>.",
               }
             }
@@ -470,7 +478,7 @@ exports[`ClaimModal handles zero score 1`] = `
             <div
               className="score-progress-fill"
               style={
-                Object {
+                {
                   "width": "0%",
                 }
               }
@@ -502,7 +510,7 @@ exports[`ClaimModal handles zero score 1`] = `
 </div>
 `;
 
-exports[`ClaimModal renders the claim modal with high score 1`] = `
+exports[`ClaimModal > renders the claim modal with high score 1`] = `
 <div
   className="claim-modal claim-green-400"
   data-testid="modal"
@@ -534,16 +542,18 @@ exports[`ClaimModal renders the claim modal with high score 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="white"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </div>
           <span
@@ -558,7 +568,7 @@ exports[`ClaimModal renders the claim modal with high score 1`] = `
           “
           <span
             dangerouslySetInnerHTML={
-              Object {
+              {
                 "__html": "This is a claim about <b>something important</b>.",
               }
             }
@@ -596,7 +606,7 @@ exports[`ClaimModal renders the claim modal with high score 1`] = `
             <div
               className="score-progress-fill"
               style={
-                Object {
+                {
                   "width": "85%",
                 }
               }
@@ -628,7 +638,7 @@ exports[`ClaimModal renders the claim modal with high score 1`] = `
 </div>
 `;
 
-exports[`ClaimModal renders with empty markers 1`] = `
+exports[`ClaimModal > renders with empty markers 1`] = `
 <div
   className="claim-modal claim-green-400"
   data-testid="modal"
@@ -660,16 +670,18 @@ exports[`ClaimModal renders with empty markers 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="white"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </div>
           <span
@@ -684,7 +696,7 @@ exports[`ClaimModal renders with empty markers 1`] = `
           “
           <span
             dangerouslySetInnerHTML={
-              Object {
+              {
                 "__html": "This is a claim about <b>something important</b>.",
               }
             }
@@ -722,7 +734,7 @@ exports[`ClaimModal renders with empty markers 1`] = `
             <div
               className="score-progress-fill"
               style={
-                Object {
+                {
                   "width": "85%",
                 }
               }
@@ -754,7 +766,7 @@ exports[`ClaimModal renders with empty markers 1`] = `
 </div>
 `;
 
-exports[`ClaimModal renders with low score 1`] = `
+exports[`ClaimModal > renders with low score 1`] = `
 <div
   className="claim-modal claim-red-300"
   data-testid="modal"
@@ -786,16 +798,18 @@ exports[`ClaimModal renders with low score 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="white"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </div>
           <span
@@ -810,7 +824,7 @@ exports[`ClaimModal renders with low score 1`] = `
           “
           <span
             dangerouslySetInnerHTML={
-              Object {
+              {
                 "__html": "This is a claim about <b>something important</b>.",
               }
             }
@@ -848,7 +862,7 @@ exports[`ClaimModal renders with low score 1`] = `
             <div
               className="score-progress-fill"
               style={
-                Object {
+                {
                   "width": "30%",
                 }
               }
@@ -880,7 +894,7 @@ exports[`ClaimModal renders with low score 1`] = `
 </div>
 `;
 
-exports[`ClaimModal renders with medium score 1`] = `
+exports[`ClaimModal > renders with medium score 1`] = `
 <div
   className="claim-modal claim-green-200"
   data-testid="modal"
@@ -912,16 +926,18 @@ exports[`ClaimModal renders with medium score 1`] = `
             <svg
               className="icon"
               dangerouslySetInnerHTML={
-                Object {
-                  "__html": undefined,
+                {
+                  "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
                 }
               }
-              fill="currentColor"
+              fill="none"
               height="20"
               stroke="white"
-              viewBox=""
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
               width="20"
-              xmlns=""
+              xmlns="http://www.w3.org/2000/svg"
             />
           </div>
           <span
@@ -936,7 +952,7 @@ exports[`ClaimModal renders with medium score 1`] = `
           “
           <span
             dangerouslySetInnerHTML={
-              Object {
+              {
                 "__html": "This is a claim about <b>something important</b>.",
               }
             }
@@ -974,7 +990,7 @@ exports[`ClaimModal renders with medium score 1`] = `
             <div
               className="score-progress-fill"
               style={
-                Object {
+                {
                   "width": "60%",
                 }
               }

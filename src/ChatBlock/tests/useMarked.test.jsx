@@ -5,18 +5,18 @@ describe('useMarked', () => {
   const createMockLibs = () => ({
     highlightJs: {
       default: {
-        getLanguage: jest.fn((lang) => (lang === 'javascript' ? true : false)),
-        highlight: jest.fn((lang, code) => ({
+        getLanguage: vi.fn((lang) => (lang === 'javascript' ? true : false)),
+        highlight: vi.fn((lang, code) => ({
           value: `<highlighted>${code}</highlighted>`,
         })),
       },
     },
     marked: {
       marked: {
-        setOptions: jest.fn(),
-        parse: jest.fn((text) => Promise.resolve(`<p>${text}</p>`)),
+        setOptions: vi.fn(),
+        parse: vi.fn((text) => Promise.resolve(`<p>${text}</p>`)),
       },
-      Renderer: jest.fn().mockImplementation(function () {
+      Renderer: vi.fn().mockImplementation(function () {
         this.paragraph = null;
         this.list = null;
         this.listitem = null;

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`MultiToolRenderer renders multiple tool groups 1`] = `
+exports[`MultiToolRenderer > renders multiple tool groups 1`] = `
 <div
   className="multi-tool-renderer streaming"
 >
@@ -67,11 +67,19 @@ exports[`MultiToolRenderer renders multiple tool groups 1`] = `
                   >
                     <span
                       data-icon={
-                        Object {
-                          "attributes": Object {
-                            "viewBox": "",
-                            "xmlns": "",
+                        {
+                          "attributes": {
+                            "fill": "none",
+                            "height": "24",
+                            "stroke": "currentColor",
+                            "stroke-linecap": "round",
+                            "stroke-linejoin": "round",
+                            "stroke-width": "2",
+                            "viewBox": "0 0 24 24",
+                            "width": "24",
+                            "xmlns": "http://www.w3.org/2000/svg",
                           },
+                          "content": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                         }
                       }
                       data-size={14}
@@ -121,11 +129,19 @@ exports[`MultiToolRenderer renders multiple tool groups 1`] = `
                   >
                     <span
                       data-icon={
-                        Object {
-                          "attributes": Object {
-                            "viewBox": "",
-                            "xmlns": "",
+                        {
+                          "attributes": {
+                            "fill": "none",
+                            "height": "24",
+                            "stroke": "currentColor",
+                            "stroke-linecap": "round",
+                            "stroke-linejoin": "round",
+                            "stroke-width": "2",
+                            "viewBox": "0 0 24 24",
+                            "width": "24",
+                            "xmlns": "http://www.w3.org/2000/svg",
                           },
+                          "content": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                         }
                       }
                       data-size={14}
@@ -160,7 +176,7 @@ exports[`MultiToolRenderer renders multiple tool groups 1`] = `
 </div>
 `;
 
-exports[`MultiToolRenderer renders non-detailed tool collapsed view when streaming 1`] = `
+exports[`MultiToolRenderer > renders non-detailed tool collapsed view when streaming 1`] = `
 <div
   className="multi-tool-renderer streaming"
 >
@@ -235,7 +251,7 @@ exports[`MultiToolRenderer renders non-detailed tool collapsed view when streami
 </div>
 `;
 
-exports[`MultiToolRenderer renders search tool groups 1`] = `
+exports[`MultiToolRenderer > renders search tool groups 1`] = `
 <div
   className="multi-tool-renderer streaming"
 >
@@ -303,11 +319,19 @@ exports[`MultiToolRenderer renders search tool groups 1`] = `
                   >
                     <span
                       data-icon={
-                        Object {
-                          "attributes": Object {
-                            "viewBox": "",
-                            "xmlns": "",
+                        {
+                          "attributes": {
+                            "fill": "none",
+                            "height": "24",
+                            "stroke": "currentColor",
+                            "stroke-linecap": "round",
+                            "stroke-linejoin": "round",
+                            "stroke-width": "2",
+                            "viewBox": "0 0 24 24",
+                            "width": "24",
+                            "xmlns": "http://www.w3.org/2000/svg",
                           },
+                          "content": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
                         }
                       }
                       data-size={14}

@@ -188,11 +188,11 @@ describe('handleStream', () => {
 
 describe('createChatSession', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('returns chat session id on success', async () => {
@@ -224,11 +224,11 @@ describe('createChatSession', () => {
 
 describe('submitFeedback', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('sends positive feedback', async () => {
@@ -276,17 +276,17 @@ describe('submitFeedback', () => {
 
 // ── sendMessage ──────────────────────────────────────────────────────
 
-describe('sendMessage', () => {
-  const {
-    sendMessage,
-  } = require('@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService');
+describe('sendMessage', async () => {
+  const { sendMessage } = await import(
+    '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService'
+  );
 
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   function makeStreamResponse(chunks) {
@@ -440,11 +440,11 @@ describe('sendMessage', () => {
 
 describe('regenerateMessage', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('sends regenerate request', async () => {

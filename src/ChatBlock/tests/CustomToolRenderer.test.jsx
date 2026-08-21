@@ -23,7 +23,7 @@ describe('CustomToolRenderer', () => {
           },
         },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -54,7 +54,7 @@ describe('CustomToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -93,7 +93,7 @@ describe('CustomToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -122,7 +122,7 @@ describe('CustomToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -151,7 +151,7 @@ describe('CustomToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -163,7 +163,7 @@ describe('CustomToolRenderer', () => {
   it('uses default tool name when not provided', () => {
     const props = {
       packets: [{ ind: 1, obj: { type: PacketType.SECTION_END } }],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -175,7 +175,7 @@ describe('CustomToolRenderer', () => {
   it('handles empty packets array', () => {
     const props = {
       packets: [],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 
@@ -185,7 +185,7 @@ describe('CustomToolRenderer', () => {
   });
 
   it('calls onComplete when section end is received', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const props = {
       packets: [
         {
@@ -230,7 +230,7 @@ describe('CustomToolRenderer', () => {
         },
         { ind: 1, obj: { type: PacketType.SECTION_END } },
       ],
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
       children: mockChildRenderer,
     };
 

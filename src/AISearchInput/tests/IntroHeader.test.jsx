@@ -4,14 +4,16 @@ import '@testing-library/jest-dom';
 
 import IntroHeader from '@eeacms/volto-eea-chatbot/AISearchInput/components/IntroHeader';
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
   __esModule: true,
   default: () => <svg data-testid="sparkle-icon" />,
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/icons/sparkle.svg', () => 'sparkle');
+vi.mock('@eeacms/volto-eea-chatbot/icons/sparkle.svg', () => ({
+  default: 'sparkle',
+}));
 
-jest.mock('@plone/volto-slate/editor/render', () => ({
+vi.mock('@plone/volto-slate/editor/render', () => ({
   serializeNodes: (nodes) => (
     <div data-testid="slate-content">{JSON.stringify(nodes)}</div>
   ),

@@ -2,15 +2,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hocs/withOnyxData', () => {
-  return (_callback) => (Component) => Component;
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/hocs/withOnyxData', () => {
+  return { default: (_callback) => (Component) => Component };
 });
 
-jest.mock('superagent', () => ({
-  get: jest.fn().mockReturnValue({ type: jest.fn().mockReturnThis() }),
+vi.mock('superagent', () => ({
+  get: vi.fn().mockReturnValue({ type: vi.fn().mockReturnThis() }),
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView', () => ({
   __esModule: true,
   default: ({ isEditMode }) => (
     <div data-testid="chat-block-view" data-edit-mode={String(isEditMode)}>
@@ -19,19 +19,19 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView', () => ({
   ),
 }));
 
-jest.mock('@plone/volto/components/manage/Sidebar/SidebarPortal', () => ({
+vi.mock('@plone/volto/components/manage/Sidebar/SidebarPortal', () => ({
   __esModule: true,
   default: ({ selected, children }) =>
     selected ? <div data-testid="sidebar-portal">{children}</div> : null,
 }));
 
-jest.mock('@plone/volto/components/manage/Form/BlockDataForm', () => ({
+vi.mock('@plone/volto/components/manage/Form/BlockDataForm', () => ({
   __esModule: true,
   default: ({ title }) => <div data-testid="block-data-form">{title}</div>,
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/schema', () => ({
-  ChatBlockSchema: jest.fn(() => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/schema', () => ({
+  ChatBlockSchema: vi.fn(() => ({
     title: 'AI Chatbot',
     properties: {},
     fieldsets: [{ id: 'default', title: 'Default', fields: [] }],
@@ -40,14 +40,15 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/schema', () => ({
 }));
 
 // Import after mocks
-const ChatBlockEdit =
-  require('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockEdit').default;
+const ChatBlockEdit = (
+  await import('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockEdit')
+).default;
 
 describe('ChatBlockEdit', () => {
   const defaultProps = {
     block: 'block-uuid-1',
     data: { assistant: 1 },
-    onChangeBlock: jest.fn(),
+    onChangeBlock: vi.fn(),
     selected: false,
     assistants: [{ id: 1, name: 'Assistant 1' }],
   };

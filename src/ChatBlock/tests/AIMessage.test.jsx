@@ -10,8 +10,8 @@ import { RendererComponent } from '@eeacms/volto-eea-chatbot/ChatBlock/packets';
 
 const mockStore = configureStore();
 
-global.AudioContext = jest.fn().mockImplementation(() => ({
-  close: jest.fn(),
+global.AudioContext = vi.fn().mockImplementation(() => ({
+  close: vi.fn(),
 }));
 
 describe('AIMessage', () => {
@@ -76,7 +76,7 @@ describe('AIMessage', () => {
         message: 'This is a response',
         type: 'assistant',
       },
-      onFeedback: jest.fn(),
+      onFeedback: vi.fn(),
       enableFeedback: true,
     };
 

@@ -7,35 +7,35 @@ import '@testing-library/jest-dom';
 import ChatWindowWrapped from '@eeacms/volto-eea-chatbot/ChatBlock/chat/ChatWindow';
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 
-jest.mock('@plone/volto/helpers/Loadable', () => ({
+vi.mock('@plone/volto/helpers/Loadable', () => ({
   injectLazyLibs: (libs) => (Component) => (props) => (
     <Component {...props} rehypePrism={null} remarkGfm={null} />
   ),
 }));
 
-jest.mock('@eeacms/volto-matomo/utils', () => ({
-  trackEvent: jest.fn(),
+vi.mock('@eeacms/volto-matomo/utils', () => ({
+  trackEvent: vi.fn(),
 }));
 
-const mockHistory = { push: jest.fn(), replace: jest.fn() };
-jest.mock('react-router-dom', () => ({
+const mockHistory = { push: vi.fn(), replace: vi.fn() };
+vi.mock('react-router-dom', () => ({
   useHistory: () => mockHistory,
 }));
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hooks', () => ({
-  useChatController: jest.fn(() => ({
-    onSubmit: jest.fn(),
-    onFetchRelatedQuestions: jest.fn(),
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/hooks', () => ({
+  useChatController: vi.fn(() => ({
+    onSubmit: vi.fn(),
+    onFetchRelatedQuestions: vi.fn(),
     messages: [],
     isStreaming: false,
     isFetchingRelatedQuestions: false,
-    clearChat: jest.fn(),
-    setIsDeepResearchEnabled: jest.fn(),
+    clearChat: vi.fn(),
+    setIsDeepResearchEnabled: vi.fn(),
     isDeepResearchEnabled: false,
   })),
 }));
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea',
   () => ({
     __esModule: true,
@@ -45,7 +45,7 @@ jest.mock(
   }),
 );
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState', () => ({
   __esModule: true,
   default: ({ onChoice }) => (
     <div data-testid="empty-state">
@@ -54,7 +54,7 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState', () => ({
   ),
 }));
 
-jest.mock(
+vi.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/QualityCheckToggle',
   () => ({
     __esModule: true,
@@ -64,12 +64,12 @@ jest.mock(
   }),
 );
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => ({
   __esModule: true,
   default: () => <span data-testid="svg-icon" />,
 }));
 
-jest.mock(
+vi.mock(
   '.',
   () => ({
     ChatMessage: () => <div data-testid="chat-message" />,
@@ -77,7 +77,7 @@ jest.mock(
   { virtual: true },
 );
 
-jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
   ChatMessage: () => <div data-testid="chat-message" />,
 }));
 
@@ -89,15 +89,15 @@ const mockPersona = {
 
 describe('ChatWindow', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     useChatController.mockReturnValue({
-      onSubmit: jest.fn(),
-      onFetchRelatedQuestions: jest.fn(),
+      onSubmit: vi.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [],
       isStreaming: false,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
-      setIsDeepResearchEnabled: jest.fn(),
+      clearChat: vi.fn(),
+      setIsDeepResearchEnabled: vi.fn(),
       isDeepResearchEnabled: false,
     });
   });
@@ -170,8 +170,8 @@ describe('ChatWindow', () => {
 
   it('shows messages and clear button when messages exist', () => {
     useChatController.mockReturnValue({
-      onSubmit: jest.fn(),
-      onFetchRelatedQuestions: jest.fn(),
+      onSubmit: vi.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [
         {
           messageId: 1,
@@ -186,8 +186,8 @@ describe('ChatWindow', () => {
       ],
       isStreaming: false,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
-      setIsDeepResearchEnabled: jest.fn(),
+      clearChat: vi.fn(),
+      setIsDeepResearchEnabled: vi.fn(),
       isDeepResearchEnabled: false,
     });
 
@@ -232,15 +232,15 @@ describe('ChatWindow', () => {
   });
 
   it('calls onSubmit when starter prompt is clicked', () => {
-    const mockOnSubmit = jest.fn();
+    const mockOnSubmit = vi.fn();
     useChatController.mockReturnValue({
       onSubmit: mockOnSubmit,
-      onFetchRelatedQuestions: jest.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [],
       isStreaming: false,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
-      setIsDeepResearchEnabled: jest.fn(),
+      clearChat: vi.fn(),
+      setIsDeepResearchEnabled: vi.fn(),
       isDeepResearchEnabled: false,
     });
 
@@ -251,8 +251,8 @@ describe('ChatWindow', () => {
 
   it('shows loading indicator when streaming without final message', () => {
     useChatController.mockReturnValue({
-      onSubmit: jest.fn(),
-      onFetchRelatedQuestions: jest.fn(),
+      onSubmit: vi.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [
         {
           messageId: 1,
@@ -268,8 +268,8 @@ describe('ChatWindow', () => {
       ],
       isStreaming: true,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
-      setIsDeepResearchEnabled: jest.fn(),
+      clearChat: vi.fn(),
+      setIsDeepResearchEnabled: vi.fn(),
       isDeepResearchEnabled: false,
     });
 
@@ -279,20 +279,20 @@ describe('ChatWindow', () => {
 
   // Auto-submit from URL parameter tests
   it('initialQuery triggers auto-submit on mount', () => {
-    const mockOnSubmit = jest.fn();
-    const mockSetIsDeepResearchEnabled = jest.fn();
+    const mockOnSubmit = vi.fn();
+    const mockSetIsDeepResearchEnabled = vi.fn();
     useChatController.mockReturnValue({
       onSubmit: mockOnSubmit,
-      onFetchRelatedQuestions: jest.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [],
       isStreaming: false,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
+      clearChat: vi.fn(),
       setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
       isDeepResearchEnabled: false,
     });
 
-    jest.spyOn(window, 'location', 'get').mockReturnValue({
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
       pathname: '/assistant-page',
     });
 
@@ -304,20 +304,20 @@ describe('ChatWindow', () => {
   });
 
   it('initialDeepResearch sets deep research toggle state', () => {
-    const mockOnSubmit = jest.fn();
-    const mockSetIsDeepResearchEnabled = jest.fn();
+    const mockOnSubmit = vi.fn();
+    const mockSetIsDeepResearchEnabled = vi.fn();
     useChatController.mockReturnValue({
       onSubmit: mockOnSubmit,
-      onFetchRelatedQuestions: jest.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [],
       isStreaming: false,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
+      clearChat: vi.fn(),
       setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
       isDeepResearchEnabled: false,
     });
 
-    jest.spyOn(window, 'location', 'get').mockReturnValue({
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
       pathname: '/assistant-page',
     });
 
@@ -333,20 +333,20 @@ describe('ChatWindow', () => {
   });
 
   it('URL is cleaned after auto-submit via history.replace', () => {
-    const mockOnSubmit = jest.fn();
-    const mockSetIsDeepResearchEnabled = jest.fn();
+    const mockOnSubmit = vi.fn();
+    const mockSetIsDeepResearchEnabled = vi.fn();
     useChatController.mockReturnValue({
       onSubmit: mockOnSubmit,
-      onFetchRelatedQuestions: jest.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [],
       isStreaming: false,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
+      clearChat: vi.fn(),
       setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
       isDeepResearchEnabled: false,
     });
 
-    jest.spyOn(window, 'location', 'get').mockReturnValue({
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
       pathname: '/assistant-page',
     });
 
@@ -356,11 +356,11 @@ describe('ChatWindow', () => {
   });
 
   it('no auto-submit if messages already exist', () => {
-    const mockOnSubmit = jest.fn();
-    const mockSetIsDeepResearchEnabled = jest.fn();
+    const mockOnSubmit = vi.fn();
+    const mockSetIsDeepResearchEnabled = vi.fn();
     useChatController.mockReturnValue({
       onSubmit: mockOnSubmit,
-      onFetchRelatedQuestions: jest.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [
         {
           messageId: 1,
@@ -375,12 +375,12 @@ describe('ChatWindow', () => {
       ],
       isStreaming: false,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
+      clearChat: vi.fn(),
       setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
       isDeepResearchEnabled: false,
     });
 
-    jest.spyOn(window, 'location', 'get').mockReturnValue({
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
       pathname: '/assistant-page',
     });
 
@@ -395,20 +395,20 @@ describe('ChatWindow', () => {
   });
 
   it('no auto-submit if streaming is in progress', () => {
-    const mockOnSubmit = jest.fn();
-    const mockSetIsDeepResearchEnabled = jest.fn();
+    const mockOnSubmit = vi.fn();
+    const mockSetIsDeepResearchEnabled = vi.fn();
     useChatController.mockReturnValue({
       onSubmit: mockOnSubmit,
-      onFetchRelatedQuestions: jest.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [],
       isStreaming: true,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
+      clearChat: vi.fn(),
       setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
       isDeepResearchEnabled: false,
     });
 
-    jest.spyOn(window, 'location', 'get').mockReturnValue({
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
       pathname: '/assistant-page',
     });
 
@@ -423,20 +423,20 @@ describe('ChatWindow', () => {
   });
 
   it('initialDeepResearch=false sets toggle to false', () => {
-    const mockOnSubmit = jest.fn();
-    const mockSetIsDeepResearchEnabled = jest.fn();
+    const mockOnSubmit = vi.fn();
+    const mockSetIsDeepResearchEnabled = vi.fn();
     useChatController.mockReturnValue({
       onSubmit: mockOnSubmit,
-      onFetchRelatedQuestions: jest.fn(),
+      onFetchRelatedQuestions: vi.fn(),
       messages: [],
       isStreaming: false,
       isFetchingRelatedQuestions: false,
-      clearChat: jest.fn(),
+      clearChat: vi.fn(),
       setIsDeepResearchEnabled: mockSetIsDeepResearchEnabled,
       isDeepResearchEnabled: true,
     });
 
-    jest.spyOn(window, 'location', 'get').mockReturnValue({
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
       pathname: '/assistant-page',
     });
 

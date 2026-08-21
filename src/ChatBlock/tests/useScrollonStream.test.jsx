@@ -6,13 +6,13 @@ describe('useScrollonStream', () => {
   let removeEventListenerSpy;
 
   beforeEach(() => {
-    jest.useFakeTimers();
-    addEventListenerSpy = jest.spyOn(window, 'addEventListener');
-    removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+    vi.useFakeTimers();
+    addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+    removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     addEventListenerSpy.mockRestore();
     removeEventListenerSpy.mockRestore();
   });
@@ -69,7 +69,7 @@ describe('useScrollonStream', () => {
 
     // Should still be active before timeout
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
   });
 

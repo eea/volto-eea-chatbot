@@ -12,7 +12,7 @@ const mockStore = configureStore();
 // Mock clipboard API
 Object.assign(navigator, {
   clipboard: {
-    writeText: jest.fn().mockResolvedValue(undefined),
+    writeText: vi.fn().mockResolvedValue(undefined),
   },
 });
 
@@ -24,7 +24,7 @@ describe('UserActionsToolbar', () => {
       userSession: { token: '1234' },
       intl: { locale: 'en', messages: {} },
     });
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const renderComponent = (props) =>

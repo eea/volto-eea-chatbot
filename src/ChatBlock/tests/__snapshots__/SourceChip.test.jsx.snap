@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SourceChip renders with icon 1`] = `
+exports[`SourceChip > renders with icon 1`] = `
 <button
   className="source-chip "
 >
@@ -19,7 +19,7 @@ exports[`SourceChip renders with icon 1`] = `
 </button>
 `;
 
-exports[`SourceChip renders with remove button when onRemove is provided 1`] = `
+exports[`SourceChip > renders with remove button when onRemove is provided 1`] = `
 <button
   className="source-chip "
 >
@@ -40,7 +40,7 @@ exports[`SourceChip renders with remove button when onRemove is provided 1`] = `
 </button>
 `;
 
-exports[`SourceChip renders with title only 1`] = `
+exports[`SourceChip > renders with title only 1`] = `
 <button
   className="source-chip "
 >

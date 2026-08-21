@@ -3,7 +3,7 @@ import renderer, { act } from 'react-test-renderer';
 import { ReasoningRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/ReasoningRenderer';
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
-jest.mock('@loadable/component', () => {
+vi.mock('@loadable/component', () => {
   const loadable = () => {
     const MockMarkdown = ({ children }) => (
       <div data-testid="markdown">{children}</div>
@@ -43,7 +43,7 @@ describe('ReasoningRenderer', () => {
     const component = renderer.create(
       <ReasoningRenderer
         packets={[]}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
         animate={false}
         stopPacketSeen={false}
         message={defaultMessage}
@@ -67,7 +67,7 @@ describe('ReasoningRenderer', () => {
     const component = renderer.create(
       <ReasoningRenderer
         packets={packets}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
         animate={false}
         stopPacketSeen={false}
         message={defaultMessage}
@@ -80,7 +80,7 @@ describe('ReasoningRenderer', () => {
   });
 
   it('calls onComplete when reasoning ends without animation', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const packets = [
       { ind: 1, obj: { type: PacketType.REASONING_START } },
       {
@@ -121,7 +121,7 @@ describe('ReasoningRenderer', () => {
     const component = renderer.create(
       <ReasoningRenderer
         packets={packets}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
         animate={false}
         stopPacketSeen={false}
         message={defaultMessage}
@@ -149,7 +149,7 @@ describe('ReasoningRenderer', () => {
     const component = renderer.create(
       <ReasoningRenderer
         packets={packets}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
         animate={false}
         stopPacketSeen={false}
         message={defaultMessage}

@@ -4,12 +4,12 @@ import { MessageTextRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 
 // Mock AudioContext
-const mockClose = jest.fn();
-global.AudioContext = jest.fn().mockImplementation(() => ({
+const mockClose = vi.fn();
+global.AudioContext = vi.fn().mockImplementation(() => ({
   close: mockClose,
 }));
 
-jest.mock('@loadable/component', () => {
+vi.mock('@loadable/component', () => {
   const loadable = () => {
     const MockMarkdown = ({ children }) => (
       <div data-testid="markdown">{children}</div>
@@ -65,7 +65,7 @@ describe('MessageTextRenderer', () => {
       component = renderer.create(
         <MessageTextRenderer
           packets={packets}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={false}
           stopPacketSeen={true}
           message={defaultMessage}
@@ -86,7 +86,7 @@ describe('MessageTextRenderer', () => {
       component = renderer.create(
         <MessageTextRenderer
           packets={[]}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={false}
           stopPacketSeen={false}
           message={emptyMessage}
@@ -100,7 +100,7 @@ describe('MessageTextRenderer', () => {
   });
 
   it('calls onComplete when stream is finished', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const packets = [
       {
         ind: 1,
@@ -149,7 +149,7 @@ describe('MessageTextRenderer', () => {
       component = renderer.create(
         <MessageTextRenderer
           packets={packets}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={false}
           stopPacketSeen={false}
           message={{ ...defaultMessage, message: 'Starting...' }}
@@ -181,7 +181,7 @@ describe('MessageTextRenderer', () => {
       component = renderer.create(
         <MessageTextRenderer
           packets={packets}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={false}
           stopPacketSeen={true}
           message={defaultMessage}
@@ -212,7 +212,7 @@ describe('MessageTextRenderer', () => {
       component = renderer.create(
         <MessageTextRenderer
           packets={packets}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={false}
           stopPacketSeen={true}
           message={defaultMessage}
@@ -226,7 +226,7 @@ describe('MessageTextRenderer', () => {
   });
 
   it('starts animation with 1 packet initially when animate=true', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const packets = [
       {
         ind: 1,
@@ -244,7 +244,7 @@ describe('MessageTextRenderer', () => {
       component = renderer.create(
         <MessageTextRenderer
           packets={packets}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={true}
           stopPacketSeen={false}
           message={{ ...defaultMessage, message: 'AB' }}
@@ -255,12 +255,12 @@ describe('MessageTextRenderer', () => {
       );
     });
     expect(component.toJSON()).toMatchSnapshot();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('animates through packets with timer ticks', () => {
-    jest.useFakeTimers();
-    const onComplete = jest.fn();
+    vi.useFakeTimers();
+    const onComplete = vi.fn();
     const packets = [
       {
         ind: 1,
@@ -292,15 +292,15 @@ describe('MessageTextRenderer', () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     expect(component.toJSON()).toMatchSnapshot();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('resets packet count when packets array shrinks', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const packets = [
       {
         ind: 1,
@@ -318,7 +318,7 @@ describe('MessageTextRenderer', () => {
       component = renderer.create(
         <MessageTextRenderer
           packets={packets}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={true}
           stopPacketSeen={true}
           message={{ ...defaultMessage, message: 'Hi' }}
@@ -334,7 +334,7 @@ describe('MessageTextRenderer', () => {
       component.update(
         <MessageTextRenderer
           packets={[]}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={true}
           stopPacketSeen={false}
           message={{ ...defaultMessage, message: '' }}
@@ -346,7 +346,7 @@ describe('MessageTextRenderer', () => {
     });
 
     expect(component.toJSON()).toMatchSnapshot();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders with addQualityMarkersPlugin prop', () => {
@@ -367,7 +367,7 @@ describe('MessageTextRenderer', () => {
       component = renderer.create(
         <MessageTextRenderer
           packets={packets}
-          onComplete={jest.fn()}
+          onComplete={vi.fn()}
           animate={false}
           stopPacketSeen={true}
           message={defaultMessage}

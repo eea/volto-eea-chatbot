@@ -16,22 +16,36 @@ global.AudioContext = vi.fn().mockImplementation(() => ({
 
 describe('AIMessage', () => {
   let store;
+  let mountedComponents;
 
   beforeEach(() => {
     store = mockStore({
       userSession: { token: '1234' },
       intl: { locale: 'en', messages: {} },
     });
+    mountedComponents = [];
   });
 
-  const renderComponent = (props) =>
-    renderer.create(
-      <Provider store={store}>
-        <MemoryRouter>
-          <AIMessage {...props} />
-        </MemoryRouter>
-      </Provider>,
-    );
+  afterEach(() => {
+    act(() => {
+      mountedComponents.forEach((component) => component.unmount());
+    });
+  });
+
+  const renderComponent = (props) => {
+    let component;
+    act(() => {
+      component = renderer.create(
+        <Provider store={store}>
+          <MemoryRouter>
+            <AIMessage {...props} />
+          </MemoryRouter>
+        </Provider>,
+      );
+    });
+    mountedComponents.push(component);
+    return component;
+  };
 
   it('renders AI message with content', () => {
     const props = {

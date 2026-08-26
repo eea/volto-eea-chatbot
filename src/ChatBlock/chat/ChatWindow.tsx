@@ -92,6 +92,10 @@ function ChatWindow({
     maxContextSegments = 0,
     batchSize,
     onyxVersion = '2',
+    hideSourcesTab,
+    extraRemarkPlugins,
+    extraMarkdownComponents,
+    extraRehypePlugins,
   } = data;
   const [qualityCheckEnabled, setQualityCheckEnabled] = useState(
     onDemandInputToggle ?? true,
@@ -241,6 +245,10 @@ function ChatWindow({
                     chatWindowRef={chatWindowRef}
                     chatWindowEndRef={chatWindowEndRef}
                     showTools={showTools}
+                    hideSourcesTab={hideSourcesTab}
+                    extraRemarkPlugins={extraRemarkPlugins}
+                    extraMarkdownComponents={extraMarkdownComponents}
+                    extraRehypePlugins={extraRehypePlugins}
                   />
                 </React.Fragment>
               ))}

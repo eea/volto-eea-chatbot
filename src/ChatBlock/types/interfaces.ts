@@ -158,6 +158,19 @@ export interface ChatMessageProps {
   chatWindowRef?: React.RefObject<HTMLDivElement>;
   chatWindowEndRef?: React.RefObject<HTMLDivElement>;
   showTools?: PacketType[];
+  /**
+   * Hide the classic "Sources" tab, sidebar and inline source list for this
+   * presentation (the answer text still renders, and any injected markdown
+   * components still work). Used by variations that present the cited
+   * documents differently (e.g. inline catalogue cards).
+   */
+  hideSourcesTab?: boolean;
+  /** Extra remark plugins merged after the built-in ones. */
+  extraRemarkPlugins?: any[];
+  /** Extra react-markdown components merged after the built-in ones. */
+  extraMarkdownComponents?: any;
+  /** Extra rehype plugins merged after the built-in ones. */
+  extraRehypePlugins?: any[];
 }
 
 export interface Persona {

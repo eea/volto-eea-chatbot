@@ -205,10 +205,15 @@ export function AIMessage({
   enableMatomoTracking,
   persona,
   maxContextSegments,
+  batchSize,
   isLastMessage,
   className = '',
   chatWindowEndRef,
   showTools,
+  hideSourcesTab,
+  extraRemarkPlugins,
+  extraMarkdownComponents,
+  extraRehypePlugins,
 }: ChatMessageProps) {
   const [allToolsDisplayed, setAllToolsDisplayed] = useState(false);
   const [messageDisplayed, setMessageDisplayed] = useState(false);
@@ -277,6 +282,12 @@ export function AIMessage({
 
   const showSources = messageDisplayed && sources.length > 0;
 
+  // Whether to actually render the classic Sources UI (tab, sidebar, inline
+  // list). `hideSourcesTab` lets a variation present the cited documents a
+  // different way (e.g. inline catalogue cards) while keeping quality-check
+  // logic intact.
+  const showSourcesTab = showSources && !hideSourcesTab;
+
   const contextSources = getContextSources(
     message,
     sources,
@@ -319,6 +330,7 @@ export function AIMessage({
     addCitations(message.message, message),
     stableContextSources,
     maxContextSegments,
+    batchSize,
   );
 
   const claims = markers?.claims || [];
@@ -384,7 +396,7 @@ export function AIMessage({
   const answerTab = (
     <div className="answer-tab">
       {/* Show first 3 sources inline */}
-      {showSources && (
+      {showSourcesTab && (
         <div className="sources">
           {sources.slice(0, 3).map((source: any, i: number) => (
             <SourceDetails source={source} key={i} index={source.index} />
@@ -448,6 +460,9 @@ export function AIMessage({
                 markers={markers}
                 stableContextSources={stableContextSources}
                 addQualityMarkersPlugin={addQualityMarkersPlugin}
+                extraRemarkPlugins={extraRemarkPlugins}
+                extraMarkdownComponents={extraMarkdownComponents}
+                extraRehypePlugins={extraRehypePlugins}
               >
                 {({ content }) => (
                   <div className="message-text-wrapper">{content}</div>
@@ -524,7 +539,7 @@ export function AIMessage({
       menuItem: { key: 'answer', content: 'Answer', className: 'answer-tab' },
       pane: <Tab.Pane key="answer">{answerTab}</Tab.Pane>,
     },
-    ...(showSources && !error
+    ...(showSourcesTab && !error
       ? [
           {
             menuItem: {
@@ -573,14 +588,14 @@ export function AIMessage({
               secondary: true,
               pointing: true,
               fluid: true,
-              className: cx({ 'without-sources': !showSources }),
+              className: cx({ 'without-sources': !showSourcesTab }),
             }}
             panes={panes}
             renderActiveOnly={false}
           />
 
           {/* Sources sidebar */}
-          {showSources && !error && (
+          {showSourcesTab && !error && (
             <Sidebar
               visible={showSourcesSidebar}
               animation="overlay"

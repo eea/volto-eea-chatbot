@@ -30,6 +30,9 @@ export const MessageTextRenderer: MessageRenderer<ChatPacket> = ({
   markers,
   stableContextSources,
   addQualityMarkersPlugin,
+  extraMarkdownComponents,
+  extraRemarkPlugins = [],
+  extraRehypePlugins = [],
 }) => {
   const { remarkGfm } = libs;
 
@@ -163,9 +166,18 @@ export const MessageTextRenderer: MessageRenderer<ChatPacket> = ({
   const renderedContent = (
     <div className="message-text-content">
       <Markdown
-        components={components(message, markers, stableContextSources)}
-        remarkPlugins={remarkGfm ? [remarkGfm.default] : []}
-        rehypePlugins={addQualityMarkersPlugin ? [addQualityMarkersPlugin] : []}
+        components={{
+          ...components(message, markers, stableContextSources),
+          ...extraMarkdownComponents,
+        }}
+        remarkPlugins={[
+          ...(remarkGfm ? [remarkGfm.default] : []),
+          ...extraRemarkPlugins,
+        ]}
+        rehypePlugins={[
+          ...(addQualityMarkersPlugin ? [addQualityMarkersPlugin] : []),
+          ...extraRehypePlugins,
+        ]}
       >
         {displayContent}
       </Markdown>

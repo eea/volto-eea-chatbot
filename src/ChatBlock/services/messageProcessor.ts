@@ -258,15 +258,8 @@ export class MessageProcessor {
       return;
     }
     const citationDelta = packet.obj as CitationDelta;
-    const explicitCitations = (citationDelta.citations || []).filter(
-      (citation: StreamingCitation) =>
-        citation.citation_num != null && Boolean(citation.document_id),
-    );
-    if (explicitCitations.length > 0) {
-      this.clearFallbackCitations();
-    }
-    explicitCitations.forEach((citation: StreamingCitation) => {
-      if (!this._citations.has(citation.citation_num)) {
+    citationDelta.citations?.forEach((citation: StreamingCitation) => {
+      if (citation.document_id && !this._citations.has(citation.citation_num)) {
         this._citations.set(citation.citation_num, citation.document_id);
       }
     });

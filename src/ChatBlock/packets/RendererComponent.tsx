@@ -87,6 +87,9 @@ export function RendererComponent({
   markers,
   stableContextSources,
   addQualityMarkersPlugin,
+  extraMarkdownComponents,
+  extraRemarkPlugins,
+  extraRehypePlugins,
 }: {
   packets: Packet[];
   onComplete: () => void;
@@ -98,6 +101,9 @@ export function RendererComponent({
   markers?: any;
   stableContextSources?: any;
   addQualityMarkersPlugin?: any;
+  extraMarkdownComponents?: Record<string, React.ComponentType<any>>;
+  extraRemarkPlugins?: any[];
+  extraRehypePlugins?: any[];
 }) {
   const RendererFn = findRenderer({ packets });
 
@@ -116,6 +122,9 @@ export function RendererComponent({
       markers={markers}
       stableContextSources={stableContextSources}
       addQualityMarkersPlugin={addQualityMarkersPlugin}
+      extraMarkdownComponents={extraMarkdownComponents}
+      extraRemarkPlugins={extraRemarkPlugins}
+      extraRehypePlugins={extraRehypePlugins}
     >
       {children}
     </RendererFn>

@@ -116,6 +116,78 @@ Go to http://localhost:3000
 
    For a legacy Volto 17 project, install the package with `yarn` and restart the frontend as usual.
 
+## Block presentation variations
+
+Since 4.1.0 the chatbot block's presentation is pluggable. The block ships with the default `classic` presentation (the standard chat window), and other add-ons can register additional presentations ("variations") — e.g. to re-style the chat, replace the sources UI, or render custom elements inline in the assistant's answer. When two or more variations are registered, Volto core automatically adds a **Presentation** choice field to the block's edit sidebar, so editors can pick the variation per block. Old block content without a `variation` value keeps resolving to the default.
+
+### Registering a variation
+
+Push your variation onto `blocksConfig.eeaChatbot.variations` from your add-on's `applyConfig` (same cross-add-on pattern as `volto-tabs-block`):
+
+```js
+export default function applyConfig(config) {
+  const block = config.blocks.blocksConfig.eeaChatbot;
+  if (block) {
+    block.variations = block.variations || [];
+    if (!block.variations.find((v) => v.id === 'catalogue')) {
+      block.variations.push({
+        id: 'catalogue',
+        title: 'Catalogue',
+        isDefault: false,
+        view: CatalogueChatView,
+      });
+    }
+  }
+  return config;
+}
+```
+
+A variation is `{ id, title, isDefault, view }` (optionally `edit` / `schemaEnhancer`); `view` is the React component rendered for the block.
+
+### Variation view contract
+
+The variation `view` receives the block's fields as **top-level props** (there is no `data` prop), plus presentation props:
+
+```
+<View
+  persona={assistantData}   // the selected assistant
+  block_id                  // the block's internal id
+  isEditMode
+  isPlaywrightTest          // ?playwright=yes query flag
+  initialQuery              // ?query=… pre-filled question
+  initialDeepResearch       // ?deepResearch=… flag
+  {...blockFields}          // assistant, onyxVersion, height, …
+/>
+```
+
+If the registry is empty the block falls back to the classic `ChatWindow`, so registering a variation can never break the block.
+
+### Reusing the classic chat window
+
+A variation does not have to build a presentation from scratch — it can wrap the classic `ChatWindow` and only change what it needs to:
+
+```jsx
+import { ChatWindow } from '@eeacms/volto-eea-chatbot/ChatBlock/chat';
+
+export default function CatalogueChatView(props) {
+  return (
+    <ChatWindow
+      {...props}
+      hideSourcesTab
+      extraRemarkPlugins={[myRemarkPlugin]}
+      extraMarkdownComponents={{ myElement: MyElementComponent }}
+    />
+  );
+}
+```
+
+- `hideSourcesTab` — suppresses the classic Sources tab, sidebar and inline citation list only (the answer text and the quality-check logic are unaffected).
+- `extraRemarkPlugins` / `extraRehypePlugins` / `extraMarkdownComponents` — additional remark/rehype plugins and react-markdown component overrides, merged with the built-ins (the same mechanism the quality markers use). This lets a variation render custom inline elements inside the streamed answer.
+
+Custom markdown components can read the message that owns them through `ChatMessageContext` (also exported from `@eeacms/volto-eea-chatbot/ChatBlock/chat`): `ChatMessage` wraps every message in the context provider, so a component rendered from the answer text can e.g. match a marker against `message.documents`.
+
+> **Note:** the variations registry, `hideSourcesTab`, the extra-markdown pass-through props and `ChatMessageContext` are new in 4.1.0. If your project resolves an older published version, these seams don't exist — import the module namespace (e.g. `import * as chat from '…/ChatBlock/chat'`) and guard against `undefined` instead of using named imports.
+
 ## Quality Checks (Fact-Checking)
 
 When `qualityCheck` is enabled, the chatbot sends AI answers and their source

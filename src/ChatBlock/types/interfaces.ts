@@ -82,6 +82,17 @@ export interface MessageRendererProps<T extends Packet = Packet> {
   markers?: any;
   stableContextSources?: any;
   addQualityMarkersPlugin?: any;
+  /**
+   * Extra react-markdown component overrides (e.g. for custom elements
+   * produced by remark/rehype plugins), merged on top of the built-in
+   * mapping. Allows presentations to plug custom components inline in the
+   * message text.
+   */
+  extraMarkdownComponents?: Record<string, React.ComponentType<any>>;
+  /** Extra remark plugins, appended after the built-in ones. */
+  extraRemarkPlugins?: any[];
+  /** Extra rehype plugins, appended after the built-in ones. */
+  extraRehypePlugins?: any[];
   onComplete: () => void;
   animate: boolean;
   stopPacketSeen: boolean;
@@ -147,6 +158,19 @@ export interface ChatMessageProps {
   chatWindowRef?: React.RefObject<HTMLDivElement>;
   chatWindowEndRef?: React.RefObject<HTMLDivElement>;
   showTools?: PacketType[];
+  /**
+   * Hide the classic "Sources" tab, sidebar and inline source list for this
+   * presentation (the answer text still renders, and any injected markdown
+   * components still work). Used by variations that present the cited
+   * documents differently (e.g. inline catalogue cards).
+   */
+  hideSourcesTab?: boolean;
+  /** Extra remark plugins merged after the built-in ones. */
+  extraRemarkPlugins?: any[];
+  /** Extra react-markdown components merged after the built-in ones. */
+  extraMarkdownComponents?: any;
+  /** Extra rehype plugins merged after the built-in ones. */
+  extraRehypePlugins?: any[];
 }
 
 export interface Persona {

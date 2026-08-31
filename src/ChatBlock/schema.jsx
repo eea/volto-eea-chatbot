@@ -110,6 +110,11 @@ export function ChatBlockSchema({ assistants, data }) {
       },
     ],
     properties: {
+      // NOTE: the `variation` field is NOT declared here on purpose. Volto
+      // core injects it automatically in the block sidebar
+      // (withVariationSchemaEnhancer, wired into BlockDataForm) from
+      // blocksConfig.eeaChatbot.variations whenever 2+ variations are
+      // registered. See @plone/volto/helpers/Extensions.
       enableShowTotalFailMessage: {
         title: 'Show total failure message',
         type: 'boolean',

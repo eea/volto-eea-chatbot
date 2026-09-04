@@ -1,0 +1,7 @@
+{
+  "title": "Eea Chatbot",
+  "frontend_addon_name": "volto-eea-chatbot",
+  "description": "@eeacms/volto-eea-chatbot: Volto add-on",
+  "volto_version": "19.3.0",
+  "__template__": "frontend_addon"
+}

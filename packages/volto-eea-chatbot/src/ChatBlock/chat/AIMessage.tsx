@@ -41,7 +41,13 @@ const HalloumiFeedback: any = loadable(
     import('@eeacms/volto-eea-chatbot/ChatBlock/components/HalloumiFeedback'),
 );
 
-function visit(node: any, type: string, visitor: (node: any, idx?: number, parent?: any) => void, idx?: number, parent?: any) {
+function visit(
+  node: any,
+  type: string,
+  visitor: (node: any, idx?: number, parent?: any) => void,
+  idx?: number,
+  parent?: any,
+) {
   if (node.type === type) {
     visitor(node, idx, parent);
   }
@@ -332,7 +338,9 @@ export function AIMessage({
       return;
     }
     if (isLastMessage && isComplete && onFetchRelatedQuestions) {
-      console.log(`[AIMessage] Triggering RQ: messageDisplayed=${messageDisplayed}, isComplete=${isComplete}, hasContent=${!!message.message}`);
+      console.log(
+        `[AIMessage] Triggering RQ: messageDisplayed=${messageDisplayed}, isComplete=${isComplete}, hasContent=${!!message.message}`,
+      );
       if (messageDisplayed) {
         onFetchRelatedQuestions();
       }

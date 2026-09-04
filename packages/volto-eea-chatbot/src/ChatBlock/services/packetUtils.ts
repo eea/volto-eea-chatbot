@@ -51,7 +51,9 @@ export function isFinalAnswerComplete(packets: Packet[]): boolean {
   );
 
   if (hasSectionEnd) {
-    console.log(`[isFinalAnswerComplete] Complete! ind=${messageStartPacket.ind}`);
+    console.log(
+      `[isFinalAnswerComplete] Complete! ind=${messageStartPacket.ind}`,
+    );
   }
 
   return hasSectionEnd;

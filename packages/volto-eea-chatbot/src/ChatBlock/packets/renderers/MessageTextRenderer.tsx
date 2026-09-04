@@ -92,7 +92,9 @@ export const MessageTextRenderer: MessageRenderer<ChatPacket> = ({
             remaining > CATCH_UP_THRESHOLD ? PACKETS_PER_TICK : 1;
           const next = Math.min(prev + increment, packets.length);
           if (isStreamFinished && next === packets.length) {
-            console.log(`[MessageTextRenderer] Animation finished: ${next}/${packets.length}`);
+            console.log(
+              `[MessageTextRenderer] Animation finished: ${next}/${packets.length}`,
+            );
           }
           return next;
         });
@@ -125,7 +127,9 @@ export const MessageTextRenderer: MessageRenderer<ChatPacket> = ({
       ) {
         return;
       }
-      console.log(`[MessageTextRenderer] Calling onComplete: packets=${packets.length}, finished=${isStreamFinished}`);
+      console.log(
+        `[MessageTextRenderer] Calling onComplete: packets=${packets.length}, finished=${isStreamFinished}`,
+      );
       onComplete();
     }
   }, [

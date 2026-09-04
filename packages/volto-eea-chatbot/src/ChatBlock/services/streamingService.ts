@@ -313,10 +313,11 @@ export async function* sendMessage(
   const body = JSON.stringify(payload);
 
   const middleware = isRelatedQuestion ? '_rq' : '_da';
-  const endpoint =
-    onyxVersion === '3' ? 'send-chat-message' : 'send-message';
+  const endpoint = onyxVersion === '3' ? 'send-chat-message' : 'send-message';
 
-  console.log(`[sendMessage] Target URL: /${middleware}/chat/${endpoint} (v${onyxVersion})`);
+  console.log(
+    `[sendMessage] Target URL: /${middleware}/chat/${endpoint} (v${onyxVersion})`,
+  );
   console.log(`[sendMessage] Payload:`, payload);
 
   const sendMessageResponse = await fetch(`/${middleware}/chat/${endpoint}`, {

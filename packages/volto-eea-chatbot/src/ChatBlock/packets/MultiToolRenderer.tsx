@@ -180,8 +180,10 @@ export function MultiToolRenderer({
                               p.obj.type === PacketType.SEARCH_TOOL_START ||
                               p.obj.type === PacketType.SEARCH_TOOL_START_V3 ||
                               p.obj.type === PacketType.SEARCH_TOOL_DELTA ||
-                              p.obj.type === PacketType.SEARCH_TOOL_QUERIES_DELTA ||
-                              p.obj.type === PacketType.SEARCH_TOOL_DOCUMENTS_DELTA,
+                              p.obj.type ===
+                                PacketType.SEARCH_TOOL_QUERIES_DELTA ||
+                              p.obj.type ===
+                                PacketType.SEARCH_TOOL_DOCUMENTS_DELTA,
                           );
 
                           if (!isDetailedTool || !content) {

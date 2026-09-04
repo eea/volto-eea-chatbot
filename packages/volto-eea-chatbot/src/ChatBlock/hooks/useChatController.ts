@@ -68,7 +68,9 @@ async function fetchRelatedQuestions(
   onyxVersion: '2' | '3' = '2',
 ): Promise<RelatedQuestion[]> {
   try {
-    console.log(`[RQ] Creating session for assistant ${qgenAsistantId} (Onyx v${onyxVersion})`);
+    console.log(
+      `[RQ] Creating session for assistant ${qgenAsistantId} (Onyx v${onyxVersion})`,
+    );
     const chatSessionId = await createChatSession(
       qgenAsistantId,
       `Q: ${query}`,
@@ -307,7 +309,9 @@ export function useChatController({
       qgenAsistantId &&
       latestAssistantMessage?.type === 'assistant'
     ) {
-      console.log(`[RQ] Criteria met: assistantNodeId=${latestAssistantMessage.nodeId}, qgenAssistant=${qgenAsistantId}`);
+      console.log(
+        `[RQ] Criteria met: assistantNodeId=${latestAssistantMessage.nodeId}, qgenAssistant=${qgenAsistantId}`,
+      );
       if (isDeepResearchEnabled) {
         setMessages((prev) => {
           return prev.map((m) =>
@@ -349,7 +353,13 @@ export function useChatController({
         setIsFetchingRelatedQuestions(false);
       }
     }
-  }, [messages, enableQgen, qgenAsistantId, isDeepResearchEnabled, onyxVersion]);
+  }, [
+    messages,
+    enableQgen,
+    qgenAsistantId,
+    isDeepResearchEnabled,
+    onyxVersion,
+  ]);
 
   const clearChat = useCallback(() => {
     setMessages([]);

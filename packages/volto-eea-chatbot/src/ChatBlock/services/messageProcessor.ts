@@ -139,8 +139,13 @@ export class MessageProcessor {
     // Store processed packet for later aggregation
     this.packets.push(processedPacket);
 
-    if (processedPacket.obj.type === PacketType.MESSAGE_START || processedPacket.obj.type === PacketType.SECTION_END) {
-        console.log(`[MessageProcessor] Processed ${processedPacket.obj.type} for ind=${processedPacket.ind}`);
+    if (
+      processedPacket.obj.type === PacketType.MESSAGE_START ||
+      processedPacket.obj.type === PacketType.SECTION_END
+    ) {
+      console.log(
+        `[MessageProcessor] Processed ${processedPacket.obj.type} for ind=${processedPacket.ind}`,
+      );
     }
 
     // Group packets by index for later processing
@@ -297,7 +302,9 @@ export class MessageProcessor {
       // Close any remaining open sections (especially the last one)
       while (this.indicesStarted.length > 0) {
         const ind = this.indicesStarted.shift()!;
-        console.log(`[MessageProcessor] Stream ended. Synthesizing section_end for ind=${ind}`);
+        console.log(
+          `[MessageProcessor] Stream ended. Synthesizing section_end for ind=${ind}`,
+        );
         const synthetic = getSynteticPacket(ind, PacketType.SECTION_END);
         this.processPacket(synthetic);
       }

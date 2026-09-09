@@ -117,14 +117,14 @@ function mapToolDocumentsToText(message: any) {
   return {};
 }
 
-function getContextSources(
+export function getContextSources(
   message: any,
   sources: any,
-  qualityCheckContext: any,
+  qualityCheckContext: any = 'citations',
 ) {
   const documentIdToText = mapToolDocumentsToText(message);
 
-  return qualityCheckContext === 'citations'
+  return qualityCheckContext !== 'all'
     ? sources.map((doc: any) => {
         // Prefer content from tool packets (may have enriched text),
         // but fall back to doc.content from final_documents.
@@ -196,7 +196,7 @@ export function AIMessage({
   feedbackReasons,
   qualityCheck,
   qualityCheckStages,
-  qualityCheckContext,
+  qualityCheckContext = 'citations',
   qualityCheckEnabled,
   noSupportDocumentsMessage,
   totalFailMessage,

@@ -4,7 +4,10 @@ import renderer, { act } from 'react-test-renderer';
 
 import '@testing-library/jest-dom';
 import { Provider } from 'react-intl-redux';
-import { AIMessage } from '@eeacms/volto-eea-chatbot/ChatBlock/chat/AIMessage';
+import {
+  AIMessage,
+  getContextSources,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/chat/AIMessage';
 import { Tab, Sidebar } from 'semantic-ui-react';
 import { RendererComponent } from '@eeacms/volto-eea-chatbot/ChatBlock/packets';
 
@@ -204,6 +207,49 @@ describe('AIMessage', () => {
     // Verify Sidebar is closed or calls onHide
     act(() => {
       sidebar.props.onHide();
+    });
+  });
+
+  describe('getContextSources', () => {
+    const mockMessage = {
+      toolCalls: [
+        {
+          tool_result: [
+            { document_id: 'tool_doc_1', content: 'Tool doc 1 content' },
+            { document_id: 'tool_doc_2', content: 'Tool doc 2 content' },
+          ],
+        },
+      ],
+    };
+
+    const mockCitedSources = [
+      {
+        document_id: 'tool_doc_1',
+        content: 'Cited doc 1 content',
+      },
+    ];
+
+    it('defaults to cited sources when qualityCheckContext is undefined', () => {
+      const result = getContextSources(mockMessage, mockCitedSources);
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('tool_doc_1');
+    });
+
+    it('returns cited sources when qualityCheckContext is citations', () => {
+      const result = getContextSources(
+        mockMessage,
+        mockCitedSources,
+        'citations',
+      );
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('tool_doc_1');
+    });
+
+    it('returns all tool documents when qualityCheckContext is all', () => {
+      const result = getContextSources(mockMessage, mockCitedSources, 'all');
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('tool_doc_1');
+      expect(result[1].id).toBe('tool_doc_2');
     });
   });
 });

@@ -5,13 +5,18 @@ const Sentry = loadable.lib(
   () => import(/* webpackChunkName: "s_entry-browser" */ '@sentry/browser'), // chunk name avoids ad blockers
 );
 
-async function fetchHalloumi(answer, sources, maxContextSegments) {
+async function fetchHalloumi(answer, sources, maxContextSegments, batchSize) {
   const halloumiResponse = await fetch('/_ha/generate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ answer, sources, maxContextSegments }),
+    body: JSON.stringify({
+      answer,
+      sources,
+      maxContextSegments,
+      ...(batchSize != null && { batch_size: batchSize }),
+    }),
   });
   return halloumiResponse;
 }
@@ -38,6 +43,7 @@ export function useQualityMarkers(
   message,
   sources,
   maxContextSegments = 0,
+  batchSize,
 ) {
   const [halloumiResponse, setHalloumiResponse] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -48,7 +54,16 @@ export function useQualityMarkers(
 
   React.useEffect(() => {
     async function handler() {
-      const textSources = sources.map(({ halloumiContext }) => halloumiContext);
+      // Prefer structured sources (with title metadata) over plain text.
+      // Fall back to halloumiContext strings for backward compatibility.
+      const firstSource = sources[0];
+      const hasStructuredSources =
+        firstSource && typeof firstSource.halloumiSource === 'object';
+
+      const halloumiSources = hasStructuredSources
+        ? sources.map(({ halloumiSource }) => halloumiSource)
+        : sources.map(({ halloumiContext }) => halloumiContext);
+
       if (sources.length === 0) {
         setHalloumiResponse(empty(message, FAILURE_RATIONALE));
         return;
@@ -59,8 +74,9 @@ export function useQualityMarkers(
       try {
         const feedback = await fetchHalloumi(
           message,
-          textSources,
+          halloumiSources,
           maxContextSegments,
+          batchSize,
         );
         const body = await feedback.json();
         // console.log({ message, sources, body });
@@ -88,6 +104,7 @@ export function useQualityMarkers(
     message,
     sources,
     maxContextSegments,
+    batchSize,
   ]);
 
   if (halloumiResponse !== null) {

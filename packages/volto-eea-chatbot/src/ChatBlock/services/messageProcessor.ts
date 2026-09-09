@@ -216,8 +216,9 @@ export class MessageProcessor {
       this._documents = Array.from(this.documentMap.values());
     }
 
-    // If we have final_documents and no citations yet, create a fallback mapping
-    // This ensures the Sources tab shows up in v3 when citation_info is missing
+    // If we have final_documents and no citations yet, create a fallback mapping.
+    // This ensures the Sources tab shows up in v3 when citation_info is missing.
+    // The fallback is cleared in processCitations() when real citation_info arrives.
     if (
       packet.obj.type === PacketType.MESSAGE_START &&
       data.final_documents &&
@@ -245,9 +246,12 @@ export class MessageProcessor {
    */
   private processCitations(packet: Packet) {
     if (packet.obj.type === PacketType.CITATION_INFO) {
+      // First real citation_info arrived — discard the fallback mapping
+      // (which mapped ALL final_documents) and start fresh with actual citations.
+      this.clearFallbackCitations();
+
       const citationInfo = packet.obj as any;
       if (citationInfo.citation_number && citationInfo.document_id) {
-        this.clearFallbackCitations();
         this._citations.set(
           citationInfo.citation_number,
           citationInfo.document_id,
@@ -259,15 +263,8 @@ export class MessageProcessor {
       return;
     }
     const citationDelta = packet.obj as CitationDelta;
-    const explicitCitations = (citationDelta.citations || []).filter(
-      (citation: StreamingCitation) =>
-        citation.citation_num != null && Boolean(citation.document_id),
-    );
-    if (explicitCitations.length > 0) {
-      this.clearFallbackCitations();
-    }
-    explicitCitations.forEach((citation: StreamingCitation) => {
-      if (!this._citations.has(citation.citation_num)) {
+    citationDelta.citations?.forEach((citation: StreamingCitation) => {
+      if (citation.document_id && !this._citations.has(citation.citation_num)) {
         this._citations.set(citation.citation_num, citation.document_id);
       }
     });

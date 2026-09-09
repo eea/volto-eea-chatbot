@@ -58,6 +58,16 @@ export const useCopyToClipboard = (text: string): [boolean, () => void] => {
   return [copied, copy];
 };
 
+/**
+ * Map a 0-1 claim score to a categorical label.
+ * Scores: 1.0 = supported, 0.4 = not_enough_info, 0.0 = contradicted.
+ */
+export function scoreToLabel(score: number): string {
+  if (score >= 0.8) return 'High';
+  if (score >= 0.1) return 'Low';
+  return 'Failed';
+}
+
 export function convertToPercentage(
   floatValue: number,
   digits: number = 2,

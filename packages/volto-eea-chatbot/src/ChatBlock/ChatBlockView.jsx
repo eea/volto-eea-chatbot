@@ -3,6 +3,7 @@ import superagent from 'superagent';
 import { parse } from 'qs';
 import withOnyxData from './hocs/withOnyxData';
 import { ChatWindow } from './chat';
+import { getChatVariation } from './variations';
 
 function ChatBlockView(props) {
   const { id, assistantData, data, isEditMode, location } = props;
@@ -25,8 +26,13 @@ function ChatBlockView(props) {
     }
   }, [id, isPlaywrightTest, data]);
 
+  // Resolve the presentation variation for this block. Falls back to the
+  // classic ChatWindow so the block keeps working even if the registry is
+  // somehow empty.
+  const Presentation = getChatVariation(data)?.view || ChatWindow;
+
   return assistantData ? (
-    <ChatWindow
+    <Presentation
       persona={assistantData}
       isEditMode={isEditMode}
       isPlaywrightTest={isPlaywrightTest}

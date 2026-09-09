@@ -82,12 +82,12 @@ exports[`ClaimModal > handles claim with markdown formatting 1`] = `
             <span
               className="score-percentage"
             >
-              85.00%
+              High
             </span>
             <span
               className="score-label"
             >
-              Citation Support
+              Verification
             </span>
           </div>
           <div
@@ -208,12 +208,12 @@ exports[`ClaimModal > handles empty text array 1`] = `
             <span
               className="score-percentage"
             >
-              85.00%
+              High
             </span>
             <span
               className="score-label"
             >
-              Citation Support
+              Verification
             </span>
           </div>
           <div
@@ -336,12 +336,12 @@ exports[`ClaimModal > handles perfect score 1`] = `
             <span
               className="score-percentage"
             >
-              100.00%
+              High
             </span>
             <span
               className="score-label"
             >
-              Citation Support
+              Verification
             </span>
           </div>
           <div
@@ -464,12 +464,12 @@ exports[`ClaimModal > handles zero score 1`] = `
             <span
               className="score-percentage"
             >
-              0.00%
+              Failed
             </span>
             <span
               className="score-label"
             >
-              Citation Support
+              Verification
             </span>
           </div>
           <div
@@ -592,12 +592,12 @@ exports[`ClaimModal > renders the claim modal with high score 1`] = `
             <span
               className="score-percentage"
             >
-              85.00%
+              High
             </span>
             <span
               className="score-label"
             >
-              Citation Support
+              Verification
             </span>
           </div>
           <div
@@ -720,12 +720,12 @@ exports[`ClaimModal > renders with empty markers 1`] = `
             <span
               className="score-percentage"
             >
-              85.00%
+              High
             </span>
             <span
               className="score-label"
             >
-              Citation Support
+              Verification
             </span>
           </div>
           <div
@@ -848,12 +848,12 @@ exports[`ClaimModal > renders with low score 1`] = `
             <span
               className="score-percentage"
             >
-              30.00%
+              Low
             </span>
             <span
               className="score-label"
             >
-              Citation Support
+              Verification
             </span>
           </div>
           <div
@@ -976,12 +976,12 @@ exports[`ClaimModal > renders with medium score 1`] = `
             <span
               className="score-percentage"
             >
-              60.00%
+              Low
             </span>
             <span
               className="score-label"
             >
-              Citation Support
+              Verification
             </span>
           </div>
           <div

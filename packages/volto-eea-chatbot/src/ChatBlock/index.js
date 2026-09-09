@@ -1,6 +1,7 @@
 import codeSVG from '@plone/volto/icons/code.svg';
 import ChatBlockView from './ChatBlockView';
 import ChatBlockEdit from './ChatBlockEdit';
+import ChatWindow from './chat/ChatWindow';
 import { ChatBlockSchema } from './schema';
 
 export default function installChatBlock(config) {
@@ -26,7 +27,14 @@ export default function installChatBlock(config) {
       addPermission: [],
       view: [],
     },
-    variations: [],
+    variations: [
+      {
+        id: 'classic',
+        title: 'Classic',
+        isDefault: true,
+        view: ChatWindow,
+      },
+    ],
   };
 
   if (!config.blocks.blocksConfig.danswerChat) {

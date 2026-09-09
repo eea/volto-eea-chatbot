@@ -40,7 +40,7 @@ The **Volto Chatbot** block allows the integration of an AI-powered chatbot into
 | `enableShowTotalFailMessage` | Show total failure message.                                                     | Boolean  | `false`                          |
 | `showAssistantTitle`         | Display or hide the assistant's title in the chat interface.                    | Boolean  | `true`                           |
 | `showAssistantDescription`   | Display or hide the assistant's description in the chat interface.              | Boolean  | `true`                           |
-| `qualityCheck`               | Show Halloumi-based automated quality check.                                    | Dropdown | `Disabled`                       |
+| `qualityCheck`               | Show automated fact-checking of AI answers against source documents.            | Dropdown | `Disabled`                       |
 | `onDemandInputToggle`        | Sets the default state of the fact-check AI toggle.                             | Boolean  | `true`                           |
 | `showTools`                  | Show or hide tools in the chat interface.                                       | Array    | `["internal_search_tool_start"]` |
 | `scrollToInput`              | Automatically scroll the page to focus on the chat input when interacting.      | Boolean  | `false`                          |
@@ -116,6 +116,116 @@ Go to http://localhost:3000
 
    For a legacy Volto 17 project, install the package with `yarn` and restart the frontend as usual.
 
+## Block presentation variations
+
+Since 4.1.0 the chatbot block's presentation is pluggable. The block ships with the default `classic` presentation (the standard chat window), and other add-ons can register additional presentations ("variations") — e.g. to re-style the chat, replace the sources UI, or render custom elements inline in the assistant's answer. When two or more variations are registered, Volto core automatically adds a **Presentation** choice field to the block's edit sidebar, so editors can pick the variation per block. Old block content without a `variation` value keeps resolving to the default.
+
+### Registering a variation
+
+Push your variation onto `blocksConfig.eeaChatbot.variations` from your add-on's `applyConfig` (same cross-add-on pattern as `volto-tabs-block`):
+
+```js
+export default function applyConfig(config) {
+  const block = config.blocks.blocksConfig.eeaChatbot;
+  if (block) {
+    block.variations = block.variations || [];
+    if (!block.variations.find((v) => v.id === 'catalogue')) {
+      block.variations.push({
+        id: 'catalogue',
+        title: 'Catalogue',
+        isDefault: false,
+        view: CatalogueChatView,
+      });
+    }
+  }
+  return config;
+}
+```
+
+A variation is `{ id, title, isDefault, view }` (optionally `edit` / `schemaEnhancer`); `view` is the React component rendered for the block.
+
+### Variation view contract
+
+The variation `view` receives the block's fields as **top-level props** (there is no `data` prop), plus presentation props:
+
+```
+<View
+  persona={assistantData}   // the selected assistant
+  block_id                  // the block's internal id
+  isEditMode
+  isPlaywrightTest          // ?playwright=yes query flag
+  initialQuery              // ?query=… pre-filled question
+  initialDeepResearch       // ?deepResearch=… flag
+  {...blockFields}          // assistant, onyxVersion, height, …
+/>
+```
+
+If the registry is empty the block falls back to the classic `ChatWindow`, so registering a variation can never break the block.
+
+### Reusing the classic chat window
+
+A variation does not have to build a presentation from scratch — it can wrap the classic `ChatWindow` and only change what it needs to:
+
+```jsx
+import { ChatWindow } from '@eeacms/volto-eea-chatbot/ChatBlock/chat';
+
+export default function CatalogueChatView(props) {
+  return (
+    <ChatWindow
+      {...props}
+      hideSourcesTab
+      extraRemarkPlugins={[myRemarkPlugin]}
+      extraMarkdownComponents={{ myElement: MyElementComponent }}
+    />
+  );
+}
+```
+
+- `hideSourcesTab` — suppresses the classic Sources tab, sidebar and inline citation list only (the answer text and the quality-check logic are unaffected).
+- `extraRemarkPlugins` / `extraRehypePlugins` / `extraMarkdownComponents` — additional remark/rehype plugins and react-markdown component overrides, merged with the built-ins (the same mechanism the quality markers use). This lets a variation render custom inline elements inside the streamed answer.
+
+Custom markdown components can read the message that owns them through `ChatMessageContext` (also exported from `@eeacms/volto-eea-chatbot/ChatBlock/chat`): `ChatMessage` wraps every message in the context provider, so a component rendered from the answer text can e.g. match a marker against `message.documents`.
+
+> **Note:** the variations registry, `hideSourcesTab`, the extra-markdown pass-through props and `ChatMessageContext` are new in 4.1.0. If your project resolves an older published version, these seams don't exist — import the module namespace (e.g. `import * as chat from '…/ChatBlock/chat'`) and guard against `undefined` instead of using named imports.
+
+## Quality Checks (Fact-Checking)
+
+When `qualityCheck` is enabled, the chatbot sends AI answers and their source
+documents to a fact-checking backend that extracts claims, verifies each
+against the sources, and returns per-claim verdicts with evidence.
+
+### Backend dependency
+
+The fact-checking feature requires the
+[eea/rag-facts-check](https://github.com/eea/rag-facts-check) service running
+and reachable at the URL configured in `RAG_FACT_CHECKER_URL`.
+
+**Without this backend, quality checks will fail with a connection error.**
+
+The backend exposes a halloumi-compatible endpoint (`POST /halloumi/generate`)
+so the frontend can call it without code changes. It also provides a native
+`POST /check` endpoint with a richer response schema.
+
+### Deploying the backend
+
+```bash
+# Clone and build
+ git clone https://github.com/eea/rag-facts-check.git
+cd rag-facts-check
+docker build -t rag-fact-check .
+
+# Run (requires an LLM endpoint)
+# Set LLM_API_KEY to your actual API key before running
+docker run -p 8000:8000 \
+  -e LLM_API_BASE=http://your-llm:4002/v1 \
+  -e LLM_API_KEY \
+  -e LLM_MODEL=gemma \
+  rag-fact-check
+```
+
+See the [backend README](https://github.com/eea/rag-facts-check#rag-facts-check)
+for full configuration options.
+
 ## Environment Configuration
 
 To properly configure the middleware and authenticate with the Onyx service, ensure that the following environment variables are set:
@@ -131,19 +241,12 @@ This document lists the environment variables used in the Volto Chatbot project.
 - `VITEST_USE_SETUP`
   Used in Jest configuration. When set to 'ON', it enables a specific Jest setup.
 
-- `LLMGW_URL`
-  The URL for the LLM Gateway service.
-
-- `LLMGW_TOKEN`
-  The token for authenticating with the LLM Gateway service.
+- `RAG_FACT_CHECKER_URL`
+  The base URL for the [rag-facts-check](https://github.com/eea/rag-facts-check)
+  fact-checking backend. Required when `qualityCheck` is enabled.
+  Default: `http://localhost:8000`.
 
 ### Development-specific environment variables
-
-- `MOCK_HALLOUMI_FILE_PATH`
-  When set, this specifies the absolute path to the JSON file containing the mocked Halloumi response. Setting this variable enables mocking of Halloumi API calls.
-
-- `DUMP_HALLOUMI_FILE_PATH`
-  When set, the Halloumi response will be dumped to the specified absolute file path for debugging or to create new mock files.
 
 - `MOCK_LLM_FILE_PATH`
   When set, this specifies the absolute path to the JSONL file containing the mocked Onyx stream response. Setting this variable enables mocking of Onyx LLM calls.

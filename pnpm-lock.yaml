@@ -120,6 +120,9 @@ importers:
         specifier: workspace:*
         version: link:core/packages/volto
     devDependencies:
+      lint-staged:
+        specifier: ^14.0.1
+        version: 14.0.1(enquirer@2.4.1)
       mrs-developer:
         specifier: ^2.2.0
         version: 2.3.2
@@ -1361,6 +1364,9 @@ importers:
       compromise:
         specifier: 14.14.5
         version: 14.14.5
+      debug:
+        specifier: ^4.3.4
+        version: 4.3.4(supports-color@8.1.1)
       dequal:
         specifier: ^2.0.3
         version: 2.0.3
@@ -1400,6 +1406,9 @@ importers:
       remark-gfm:
         specifier: 3.0.1
         version: 3.0.1
+      superagent:
+        specifier: ^10.3.0
+        version: 10.3.0
       uuid:
         specifier: 10.0.0
         version: 10.0.0
@@ -15414,7 +15423,7 @@ snapshots:
       endent: 2.1.0
       find-cache-dir: 3.3.2
       flat-cache: 3.2.0
-      micromatch: 4.0.5
+      micromatch: 4.0.8
       react-docgen-typescript: 2.4.0(typescript@5.9.3)
       tslib: 2.8.1
       typescript: 5.9.3

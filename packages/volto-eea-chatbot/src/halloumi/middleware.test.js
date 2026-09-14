@@ -1,18 +1,19 @@
-import fetch from 'node-fetch';
 import { isPathAllowed } from '../middleware';
 
-// Mock node-fetch
-vi.mock('node-fetch');
+// Mock node-fetch — Vitest ESM interop: CJS modules must be mocked with a
+// { default: ... } object, a bare function is not accepted (unlike Jest).
+// The mock is created via vi.hoisted so every import (including re-imports
+// after vi.resetModules()) sees the same instance.
+const { fetchMock } = vi.hoisted(() => ({ fetchMock: vi.fn() }));
+vi.mock('node-fetch', () => ({ default: fetchMock }));
 
 describe('halloumi middleware', () => {
   let req, res, next, middleware;
 
   beforeEach(() => {
-    fetch.mockReset();
+    fetchMock.mockReset();
     // Clear the module cache so middleware is re-imported with current env vars
     vi.resetModules();
-    // Re-mock after reset
-    vi.mock('node-fetch', () => vi.fn());
 
     req = {
       url: '/_ha/generate',
@@ -38,8 +39,7 @@ describe('halloumi middleware', () => {
 
   it('proxies request to rag-fact-checker and returns response', async () => {
     process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
-    middleware = require('./middleware').default;
-    const mockedFetch = require('node-fetch');
+    middleware = (await import('./middleware')).default;
 
     const mockResponse = {
       claims: [
@@ -54,7 +54,7 @@ describe('halloumi middleware', () => {
       segments: { 0: { startOffset: 0, endOffset: 30 } },
     };
 
-    mockedFetch.mockResolvedValue({
+    fetchMock.mockResolvedValue({
       ok: true,
       status: 200,
       json: () => Promise.resolve(mockResponse),
@@ -62,7 +62,7 @@ describe('halloumi middleware', () => {
 
     await middleware(req, res, next);
 
-    expect(mockedFetch).toHaveBeenCalledWith(
+    expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:8000/halloumi/generate',
       expect.objectContaining({
         method: 'POST',
@@ -80,10 +80,9 @@ describe('halloumi middleware', () => {
 
   it('returns 502 when rag-fact-checker is unreachable', async () => {
     process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
-    middleware = require('./middleware').default;
-    const mockedFetch = require('node-fetch');
+    middleware = (await import('./middleware')).default;
 
-    mockedFetch.mockRejectedValue(new Error('ECONNREFUSED'));
+    fetchMock.mockRejectedValue(new Error('ECONNREFUSED'));
 
     await middleware(req, res, next);
 
@@ -97,10 +96,9 @@ describe('halloumi middleware', () => {
 
   it('returns error when rag-fact-checker responds with non-ok status', async () => {
     process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
-    middleware = require('./middleware').default;
-    const mockedFetch = require('node-fetch');
+    middleware = (await import('./middleware')).default;
 
-    mockedFetch.mockResolvedValue({
+    fetchMock.mockResolvedValue({
       ok: false,
       status: 500,
       json: () => Promise.resolve({ detail: 'Internal server error' }),
@@ -118,7 +116,7 @@ describe('halloumi middleware', () => {
 
   it('rejects disallowed paths with 404', async () => {
     process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
-    middleware = require('./middleware').default;
+    middleware = (await import('./middleware')).default;
 
     req.url = '/_ha/admin/config';
     req.method = 'POST';
@@ -131,7 +129,7 @@ describe('halloumi middleware', () => {
 
   it('rejects allowed path with wrong HTTP method', async () => {
     process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
-    middleware = require('./middleware').default;
+    middleware = (await import('./middleware')).default;
 
     req.url = '/_ha/generate';
     req.method = 'GET';
@@ -144,10 +142,9 @@ describe('halloumi middleware', () => {
 
   it('uses default URL when RAG_FACT_CHECKER_URL is not set', async () => {
     delete process.env.RAG_FACT_CHECKER_URL;
-    middleware = require('./middleware').default;
-    const mockedFetch = require('node-fetch');
+    middleware = (await import('./middleware')).default;
 
-    mockedFetch.mockResolvedValue({
+    fetchMock.mockResolvedValue({
       ok: true,
       status: 200,
       json: () => Promise.resolve({ claims: [], segments: {} }),
@@ -155,7 +152,7 @@ describe('halloumi middleware', () => {
 
     await middleware(req, res, next);
 
-    expect(mockedFetch).toHaveBeenCalledWith(
+    expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:8000/halloumi/generate',
       expect.any(Object),
     );

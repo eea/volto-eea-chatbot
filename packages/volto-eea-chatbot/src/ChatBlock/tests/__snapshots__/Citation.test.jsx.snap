@@ -15,14 +15,24 @@ exports[`Citation > should render the component with link 1`] = `
 `;
 
 exports[`Citation > should render the component without link 1`] = `
-<span
-  className="chat-citation"
-  onBlur={[Function]}
-  onClick={[Function]}
-  onFocus={[Function]}
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
+<div
+  className="popup"
 >
-  1
-</span>
+  <div
+    className="trigger"
+  >
+    <span
+      className="chat-citation"
+    >
+      1
+    </span>
+  </div>
+  <div
+    className="content"
+  >
+    <div>
+      This doc doesn't have a link.
+    </div>
+  </div>
+</div>
 `;

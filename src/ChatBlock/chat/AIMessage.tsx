@@ -477,6 +477,7 @@ export function AIMessage({
           ))}
 
         {stopButton === 'message_loader' &&
+          Boolean(message.isFinalMessageComing) &&
           isLoading &&
           isLastMessage &&
           onCancel && (

@@ -210,6 +210,31 @@ describe('AIMessage', () => {
     });
   });
 
+  it('renders inline stop button when stopButton is message_loader and isLoading is true', () => {
+    const mockCancel = jest.fn();
+    const props = {
+      message: {
+        messageId: 1,
+        message: 'Generating response...',
+        type: 'assistant',
+      },
+      isLoading: true,
+      isLastMessage: true,
+      stopButton: 'message_loader',
+      onCancel: mockCancel,
+    };
+
+    const component = renderComponent(props);
+    const stopBtn = component.root.findByProps({
+      className: 'inline-message-stop-btn',
+    });
+    expect(stopBtn).toBeDefined();
+    act(() => {
+      stopBtn.props.onClick();
+    });
+    expect(mockCancel).toHaveBeenCalled();
+  });
+
   describe('getContextSources', () => {
     const mockMessage = {
       toolCalls: [

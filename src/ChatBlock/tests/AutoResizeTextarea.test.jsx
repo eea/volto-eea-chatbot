@@ -58,13 +58,13 @@ describe('AutoResizeTextarea', () => {
     expect(textarea.value).toBe('Line 1\n');
   });
 
-  it('renders stop button during streaming when enableStopButton is true', () => {
+  it('renders stop button during streaming when stopButton is input', () => {
     const mockCancel = jest.fn();
     const { getByLabelText, queryByLabelText } = render(
       <AutoResizeTextarea
         onSubmit={jest.fn()}
         isStreaming={true}
-        enableStopButton={true}
+        stopButton="input"
         enableMatomoTracking={true}
         onCancel={mockCancel}
       />,
@@ -82,18 +82,26 @@ describe('AutoResizeTextarea', () => {
     );
   });
 
-  it('renders disabled send button during streaming when enableStopButton is false', () => {
-    const { getByLabelText, queryByLabelText } = render(
+  it('renders disabled send button during streaming when stopButton is disabled or non-input', () => {
+    const { getByLabelText, queryByLabelText, rerender } = render(
       <AutoResizeTextarea
         onSubmit={jest.fn()}
         isStreaming={true}
-        enableStopButton={false}
+        stopButton="disabled"
       />,
     );
 
     expect(queryByLabelText('Stop generating')).not.toBeInTheDocument();
-    const sendButton = getByLabelText('Send');
-    expect(sendButton).toBeInTheDocument();
-    expect(sendButton).toBeDisabled();
+    expect(getByLabelText('Send')).toBeDisabled();
+
+    rerender(
+      <AutoResizeTextarea
+        onSubmit={jest.fn()}
+        isStreaming={true}
+        stopButton="floating"
+      />,
+    );
+    expect(queryByLabelText('Stop generating')).not.toBeInTheDocument();
+    expect(getByLabelText('Send')).toBeDisabled();
   });
 });

@@ -23,6 +23,7 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
   const {
     onSubmit,
     isStreaming,
+    stopButton,
     enableStopButton = true,
     onCancel,
     enableMatomoTracking,
@@ -62,7 +63,9 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
     }
   };
 
-  const showStopButton = Boolean(enableStopButton && isStreaming);
+  const resolvedStopButton =
+    stopButton || (enableStopButton === false ? 'disabled' : 'input');
+  const showStopButton = Boolean(resolvedStopButton === 'input' && isStreaming);
 
   return (
     <>

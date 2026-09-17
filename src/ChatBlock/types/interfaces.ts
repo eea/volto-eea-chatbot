@@ -171,6 +171,8 @@ export interface ChatMessageProps {
   extraMarkdownComponents?: any;
   /** Extra rehype plugins merged after the built-in ones. */
   extraRehypePlugins?: any[];
+  stopButton?: 'disabled' | 'input' | 'floating' | 'message_loader';
+  onCancel?: () => void;
 }
 
 export interface Persona {

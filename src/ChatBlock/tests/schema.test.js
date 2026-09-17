@@ -137,13 +137,19 @@ describe('ChatBlockSchema', () => {
     expect(schema.properties.placeholderPrompt.default).toBe('Ask a question');
     expect(schema.properties.chatTitle.default).toBe('Online public chat');
     expect(schema.properties.enableFeedback.default).toBe(true);
-    expect(schema.properties.enableStopButton.default).toBe(true);
+    expect(schema.properties.stopButton.default).toBe('input');
     expect(schema.properties.qualityCheck.default).toBe('disabled');
   });
 
-  it('includes enableStopButton in default fields', () => {
+  it('includes stopButton in default fields and has choices', () => {
     const schema = ChatBlockSchema({ assistants: mockAssistants, data: {} });
-    expect(schema.fieldsets[0].fields).toContain('enableStopButton');
+    expect(schema.fieldsets[0].fields).toContain('stopButton');
+    expect(schema.properties.stopButton.choices).toEqual([
+      ['disabled', 'Disabled'],
+      ['input', 'Inline text input'],
+      ['floating', 'Floating pill'],
+      ['message_loader', 'Inline message loader'],
+    ]);
   });
 
   it('has qualityCheckStages with default score ranges', () => {

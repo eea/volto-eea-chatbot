@@ -23,6 +23,9 @@ import { addCitations } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/citation
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import BotIcon from '@eeacms/volto-eea-chatbot/icons/bot.svg';
 import ClearIcon from '@eeacms/volto-eea-chatbot/icons/clear.svg';
+import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
+import { trackEvent } from '@eeacms/volto-matomo/utils';
+import { FormattedMessage } from 'react-intl';
 
 // Lazy load heavy components
 const SourceDetails: any = loadable(
@@ -214,6 +217,8 @@ export function AIMessage({
   extraRemarkPlugins,
   extraMarkdownComponents,
   extraRehypePlugins,
+  stopButton,
+  onCancel,
 }: ChatMessageProps) {
   const [allToolsDisplayed, setAllToolsDisplayed] = useState(false);
   const [messageDisplayed, setMessageDisplayed] = useState(false);
@@ -470,6 +475,41 @@ export function AIMessage({
               </RendererComponent>
             </div>
           ))}
+
+        {stopButton === 'message_loader' &&
+          isLoading &&
+          isLastMessage &&
+          onCancel && (
+            <div className="inline-message-stop">
+              <Button
+                className="inline-message-stop-btn"
+                type="button"
+                aria-label="Stop generating"
+                onClick={() => {
+                  if (enableMatomoTracking) {
+                    trackEvent({
+                      category: persona ? `Chatbot - ${persona}` : 'Chatbot',
+                      action: 'Chatbot: Stop generating',
+                      name: 'Message generation stopped',
+                    });
+                  }
+                  onCancel();
+                }}
+              >
+                <div className="stop-btn-inner">
+                  <div className="stop-icon-circle">
+                    <SVGIcon name={StopIcon} size={8} color="#fff" />
+                  </div>
+                  <span>
+                    <FormattedMessage
+                      id="Stop generating"
+                      defaultMessage="Stop generating"
+                    />
+                  </span>
+                </div>
+              </Button>
+            </div>
+          )}
       </div>
 
       {/* Total fail message */}

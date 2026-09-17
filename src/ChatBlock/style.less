@@ -123,6 +123,20 @@
   }
 }
 
+@keyframes stopButtonPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.45);
+  }
+
+  70% {
+    box-shadow: 0 0 0 7px rgba(0, 0, 0, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
 @keyframes popIn {
   0% {
     opacity: 0;
@@ -1363,12 +1377,16 @@ mark {
     padding: 0;
     border-radius: 50%;
     margin: 0 0.5em 0 0.8em;
+    animation: stopButtonPulse 1.8s cubic-bezier(0.66, 0, 0, 1) infinite;
     background: #000;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      transform 0.15s ease;
 
     &:hover {
       background: #333;
+      transform: scale(1.1);
     }
 
     &:focus {
@@ -1388,6 +1406,81 @@ mark {
         color: #fff;
         fill: #fff;
       }
+    }
+  }
+}
+
+.chat-floating-stop {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75em;
+  animation: fadeInScale 0.2s ease;
+}
+
+.message-loader-stop {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.inline-message-stop {
+  display: flex;
+  margin-top: 12px;
+  animation: fadeIn 0.2s ease;
+}
+
+.ui.button.floating-stop-btn,
+.ui.button.inline-message-stop-btn,
+.ui.button.message-loader-stop-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  color: #344054;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #98a2b3;
+    background: #f9fafb;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    color: #1d2939;
+    transform: translateY(-1px);
+  }
+
+  &:focus {
+    background: #fff;
+    color: #344054;
+  }
+
+  .stop-btn-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stop-icon-circle {
+    display: flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    animation: stopButtonPulse 1.8s cubic-bezier(0.66, 0, 0, 1) infinite;
+    background: #000;
+
+    svg {
+      width: 8px;
+      height: 8px;
+      color: #fff;
+      fill: #fff;
     }
   }
 }

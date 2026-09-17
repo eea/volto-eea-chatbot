@@ -509,6 +509,23 @@ describe('ChatWindow', () => {
     expect(mockCancel).toHaveBeenCalled();
   });
 
+  it('defaults to floating stop button when stopButton is not specified', () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: true,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+    });
+
+    const { container } = render(<ChatWindowWrapped persona={mockPersona} />);
+    expect(container.querySelector('.floating-stop-btn')).toBeInTheDocument();
+  });
+
   it('renders message loader stop button and triggers cancelStreaming when stopButton is message_loader', () => {
     const mockCancel = jest.fn();
     useChatController.mockReturnValue({

@@ -184,7 +184,7 @@ export function ChatBlockSchema({ assistants, data }) {
           ['floating', 'Floating pill'],
           ['message_loader', 'Inline message loader'],
         ],
-        default: 'input',
+        default: 'floating',
         description:
           'Choose where and how the stop generation button appears during response generation',
       },

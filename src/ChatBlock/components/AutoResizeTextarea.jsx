@@ -64,7 +64,7 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
   };
 
   const resolvedStopButton =
-    stopButton || (enableStopButton === false ? 'disabled' : 'input');
+    stopButton || (enableStopButton === false ? 'disabled' : 'floating');
   const showStopButton = Boolean(resolvedStopButton === 'input' && isStreaming);
 
   return (

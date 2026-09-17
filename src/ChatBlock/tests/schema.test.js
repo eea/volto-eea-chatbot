@@ -137,7 +137,7 @@ describe('ChatBlockSchema', () => {
     expect(schema.properties.placeholderPrompt.default).toBe('Ask a question');
     expect(schema.properties.chatTitle.default).toBe('Online public chat');
     expect(schema.properties.enableFeedback.default).toBe(true);
-    expect(schema.properties.stopButton.default).toBe('input');
+    expect(schema.properties.stopButton.default).toBe('floating');
     expect(schema.properties.qualityCheck.default).toBe('disabled');
   });
 

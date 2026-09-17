@@ -109,7 +109,7 @@ function ChatWindow({
     | 'input'
     | 'floating'
     | 'message_loader' =
-    stopButton || (enableStopButton === false ? 'disabled' : 'input');
+    stopButton || (enableStopButton === false ? 'disabled' : 'floating');
 
   const [qualityCheckEnabled, setQualityCheckEnabled] = useState(
     onDemandInputToggle ?? true,

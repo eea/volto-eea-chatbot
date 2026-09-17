@@ -13,6 +13,12 @@ jest.mock('@plone/volto/helpers/Loadable', () => ({
   ),
 }));
 
+jest.mock('react-intl', () => ({
+  useIntl: () => ({ formatMessage: ({ defaultMessage }) => defaultMessage }),
+  defineMessages: (msgs) => msgs,
+  FormattedMessage: ({ defaultMessage }) => <span>{defaultMessage}</span>,
+}));
+
 jest.mock('@eeacms/volto-matomo/utils', () => ({
   trackEvent: jest.fn(),
 }));
@@ -30,6 +36,7 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hooks', () => ({
     isStreaming: false,
     isFetchingRelatedQuestions: false,
     clearChat: jest.fn(),
+    cancelStreaming: jest.fn(),
     setIsDeepResearchEnabled: jest.fn(),
     isDeepResearchEnabled: false,
   })),
@@ -39,8 +46,15 @@ jest.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea',
   () => ({
     __esModule: true,
-    default: ({ placeholder }) => (
-      <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
+    default: ({ placeholder, isStreaming, stopButton, onCancel }) => (
+      <div>
+        <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
+        {stopButton === 'input' && isStreaming && (
+          <button data-testid="mock-stop-button" onClick={onCancel}>
+            Stop
+          </button>
+        )}
+      </div>
     ),
   }),
 );
@@ -449,5 +463,123 @@ describe('ChatWindow', () => {
     );
 
     expect(mockSetIsDeepResearchEnabled).toHaveBeenCalledWith(false);
+  });
+
+  it('passes cancelStreaming to AutoResizeTextarea and triggers it when stopButton is input', () => {
+    const mockCancel = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: true,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: mockCancel,
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} stopButton="input" />);
+    const stopBtn = screen.getByTestId('mock-stop-button');
+    expect(stopBtn).toBeInTheDocument();
+    fireEvent.click(stopBtn);
+    expect(mockCancel).toHaveBeenCalled();
+  });
+
+  it('renders floating stop button and triggers cancelStreaming when stopButton is floating', () => {
+    const mockCancel = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: true,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: mockCancel,
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+    });
+
+    const { container } = render(
+      <ChatWindowWrapped persona={mockPersona} stopButton="floating" />,
+    );
+    const floatingBtn = container.querySelector('.floating-stop-btn');
+    expect(floatingBtn).toBeInTheDocument();
+    fireEvent.click(floatingBtn);
+    expect(mockCancel).toHaveBeenCalled();
+  });
+
+  it('defaults to floating stop button when stopButton is not specified', () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: true,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+    });
+
+    const { container } = render(<ChatWindowWrapped persona={mockPersona} />);
+    expect(container.querySelector('.floating-stop-btn')).toBeInTheDocument();
+  });
+
+  it('renders message loader stop button and triggers cancelStreaming when stopButton is message_loader', () => {
+    const mockCancel = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [
+        {
+          message: 'Hello',
+          messageId: 1,
+          type: 'user',
+          nodeId: 1,
+          isFinalMessageComing: false,
+          packets: [],
+        },
+      ],
+      isStreaming: true,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: mockCancel,
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+    });
+
+    const { container } = render(
+      <ChatWindowWrapped persona={mockPersona} stopButton="message_loader" />,
+    );
+    const loaderBtn = container.querySelector('.message-loader-stop-btn');
+    expect(loaderBtn).toBeInTheDocument();
+    fireEvent.click(loaderBtn);
+    expect(mockCancel).toHaveBeenCalled();
+  });
+
+  it('does not render stop buttons when stopButton is disabled', () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: true,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+    });
+
+    const { container } = render(
+      <ChatWindowWrapped persona={mockPersona} stopButton="disabled" />,
+    );
+    expect(screen.queryByTestId('mock-stop-button')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('.floating-stop-btn'),
+    ).not.toBeInTheDocument();
+    expect(
+      container.querySelector('.message-loader-stop-btn'),
+    ).not.toBeInTheDocument();
   });
 });

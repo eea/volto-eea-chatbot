@@ -10,6 +10,7 @@ import type { Persona } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfac
 import { Button, Form, Segment, Checkbox } from 'semantic-ui-react';
 import { injectLazyLibs } from '@plone/volto/helpers/Loadable';
 import { trackEvent } from '@eeacms/volto-matomo/utils';
+import { FormattedMessage } from 'react-intl';
 
 import { ChatMessage } from '.';
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
@@ -19,6 +20,7 @@ import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyStat
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
+import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
 
 import '@eeacms/volto-eea-chatbot/ChatBlock/style.less';
 
@@ -33,6 +35,8 @@ interface ChatWindowProps {
   qgenAsistantId?: number;
   enableQgen?: boolean;
   enableFeedback?: boolean;
+  stopButton?: 'disabled' | 'input' | 'floating' | 'message_loader';
+  enableStopButton?: boolean;
   scrollToInput?: boolean;
   feedbackReasons?: string[];
   qualityCheck?: string;
@@ -74,6 +78,8 @@ function ChatWindow({
     qgenAsistantId,
     enableQgen,
     enableFeedback = true,
+    stopButton,
+    enableStopButton = true,
     scrollToInput,
     feedbackReasons,
     qualityCheck = 'disabled',
@@ -97,6 +103,14 @@ function ChatWindow({
     extraMarkdownComponents,
     extraRehypePlugins,
   } = data;
+
+  const stopButtonSetting:
+    | 'disabled'
+    | 'input'
+    | 'floating'
+    | 'message_loader' =
+    stopButton || (enableStopButton === false ? 'disabled' : 'floating');
+
   const [qualityCheckEnabled, setQualityCheckEnabled] = useState(
     onDemandInputToggle ?? true,
   );
@@ -123,6 +137,7 @@ function ChatWindow({
     isStreaming,
     isFetchingRelatedQuestions,
     clearChat,
+    cancelStreaming,
     setIsDeepResearchEnabled,
     isDeepResearchEnabled,
   } = useChatController({
@@ -249,6 +264,8 @@ function ChatWindow({
                     extraRemarkPlugins={extraRemarkPlugins}
                     extraMarkdownComponents={extraMarkdownComponents}
                     extraRehypePlugins={extraRehypePlugins}
+                    stopButton={stopButtonSetting}
+                    onCancel={cancelStreaming}
                   />
                 </React.Fragment>
               ))}
@@ -261,6 +278,43 @@ function ChatWindow({
                     <div className="comment-content">
                       <div className="loader-container">
                         <div className="loader" />
+                        {stopButtonSetting === 'message_loader' && (
+                          <div className="message-loader-stop">
+                            <Button
+                              className="message-loader-stop-btn"
+                              type="button"
+                              aria-label="Stop generating"
+                              onClick={() => {
+                                if (enableMatomoTracking) {
+                                  trackEvent({
+                                    category: persona?.name
+                                      ? `Chatbot - ${persona.name}`
+                                      : 'Chatbot',
+                                    action: 'Chatbot: Stop generating',
+                                    name: 'Message generation stopped',
+                                  });
+                                }
+                                cancelStreaming();
+                              }}
+                            >
+                              <div className="stop-btn-inner">
+                                <div className="stop-icon-circle">
+                                  <SVGIcon
+                                    name={StopIcon}
+                                    size={8}
+                                    color="#fff"
+                                  />
+                                </div>
+                                <span>
+                                  <FormattedMessage
+                                    id="Stop generating"
+                                    defaultMessage="Stop generating"
+                                  />
+                                </span>
+                              </div>
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -271,6 +325,39 @@ function ChatWindow({
       </div>
 
       <div className="chat-form">
+        {stopButtonSetting === 'floating' && isStreaming && (
+          <div className="chat-floating-stop">
+            <Button
+              className="floating-stop-btn"
+              type="button"
+              aria-label="Stop generating"
+              onClick={() => {
+                if (enableMatomoTracking) {
+                  trackEvent({
+                    category: persona?.name
+                      ? `Chatbot - ${persona.name}`
+                      : 'Chatbot',
+                    action: 'Chatbot: Stop generating',
+                    name: 'Message generation stopped',
+                  });
+                }
+                cancelStreaming();
+              }}
+            >
+              <div className="stop-btn-inner">
+                <div className="stop-icon-circle">
+                  <SVGIcon name={StopIcon} size={8} color="#fff" />
+                </div>
+                <span>
+                  <FormattedMessage
+                    id="Stop generating"
+                    defaultMessage="Stop generating"
+                  />
+                </span>
+              </div>
+            </Button>
+          </div>
+        )}
         {/* @ts-ignore */}
         <Form>
           <div className="textarea-wrapper">
@@ -283,6 +370,8 @@ function ChatWindow({
                 messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
               }
               isStreaming={isStreaming}
+              stopButton={stopButtonSetting}
+              onCancel={cancelStreaming}
               enableMatomoTracking={enableMatomoTracking}
               persona={persona}
               onSubmit={onSubmit}

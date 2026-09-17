@@ -100,6 +100,7 @@ export function ChatBlockSchema({ assistants, data }) {
             : []),
           'enableFeedback',
           ...(data.enableFeedback ? ['feedbackReasons'] : []),
+          'stopButton',
           'showTools',
           'enableMatomoTracking',
           'scrollToInput',
@@ -174,6 +175,18 @@ export function ChatBlockSchema({ assistants, data }) {
         title: 'Enable feedback',
         type: 'boolean',
         default: true,
+      },
+      stopButton: {
+        title: 'Stop generation button',
+        choices: [
+          ['disabled', 'Disabled'],
+          ['input', 'Inline text input'],
+          ['floating', 'Floating pill'],
+          ['message_loader', 'Inline message loader'],
+        ],
+        default: 'floating',
+        description:
+          'Choose where and how the stop generation button appears during response generation',
       },
       qualityCheck: {
         title: 'Quality checks',

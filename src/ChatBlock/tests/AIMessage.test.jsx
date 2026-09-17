@@ -210,6 +210,54 @@ describe('AIMessage', () => {
     });
   });
 
+  it('renders inline stop button when stopButton is message_loader, isLoading is true and isFinalMessageComing is true', () => {
+    const mockCancel = jest.fn();
+    const props = {
+      message: {
+        messageId: 1,
+        message: 'Generating response...',
+        type: 'assistant',
+        isFinalMessageComing: true,
+      },
+      isLoading: true,
+      isLastMessage: true,
+      stopButton: 'message_loader',
+      onCancel: mockCancel,
+    };
+
+    const component = renderComponent(props);
+    const stopBtn = component.root.findByProps({
+      className: 'inline-message-stop-btn',
+    });
+    expect(stopBtn).toBeDefined();
+    act(() => {
+      stopBtn.props.onClick();
+    });
+    expect(mockCancel).toHaveBeenCalled();
+  });
+
+  it('does not render inline stop button when isFinalMessageComing is false (loader in ChatWindow handles it)', () => {
+    const mockCancel = jest.fn();
+    const props = {
+      message: {
+        messageId: 1,
+        message: 'Generating response...',
+        type: 'assistant',
+        isFinalMessageComing: false,
+      },
+      isLoading: true,
+      isLastMessage: true,
+      stopButton: 'message_loader',
+      onCancel: mockCancel,
+    };
+
+    const component = renderComponent(props);
+    const stopBtns = component.root.findAllByProps({
+      className: 'inline-message-stop-btn',
+    });
+    expect(stopBtns.length).toBe(0);
+  });
+
   describe('getContextSources', () => {
     const mockMessage = {
       toolCalls: [

@@ -137,7 +137,13 @@ describe('ChatBlockSchema', () => {
     expect(schema.properties.placeholderPrompt.default).toBe('Ask a question');
     expect(schema.properties.chatTitle.default).toBe('Online public chat');
     expect(schema.properties.enableFeedback.default).toBe(true);
+    expect(schema.properties.enableStopButton.default).toBe(true);
     expect(schema.properties.qualityCheck.default).toBe('disabled');
+  });
+
+  it('includes enableStopButton in default fields', () => {
+    const schema = ChatBlockSchema({ assistants: mockAssistants, data: {} });
+    expect(schema.fieldsets[0].fields).toContain('enableStopButton');
   });
 
   it('has qualityCheckStages with default score ranges', () => {

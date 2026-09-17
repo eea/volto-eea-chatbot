@@ -100,6 +100,7 @@ export function ChatBlockSchema({ assistants, data }) {
             : []),
           'enableFeedback',
           ...(data.enableFeedback ? ['feedbackReasons'] : []),
+          'enableStopButton',
           'showTools',
           'enableMatomoTracking',
           'scrollToInput',
@@ -174,6 +175,13 @@ export function ChatBlockSchema({ assistants, data }) {
         title: 'Enable feedback',
         type: 'boolean',
         default: true,
+      },
+      enableStopButton: {
+        title: 'Enable stop button',
+        type: 'boolean',
+        default: true,
+        description:
+          'Show a stop button during streaming to allow aborting the response',
       },
       qualityCheck: {
         title: 'Quality checks',

@@ -33,6 +33,7 @@ interface ChatWindowProps {
   qgenAsistantId?: number;
   enableQgen?: boolean;
   enableFeedback?: boolean;
+  enableStopButton?: boolean;
   scrollToInput?: boolean;
   feedbackReasons?: string[];
   qualityCheck?: string;
@@ -74,6 +75,7 @@ function ChatWindow({
     qgenAsistantId,
     enableQgen,
     enableFeedback = true,
+    enableStopButton = true,
     scrollToInput,
     feedbackReasons,
     qualityCheck = 'disabled',
@@ -123,6 +125,7 @@ function ChatWindow({
     isStreaming,
     isFetchingRelatedQuestions,
     clearChat,
+    cancelStreaming,
     setIsDeepResearchEnabled,
     isDeepResearchEnabled,
   } = useChatController({
@@ -283,6 +286,8 @@ function ChatWindow({
                 messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
               }
               isStreaming={isStreaming}
+              enableStopButton={enableStopButton}
+              onCancel={cancelStreaming}
               enableMatomoTracking={enableMatomoTracking}
               persona={persona}
               onSubmit={onSubmit}

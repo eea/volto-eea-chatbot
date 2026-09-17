@@ -1353,6 +1353,43 @@ mark {
       color: @grey;
     }
   }
+
+  .ui.button.stop-btn {
+    display: flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    margin: 0 0.5em 0 0.8em;
+    background: #000;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: #333;
+    }
+
+    &:focus {
+      background: #000;
+    }
+
+    .btn-icon {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        width: 12px;
+        height: 12px;
+        color: #fff;
+        fill: #fff;
+      }
+    }
+  }
 }
 
 #quality-check-toggle[disabled] ~ label {

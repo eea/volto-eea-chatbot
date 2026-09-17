@@ -30,6 +30,7 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hooks', () => ({
     isStreaming: false,
     isFetchingRelatedQuestions: false,
     clearChat: jest.fn(),
+    cancelStreaming: jest.fn(),
     setIsDeepResearchEnabled: jest.fn(),
     isDeepResearchEnabled: false,
   })),
@@ -39,8 +40,15 @@ jest.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea',
   () => ({
     __esModule: true,
-    default: ({ placeholder }) => (
-      <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
+    default: ({ placeholder, isStreaming, enableStopButton, onCancel }) => (
+      <div>
+        <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
+        {enableStopButton && isStreaming && (
+          <button data-testid="mock-stop-button" onClick={onCancel}>
+            Stop
+          </button>
+        )}
+      </div>
     ),
   }),
 );
@@ -449,5 +457,26 @@ describe('ChatWindow', () => {
     );
 
     expect(mockSetIsDeepResearchEnabled).toHaveBeenCalledWith(false);
+  });
+
+  it('passes cancelStreaming to AutoResizeTextarea and triggers it', () => {
+    const mockCancel = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: true,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: mockCancel,
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} enableStopButton={true} />);
+    const stopBtn = screen.getByTestId('mock-stop-button');
+    expect(stopBtn).toBeInTheDocument();
+    fireEvent.click(stopBtn);
+    expect(mockCancel).toHaveBeenCalled();
   });
 });

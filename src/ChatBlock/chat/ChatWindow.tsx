@@ -97,7 +97,7 @@ function ChatWindow({
     onDemandInputToggle = true,
     maxContextSegments = 0,
     batchSize,
-    onyxVersion = '2',
+    onyxVersion = '3',
     hideSourcesTab,
     extraRemarkPlugins,
     extraMarkdownComponents,
@@ -272,7 +272,7 @@ function ChatWindow({
 
               {isStreaming &&
                 !isFetchingRelatedQuestions &&
-                !messages[messages.length - 1]?.isFinalMessageComing && (
+                messages[messages.length - 1]?.type === 'user' && (
                   <div className="comment">
                     <div className="circle assistant placeholder"></div>
                     <div className="comment-content">

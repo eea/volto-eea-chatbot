@@ -18,6 +18,9 @@ const ALLOWED_PROXY_PATHS = [
   { path: '/chat/send-message', methods: ['POST'] },
   { path: '/chat/send-chat-message', methods: ['POST'] },
   { path: '/chat/create-chat-message-feedback', methods: ['POST'] },
+  // Real document text behind an answer, used to give the fact-checker the same
+  // text the answer generator read (see ChatBlock/services/chunkEvidence.ts).
+  { pathPattern: /^\/document\/chunk-info$/, methods: ['GET'] },
 ];
 
 /**

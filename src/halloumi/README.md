@@ -36,6 +36,44 @@ the **joined** sources string:
 source text. Segments are half-open `[start, end)`; overlapping ones are clipped so
 the source text is never rendered twice.
 
+## Source text: Onyx chunks, not search blurbs
+
+The Onyx v3 chat stream carries documents as `SearchDoc` objects, which have **no
+`content` field** — only a ~600-character `blurb`. Sending blurbs makes supported
+claims look hallucinated, because the answer was written from full chunk text.
+
+`ChatBlock/services/chunkEvidence.ts` therefore resolves the real text before the
+fact-check runs, through the existing `/_da` proxy:
+
+```
+GET /_da/document/chunk-info?document_id=<id>&chunk_id=<n>
+  -> Onyx GET /api/document/chunk-info -> { "content": "<chunk text>", "num_tokens": 512 }
+```
+
+- Both parameters are already present on every streamed document (`document_id`,
+  `chunk_ind`), so no extra data is needed from Onyx.
+- The matched chunk is fetched together with `chunkEvidenceWindow` chunks on each
+  side (default **2**, i.e. what Onyx's `INCLUDE_ADJACENT_SECTIONS` expansion uses).
+  The centre chunk alone is not enough — the claims usually sit in its
+  neighbourhood. Onyx's widest expansion is ±5; raise the prop to match it.
+- A gateway in front of Onyx returns **429** under concurrency, so requests run
+  through a small pool with one retry after 1s. **404** means "no such chunk" and
+  simply ends the expansion for that document.
+- `useChunkEvidence` gates the fact-check call on `evidenceSettled`, so a check is
+  never fired on blurbs in the same commit that started the fetch. If resolution
+  fails, verification still runs on blurbs rather than never running.
+
+Each source sent to the fact-checker carries `kind`:
+
+| `kind`    | meaning                                                               |
+| --------- | --------------------------------------------------------------------- |
+| `chunk`   | real Onyx chunk text — a claim missing from it is meaningful evidence |
+| `snippet` | only the search blurb is available — a missing claim proves nothing   |
+
+`halloumiContext` (used for segment highlighting) and `halloumiSource.text` (used by
+the fact-checker for offsets) are always the same nbsp-cleaned string. Changing one
+without the other breaks highlighting.
+
 ## Configuration
 
 | Environment Variable   | Default                 | Description                              |

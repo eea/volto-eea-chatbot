@@ -1,5 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ClaimModal } from '@eeacms/volto-eea-chatbot/ChatBlock/components/markdown/ClaimModal';
 
@@ -135,5 +136,36 @@ describe('ClaimModal', () => {
     const component = renderer.create(<ClaimModal {...props} />);
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
+  });
+
+  it('labels a context-limited claim as unverified rather than low', () => {
+    const props = {
+      ...defaultProps,
+      claim: {
+        ...defaultProps.claim,
+        score: 0.4,
+        context_limited: true,
+      },
+    };
+    render(<ClaimModal {...props} />);
+    expect(screen.getByText('Unverified')).toBeInTheDocument();
+    expect(screen.getByText('Partial context')).toBeInTheDocument();
+    expect(
+      screen.getByText(/not evidence that the answer is wrong/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Low')).not.toBeInTheDocument();
+  });
+
+  it('keeps the normal label when the claim was checked against real text', () => {
+    const props = {
+      ...defaultProps,
+      claim: { ...defaultProps.claim, score: 0.4 },
+    };
+    render(<ClaimModal {...props} />);
+    expect(screen.getByText('Low')).toBeInTheDocument();
+    expect(screen.getByText('Verification')).toBeInTheDocument();
+    expect(
+      screen.queryByText(/not evidence that the answer is wrong/),
+    ).not.toBeInTheDocument();
   });
 });

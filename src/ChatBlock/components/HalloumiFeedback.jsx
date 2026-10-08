@@ -73,6 +73,7 @@ const HalloumiFeedback = ({
   sources,
   retryHalloumi,
   emptyClaims,
+  contextQuality,
 }) => {
   const claims = (markers?.claims || []).filter((claim) => !claim.skipped);
   const noClaimsScore = claims[0]?.score === null;
@@ -120,6 +121,19 @@ const HalloumiFeedback = ({
         >
           <MessageContent>
             {emptyClaims || printSlate(halloumiMessage, `${score}%`)}
+          </MessageContent>
+        </Message>
+      )}
+
+      {/* The fact-checker only saw part of the answer's sources, so a low score
+          is not a verdict on the answer. Say so instead of letting the number
+          stand on its own. */}
+      {contextQuality?.level === 'partial' && (
+        <Message color="yellow" className="context-quality-message">
+          <MessageContent>
+            <strong>Partial context.</strong>{' '}
+            {contextQuality.note ||
+              `${contextQuality.snippet_sources} of ${contextQuality.sources} sources were search snippets rather than full document text. Claims reported as "not enough information" may still be supported by text that was not sent.`}
           </MessageContent>
         </Message>
       )}

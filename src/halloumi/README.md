@@ -70,6 +70,33 @@ Each source sent to the fact-checker carries `kind`:
 | `chunk`   | real Onyx chunk text — a claim missing from it is meaningful evidence |
 | `snippet` | only the search blurb is available — a missing claim proves nothing   |
 
+The fact-checker answers with a `context_quality` block describing what it was
+actually given:
+
+```json
+{
+  "level": "partial",
+  "sources": 4,
+  "chunk_sources": 3,
+  "snippet_sources": 1,
+  "note": "1 of 4 sources were search snippets, not full document text…"
+}
+```
+
+| `level`   | meaning                                                     |
+| --------- | ----------------------------------------------------------- |
+| `full`    | every source was `chunk` text — the score is a real verdict |
+| `partial` | at least one source was a `snippet`                         |
+| `unknown` | the backend reported no level (older deployment)            |
+| `none`    | no sources reached the checker                              |
+
+In `partial` mode each `not_enough_info` claim additionally carries
+`context_limited: true`. Both signals are rendered: `HalloumiFeedback` shows a
+"Partial context" notice under the score, and `ClaimModal` labels such a claim
+`Unverified / Partial context` instead of `Low / Verification`. The numeric score is
+deliberately left alone — the label carries the caveat, the number stays comparable
+across runs.
+
 `halloumiContext` (used for segment highlighting) and `halloumiSource.text` (used by
 the fact-checker for offsets) are always the same nbsp-cleaned string. Changing one
 without the other breaks highlighting.

@@ -585,6 +585,7 @@ export function AIMessage({
           showVerifyClaimsButton={showVerifyClaimsButton}
           retryHalloumi={retryHalloumi}
           emptyClaims={emptyClaims}
+          contextQuality={markers?.context_quality}
         />
       )}
 

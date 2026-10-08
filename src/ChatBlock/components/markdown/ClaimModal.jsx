@@ -70,9 +70,13 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
           <div className="score-badge-section">
             <div className="score-badge">
               <span className="score-percentage">
-                {scoreToLabel(claim.score)}
+                {claim.context_limited
+                  ? 'Unverified'
+                  : scoreToLabel(claim.score)}
               </span>
-              <span className="score-label">Verification</span>
+              <span className="score-label">
+                {claim.context_limited ? 'Partial context' : 'Verification'}
+              </span>
             </div>
             <div className="score-progress-bar">
               <div
@@ -84,6 +88,13 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
           <div className="rationale-section">
             <h5 className="rationale-header">Rationale</h5>
             <p className="claim-rationale">{claim.rationale}</p>
+            {claim.context_limited && (
+              <p className="claim-rationale context-limited-note">
+                Only search snippets were available for this check, so the
+                supporting text may simply be missing. This is not evidence that
+                the answer is wrong.
+              </p>
+            )}
           </div>
         </div>
 

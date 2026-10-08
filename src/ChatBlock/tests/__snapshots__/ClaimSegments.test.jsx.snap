@@ -16,7 +16,7 @@ exports[`ClaimSegments filters out sources without matching snippets 1`] = `
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
-        onKeydown={[Function]}
+        onKeyDown={[Function]}
         role="tab"
         tabIndex={0}
       >
@@ -133,7 +133,7 @@ exports[`ClaimSegments handles missing segments in segments object 1`] = `
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
-        onKeydown={[Function]}
+        onKeyDown={[Function]}
         role="tab"
         tabIndex={0}
       >
@@ -272,7 +272,7 @@ exports[`ClaimSegments renders source without link 1`] = `
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
-        onKeydown={[Function]}
+        onKeyDown={[Function]}
         role="tab"
         tabIndex={0}
       >
@@ -343,6 +343,13 @@ exports[`ClaimSegments renders source without link 1`] = `
               #
               1
             </button>
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              2
+            </button>
           </div>
         </div>
         <div
@@ -372,7 +379,7 @@ exports[`ClaimSegments renders with basic props 1`] = `
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
-        onKeydown={[Function]}
+        onKeyDown={[Function]}
         role="tab"
         tabIndex={0}
       >
@@ -501,7 +508,7 @@ exports[`ClaimSegments renders with file source type icon 1`] = `
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
-        onKeydown={[Function]}
+        onKeyDown={[Function]}
         role="tab"
         tabIndex={0}
       >
@@ -623,7 +630,7 @@ exports[`ClaimSegments renders with multiple sources 1`] = `
         className="active"
         data-testid="menu-item-0"
         onClick={[Function]}
-        onKeydown={[Function]}
+        onKeyDown={[Function]}
         role="tab"
         tabIndex={0}
       >
@@ -639,7 +646,7 @@ exports[`ClaimSegments renders with multiple sources 1`] = `
         className=""
         data-testid="menu-item-1"
         onClick={[Function]}
-        onKeydown={[Function]}
+        onKeyDown={[Function]}
         role="tab"
         tabIndex={-1}
       >

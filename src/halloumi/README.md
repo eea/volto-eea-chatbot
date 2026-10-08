@@ -55,7 +55,11 @@ GET /_da/document/chunk-info?document_id=<id>&chunk_id=<n>
 - The matched chunk is fetched together with `chunkEvidenceWindow` chunks on each
   side (default **2**, i.e. what Onyx's `INCLUDE_ADJACENT_SECTIONS` expansion uses).
   The centre chunk alone is not enough — the claims usually sit in its
-  neighbourhood. Onyx's widest expansion is ±5; raise the prop to match it.
+  neighbourhood. Onyx's widest expansion is ±5; raise the value to match it.
+- The window is also a block setting — **Evidence window** in the chat block sidebar —
+  so it can be tuned per block without a deploy. Values outside 0–20 are clamped
+  (`MAX_CHUNK_EVIDENCE_WINDOW`): each extra step costs two more chunk requests per
+  document against a rate-limited gateway.
 - A gateway in front of Onyx returns **429** under concurrency, so requests run
   through a small pool with one retry after 1s. **404** means "no such chunk" and
   simply ends the expansion for that document.

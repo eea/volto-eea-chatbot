@@ -1,8 +1,11 @@
 import {
+  CHUNK_EVIDENCE_WINDOW,
+  MAX_CHUNK_EVIDENCE_WINDOW,
   chunkInfoUrl,
   fetchChunk,
   fetchDocumentEvidence,
   fetchEvidence,
+  normalizeWindow,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chunkEvidence';
 
 const response = (status, body = {}) => ({
@@ -17,6 +20,25 @@ const chunkIndOf = (url) =>
   Number(new URL(url, 'http://localhost').searchParams.get('chunk_id'));
 
 describe('ChatBlock/services/chunkEvidence', () => {
+  describe('normalizeWindow', () => {
+    it('keeps sane whole numbers, including numeric strings from the CMS', () => {
+      expect(normalizeWindow(0)).toBe(0);
+      expect(normalizeWindow(2)).toBe(2);
+      expect(normalizeWindow(5)).toBe(5);
+      expect(normalizeWindow('3')).toBe(3);
+    });
+
+    it('clamps absurd windows instead of firing a request storm', () => {
+      expect(normalizeWindow(999)).toBe(MAX_CHUNK_EVIDENCE_WINDOW);
+      expect(normalizeWindow(-4)).toBe(0);
+    });
+
+    it('falls back to the default for junk input', () => {
+      expect(normalizeWindow(undefined)).toBe(CHUNK_EVIDENCE_WINDOW);
+      expect(normalizeWindow('abc')).toBe(CHUNK_EVIDENCE_WINDOW);
+    });
+  });
+
   describe('chunkInfoUrl', () => {
     it('routes through the _da proxy and encodes the document id', () => {
       const url = chunkInfoUrl('https://example.com/a b/c.pdf', 7);
@@ -94,6 +116,16 @@ describe('ChatBlock/services/chunkEvidence', () => {
       await fetchDocumentEvidence('doc-1', 0, { window: 2, fetchImpl });
       const inds = fetchImpl.mock.calls.map(([url]) => chunkIndOf(url));
       expect(inds).toEqual([0, 1, 2]);
+    });
+
+    it('clamps a nonsensical window from a CMS field', async () => {
+      const fetchImpl = fetchReturning((url) =>
+        response(200, { content: `chunk ${chunkIndOf(url)}` }),
+      );
+      await fetchDocumentEvidence('doc-1', 100, { window: 500, fetchImpl });
+      const inds = fetchImpl.mock.calls.map(([url]) => chunkIndOf(url));
+      expect(inds.length).toBe(MAX_CHUNK_EVIDENCE_WINDOW * 2 + 1);
+      expect(Math.max(...inds)).toBe(100 + MAX_CHUNK_EVIDENCE_WINDOW);
     });
 
     it('stops expanding at the first missing chunk above the centre', async () => {

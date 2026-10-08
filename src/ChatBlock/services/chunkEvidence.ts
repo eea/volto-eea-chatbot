@@ -27,6 +27,13 @@
  */
 
 export const CHUNK_EVIDENCE_WINDOW = 2;
+/**
+ * Safety bound for the window. Onyx itself never expands past ±5
+ * (`FULL_DOC_NUM_CHUNKS_AROUND`), and every extra step costs two more chunk
+ * requests per document, so a nonsensical CMS value is clamped rather than
+ * turned into a request storm against a rate-limited gateway.
+ */
+export const MAX_CHUNK_EVIDENCE_WINDOW = 20;
 const DEFAULT_CONCURRENCY = 4;
 const RETRY_DELAY_MS = 1000;
 
@@ -104,6 +111,19 @@ export async function fetchChunk(
 }
 
 /**
+ * Normalise a configured window: whole number between 0 and
+ * `MAX_CHUNK_EVIDENCE_WINDOW`, falling back to the default for junk input.
+ * The value comes from a Volto block field, so it can be anything an editor typed.
+ */
+export function normalizeWindow(window: number): number {
+  const value = Number(window);
+  if (!Number.isFinite(value)) {
+    return CHUNK_EVIDENCE_WINDOW;
+  }
+  return Math.max(0, Math.min(Math.floor(value), MAX_CHUNK_EVIDENCE_WINDOW));
+}
+
+/**
  * Fetch the matched chunk plus `window` chunks on each side, stopping at the
  * first missing chunk above the centre (the end of the document).
  */
@@ -117,8 +137,9 @@ export async function fetchDocumentEvidence(
   }: { window?: number; fetchImpl?: FetchLike; retryDelay?: number } = {},
 ): Promise<ChunkEvidence> {
   const center = Math.max(0, Number(centerChunkInd) || 0);
-  const lower = Math.max(0, center - window);
-  const upper = center + window;
+  const win = normalizeWindow(window);
+  const lower = Math.max(0, center - win);
+  const upper = center + win;
 
   const inds: number[] = [];
   for (let ind = lower; ind <= upper; ind++) {

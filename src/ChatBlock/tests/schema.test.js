@@ -82,7 +82,17 @@ describe('ChatBlockSchema', () => {
     expect(schema.fieldsets[0].fields).toContain('maxContextSegments');
     expect(schema.fieldsets[0].fields).toContain('noSupportDocumentsMessage');
     expect(schema.fieldsets[0].fields).toContain('qualityCheckContext');
+    expect(schema.fieldsets[0].fields).toContain('chunkEvidenceWindow');
     expect(schema.fieldsets[0].fields).toContain('qualityCheckStages');
+  });
+
+  it('defaults the evidence window to Onyx INCLUDE_ADJACENT_SECTIONS (2)', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: { qualityCheck: 'enabled' },
+    });
+    expect(schema.properties.chunkEvidenceWindow.default).toBe(2);
+    expect(schema.properties.chunkEvidenceWindow.type).toBe('number');
   });
 
   it('excludes quality check fields when qualityCheck is disabled', () => {
@@ -92,6 +102,7 @@ describe('ChatBlockSchema', () => {
     });
     expect(schema.fieldsets[0].fields).not.toContain('maxContextSegments');
     expect(schema.fieldsets[0].fields).not.toContain('qualityCheckContext');
+    expect(schema.fieldsets[0].fields).not.toContain('chunkEvidenceWindow');
   });
 
   it('includes onDemandInputToggle when qualityCheck is ondemand_toggle', () => {

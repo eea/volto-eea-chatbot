@@ -57,5 +57,6 @@ export * from './ChatBlock/packets';
 export { default as UserActionsToolbar } from './ChatBlock/components/UserActionsToolbar';
 export { default as FeedbackModal } from './ChatBlock/components/FeedbackModal';
 export { default as ChatMessageFeedback } from './ChatBlock/components/ChatMessageFeedback';
+export { isAISearchInputRestricted } from './AISearchInput';
 
 export default applyConfig;

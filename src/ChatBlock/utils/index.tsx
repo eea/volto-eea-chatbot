@@ -105,6 +105,19 @@ export function claimBadgeLabel(score: number, contextLimited = false): string {
   return VERDICT_BADGE[scoreToVerdict(score)];
 }
 
+/**
+ * Which of the three positions the verdict indicator marks, or `unknown` when the
+ * check ran over snippets only and no verdict can be named.
+ */
+export type ClaimScaleState = ClaimVerdict | 'unknown';
+
+export function claimScaleState(
+  score: number,
+  contextLimited = false,
+): ClaimScaleState {
+  return contextLimited ? 'unknown' : scoreToVerdict(score);
+}
+
 export function convertToPercentage(
   floatValue: number,
   digits: number = 2,

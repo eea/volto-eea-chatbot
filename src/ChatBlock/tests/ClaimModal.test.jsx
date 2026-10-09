@@ -192,4 +192,39 @@ describe('ClaimModal', () => {
     expect(screen.getByText('Supported by the sources')).toBeInTheDocument();
     expect(screen.getByText('Supported')).toBeInTheDocument();
   });
+
+  it('marks a discrete verdict position instead of a proportional bar', () => {
+    const { container } = render(<ClaimModal {...defaultProps} />);
+    const scale = container.querySelector('.verdict-scale');
+    expect(scale).toHaveAttribute('data-verdict', 'supported');
+    expect(scale.querySelectorAll('.verdict-step')).toHaveLength(3);
+    // the old fill implied a probability the checker never measured
+    expect(
+      container.querySelector('.score-progress-fill'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('marks the contradicted position for a score of zero', () => {
+    const props = {
+      ...defaultProps,
+      claim: { ...defaultProps.claim, score: 0.0 },
+    };
+    const { container } = render(<ClaimModal {...props} />);
+    expect(container.querySelector('.verdict-scale')).toHaveAttribute(
+      'data-verdict',
+      'contradicted',
+    );
+  });
+
+  it('claims no position when the check ran over snippets only', () => {
+    const props = {
+      ...defaultProps,
+      claim: { ...defaultProps.claim, score: 0.4, context_limited: true },
+    };
+    const { container } = render(<ClaimModal {...props} />);
+    expect(container.querySelector('.verdict-scale')).toHaveAttribute(
+      'data-verdict',
+      'unknown',
+    );
+  });
 });

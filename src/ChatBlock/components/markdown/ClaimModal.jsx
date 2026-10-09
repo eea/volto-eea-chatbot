@@ -3,6 +3,7 @@ import cx from 'classnames';
 import {
   claimBadgeLabel,
   claimHeaderLabel,
+  claimScaleState,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import { getSupportedBgColor } from './colors';
@@ -79,11 +80,18 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
               </span>
               <span className="score-label">Fact check</span>
             </div>
-            <div className="score-progress-bar">
-              <div
-                className="score-progress-fill"
-                style={{ width: `${claim.score * 100}%` }}
-              />
+            {/* Three discrete positions, not a fill. The per-claim score is a
+                verdict, not a probability: the old proportional bar made
+                not_enough_info look like "40% verified", which was never
+                measured. Decorative — the badge text carries the verdict. */}
+            <div
+              className="verdict-scale"
+              data-verdict={claimScaleState(claim.score, claim.context_limited)}
+              aria-hidden="true"
+            >
+              <span className="verdict-step" />
+              <span className="verdict-step" />
+              <span className="verdict-step" />
             </div>
           </div>
           <div className="rationale-section">

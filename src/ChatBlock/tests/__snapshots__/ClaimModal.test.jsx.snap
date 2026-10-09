@@ -89,15 +89,18 @@ exports[`ClaimModal handles claim with markdown formatting 1`] = `
             </span>
           </div>
           <div
-            className="score-progress-bar"
+            aria-hidden="true"
+            className="verdict-scale"
+            data-verdict="supported"
           >
-            <div
-              className="score-progress-fill"
-              style={
-                Object {
-                  "width": "85%",
-                }
-              }
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
             />
           </div>
         </div>
@@ -213,15 +216,18 @@ exports[`ClaimModal handles empty text array 1`] = `
             </span>
           </div>
           <div
-            className="score-progress-bar"
+            aria-hidden="true"
+            className="verdict-scale"
+            data-verdict="supported"
           >
-            <div
-              className="score-progress-fill"
-              style={
-                Object {
-                  "width": "85%",
-                }
-              }
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
             />
           </div>
         </div>
@@ -339,15 +345,18 @@ exports[`ClaimModal handles perfect score 1`] = `
             </span>
           </div>
           <div
-            className="score-progress-bar"
+            aria-hidden="true"
+            className="verdict-scale"
+            data-verdict="supported"
           >
-            <div
-              className="score-progress-fill"
-              style={
-                Object {
-                  "width": "100%",
-                }
-              }
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
             />
           </div>
         </div>
@@ -465,15 +474,18 @@ exports[`ClaimModal handles zero score 1`] = `
             </span>
           </div>
           <div
-            className="score-progress-bar"
+            aria-hidden="true"
+            className="verdict-scale"
+            data-verdict="contradicted"
           >
-            <div
-              className="score-progress-fill"
-              style={
-                Object {
-                  "width": "0%",
-                }
-              }
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
             />
           </div>
         </div>
@@ -591,15 +603,18 @@ exports[`ClaimModal renders the claim modal with high score 1`] = `
             </span>
           </div>
           <div
-            className="score-progress-bar"
+            aria-hidden="true"
+            className="verdict-scale"
+            data-verdict="supported"
           >
-            <div
-              className="score-progress-fill"
-              style={
-                Object {
-                  "width": "85%",
-                }
-              }
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
             />
           </div>
         </div>
@@ -717,15 +732,18 @@ exports[`ClaimModal renders with empty markers 1`] = `
             </span>
           </div>
           <div
-            className="score-progress-bar"
+            aria-hidden="true"
+            className="verdict-scale"
+            data-verdict="supported"
           >
-            <div
-              className="score-progress-fill"
-              style={
-                Object {
-                  "width": "85%",
-                }
-              }
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
             />
           </div>
         </div>
@@ -843,15 +861,18 @@ exports[`ClaimModal renders with low score 1`] = `
             </span>
           </div>
           <div
-            className="score-progress-bar"
+            aria-hidden="true"
+            className="verdict-scale"
+            data-verdict="not_enough_info"
           >
-            <div
-              className="score-progress-fill"
-              style={
-                Object {
-                  "width": "30%",
-                }
-              }
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
             />
           </div>
         </div>
@@ -969,15 +990,18 @@ exports[`ClaimModal renders with medium score 1`] = `
             </span>
           </div>
           <div
-            className="score-progress-bar"
+            aria-hidden="true"
+            className="verdict-scale"
+            data-verdict="not_enough_info"
           >
-            <div
-              className="score-progress-fill"
-              style={
-                Object {
-                  "width": "60%",
-                }
-              }
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
+            />
+            <span
+              className="verdict-step"
             />
           </div>
         </div>

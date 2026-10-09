@@ -9,6 +9,7 @@ import {
   convertToPercentage,
   claimBadgeLabel,
   claimHeaderLabel,
+  claimScaleState,
   scoreToVerdict,
   createChatMessageFeedback,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
@@ -206,6 +207,19 @@ describe('utils', () => {
 
     it('marks snippet-only checks as unverified', () => {
       expect(claimBadgeLabel(0.4, true)).toBe('Unverified');
+    });
+  });
+
+  describe('claimScaleState', () => {
+    it('marks one of three positions for a real verdict', () => {
+      expect(claimScaleState(1.0)).toBe('supported');
+      expect(claimScaleState(0.4)).toBe('not_enough_info');
+      expect(claimScaleState(0.0)).toBe('contradicted');
+    });
+
+    it('claims no position when only snippets were checked', () => {
+      expect(claimScaleState(1.0, true)).toBe('unknown');
+      expect(claimScaleState(0.4, true)).toBe('unknown');
     });
   });
 

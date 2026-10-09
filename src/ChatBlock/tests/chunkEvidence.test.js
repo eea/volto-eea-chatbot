@@ -93,6 +93,54 @@ describe('ChatBlock/services/chunkEvidence', () => {
       );
       await expect(fetchChunk('doc-1', 0, { fetchImpl })).resolves.toBeNull();
     });
+
+    // The Volto proxy pipes Onyx bodies without the upstream status, so errors
+    // arrive as 200 + an error envelope. Verified live against the dev server:
+    // 30 requests through /_da all returned 200, 24 of them "Chunk not found".
+    it('treats a proxy-flattened 404 as a missing chunk', async () => {
+      const fetchImpl = fetchReturning(() =>
+        response(200, { detail: 'Chunk not found' }),
+      );
+      await expect(fetchChunk('doc-1', 9, { fetchImpl })).resolves.toBeNull();
+    });
+
+    it('treats an empty content field as a missing chunk', async () => {
+      const fetchImpl = fetchReturning(() =>
+        response(200, { content: '', num_tokens: 0 }),
+      );
+      await expect(fetchChunk('doc-1', 3, { fetchImpl })).resolves.toBeNull();
+    });
+
+    it('retries a proxy-flattened rate limit, not just a real 429', async () => {
+      let calls = 0;
+      const fetchImpl = fetchReturning(() => {
+        calls += 1;
+        return calls === 1
+          ? response(200, {
+              error: 'Rate limit exceeded. Please slow down your requests.',
+            })
+          : response(200, { content: 'recovered' });
+      });
+      await expect(
+        fetchChunk('doc-1', 0, { fetchImpl, retryDelay: 0 }),
+      ).resolves.toBe('recovered');
+      expect(calls).toBe(2);
+    });
+
+    it('does not count flattened 404s as fetched chunks', async () => {
+      const fetchImpl = fetchReturning((url) =>
+        chunkIndOf(url) === 0
+          ? response(200, { content: 'only chunk' })
+          : response(200, { detail: 'Chunk not found' }),
+      );
+      const result = await fetchDocumentEvidence('doc-1', 0, {
+        window: 2,
+        fetchImpl,
+      });
+      expect(result.kind).toBe('chunk');
+      expect(result.text).toBe('only chunk');
+      expect(result.chunks).toBe(1);
+    });
   });
 
   describe('fetchDocumentEvidence', () => {

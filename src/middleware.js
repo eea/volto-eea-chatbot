@@ -262,6 +262,12 @@ async function send_onyx_request(
       log(`Dumped LLM response to: ${filePath}`);
     }
 
+    // Propagate the upstream status. Without this, Express defaults to 200 and
+    // every Onyx error (404 chunk not found, 429 rate limit, 401 revoked key)
+    // reaches the browser as a successful response, which makes the evidence
+    // client unable to tell "missing" from "found".
+    res.status(response.status);
+
     if (!api_key) {
       if (response.headers.get('transfer-encoding') === 'chunked') {
         res.set('Content-Type', 'text/event-stream');

@@ -52,10 +52,20 @@ export interface ChunkEvidence {
 
 export type ChunkEvidenceMap = Record<string, ChunkEvidence>;
 
+type ChunkInfoBody = {
+  content?: string;
+  num_tokens?: number;
+  // Error envelopes: Onyx uses `detail`, the gateway in front of it uses `error`.
+  detail?: string;
+  error?: string;
+};
+
 type FetchLike = (url: string) => Promise<{
   status: number;
-  json: () => Promise<{ content?: string; num_tokens?: number }>;
+  json: () => Promise<ChunkInfoBody>;
 }>;
+
+const RATE_LIMIT_PATTERN = /rate limit|slow down/i;
 
 const sleep = (ms: number) =>
   new Promise((resolve) => {
@@ -70,8 +80,14 @@ export function chunkInfoUrl(documentId: string, chunkInd: number): string {
 }
 
 /**
- * Fetch a single chunk. Returns null for "no such chunk" (404) and for any
+ * Fetch a single chunk. Returns null for "no such chunk" and for any
  * transport/HTTP failure, retrying once on 429.
+ *
+ * The response body is authoritative, not the status: the Volto proxy pipes
+ * Onyx bodies through without the upstream status, so a 404 arrives as
+ * `200 + {"detail": "Chunk not found"}` and a gateway throttle as
+ * `200 + {"error": "Rate limit exceeded…"}`. A chunk with no `content` is never
+ * usable evidence, whatever the status says.
  */
 export async function fetchChunk(
   documentId: string,
@@ -89,11 +105,21 @@ export async function fetchChunk(
   } | null> => {
     try {
       const response = await doFetch(chunkInfoUrl(documentId, chunkInd));
-      if (response.status === 200) {
-        const body = await response.json();
-        return { status: 200, text: body?.content || '' };
+      if (response.status === 429) {
+        return { status: 429, text: '' };
       }
-      return { status: response.status, text: '' };
+      if (response.status !== 200) {
+        return { status: response.status, text: '' };
+      }
+      const body = await response.json();
+      if (typeof body?.content === 'string' && body.content !== '') {
+        return { status: 200, text: body.content };
+      }
+      const message = String(body?.error || body?.detail || '');
+      return {
+        status: RATE_LIMIT_PATTERN.test(message) ? 429 : 404,
+        text: '',
+      };
     } catch {
       return null;
     }

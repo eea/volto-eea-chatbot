@@ -174,6 +174,62 @@ describe('src/middleware', () => {
     expect(lastCall[1].body).toBeUndefined();
   });
 
+  // Express defaults to 200 when the proxy never sets a status, so every Onyx
+  // error reached the browser as a success. The evidence client cannot tell a
+  // missing chunk from a found one (or a gateway throttle from a response) unless
+  // the upstream status survives the proxy.
+  it('propagates an upstream 404 instead of flattening it to 200', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.method = 'GET';
+    req.url = '/_da/document/chunk-info?document_id=doc-1&chunk_id=9';
+    req.body = null;
+    nodeFetch.mockResolvedValueOnce({
+      status: 404,
+      headers: {
+        get: jest.fn().mockReturnValue('application/json'),
+        raw: jest.fn().mockReturnValue({}),
+      },
+      body: { pipe: jest.fn() },
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+  });
+
+  it('propagates an upstream 429 so the client can retry it', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.method = 'GET';
+    req.url = '/_da/document/chunk-info?document_id=doc-1&chunk_id=0';
+    req.body = null;
+    nodeFetch.mockResolvedValueOnce({
+      status: 429,
+      headers: {
+        get: jest.fn().mockReturnValue('application/json'),
+        raw: jest.fn().mockReturnValue({}),
+      },
+      body: { pipe: jest.fn() },
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(429);
+  });
+
+  it('answers 200 for a successful proxied chunk', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.method = 'GET';
+    req.url = '/_da/document/chunk-info?document_id=doc-1&chunk_id=0';
+    req.body = null;
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
   it('uses mock create-chat-session when MOCK_LLM_FILE_PATH is set', async () => {
     process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
     process.env.ONYX_URL = 'http://localhost:3000';

@@ -150,9 +150,11 @@ describe('ClaimModal', () => {
     render(<ClaimModal {...props} />);
     expect(screen.getByText('Unverified')).toBeInTheDocument();
     expect(screen.getByText("Couldn't be checked")).toBeInTheDocument();
+    // the explanation lives once, at answer level - the modal says it in the
+    // header and the badge already
     expect(
-      screen.getByText(/not evidence that the answer is wrong/),
-    ).toBeInTheDocument();
+      screen.queryByText(/not evidence that the answer is wrong/),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText('Not confirmed')).not.toBeInTheDocument();
   });
 

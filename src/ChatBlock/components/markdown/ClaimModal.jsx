@@ -6,7 +6,7 @@ import {
   claimScaleState,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
-import { getSupportedBgColor } from './colors';
+import { getVerdictBgColor } from './colors';
 import { ClaimSegments } from './ClaimSegments';
 
 import BotIcon from '@eeacms/volto-eea-chatbot/icons/bot.svg';
@@ -38,11 +38,9 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
 
   return (
     <Modal
-      className={cx('claim-modal', getSupportedBgColor(claim.score, 'claim'))}
+      className={cx('claim-modal', getVerdictBgColor(claim.score))}
       trigger={
-        <span
-          className={cx('claim', getSupportedBgColor(claim.score, 'claim'))}
-        >
+        <span className={cx('claim', getVerdictBgColor(claim.score))}>
           {text}
         </span>
       }
@@ -97,13 +95,9 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
           <div className="rationale-section">
             <h5 className="rationale-header">Rationale</h5>
             <p className="claim-rationale">{claim.rationale}</p>
-            {claim.context_limited && (
-              <p className="claim-rationale context-limited-note">
-                Only search snippets were available for this check, so the
-                supporting text may simply be missing. This is not evidence that
-                the answer is wrong.
-              </p>
-            )}
+            {/* No snippet caveat here: the header already says "Couldn't be
+                checked" and the badge says "Unverified". The explanation lives
+                once, at answer level, in HalloumiFeedback. */}
           </div>
         </div>
 

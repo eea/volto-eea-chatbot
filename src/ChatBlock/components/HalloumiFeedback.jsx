@@ -76,6 +76,7 @@ const HalloumiFeedback = ({
   contextQuality,
 }) => {
   const claims = (markers?.claims || []).filter((claim) => !claim.skipped);
+  const limitedClaims = claims.filter((claim) => claim.context_limited);
   const noClaimsScore = claims[0]?.score === null;
   const messageBySource =
     'Please allow a few minutes for claim verification when many references are involved.';
@@ -125,15 +126,19 @@ const HalloumiFeedback = ({
         </Message>
       )}
 
-      {/* The fact-checker only saw part of the answer's sources, so a low score
-          is not a verdict on the answer. Say so instead of letting the number
-          stand on its own. */}
+      {/* The fact-checker only saw part of the answer's sources, so a "not
+          confirmed" verdict may mean missing text rather than a mistake. Said
+          once, at answer level - the claim modal already says "Couldn't be
+          checked" and needs no repeat of this. */}
       {contextQuality?.level === 'partial' && (
         <Message color="yellow" className="context-quality-message">
           <MessageContent>
-            <strong>Partial context.</strong>{' '}
-            {contextQuality.note ||
-              `${contextQuality.snippet_sources} of ${contextQuality.sources} sources were search snippets rather than full document text. Claims reported as "not enough information" may still be supported by text that was not sent.`}
+            <strong>Some sources could not be loaded in full.</strong>{' '}
+            {limitedClaims.length > 0
+              ? `${limitedClaims.length} ${
+                  limitedClaims.length === 1 ? 'claim was' : 'claims were'
+                } checked against short excerpts, so “not confirmed” may mean missing text rather than a mistake.`
+              : 'Every claim was still matched against the text that was available, so this did not change the result.'}
           </MessageContent>
         </Message>
       )}

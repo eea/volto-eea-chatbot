@@ -2,14 +2,14 @@
 
 exports[`ClaimModal handles claim with markdown formatting 1`] = `
 <div
-  className="claim-modal claim-green-400"
+  className="claim-modal claim-green-500"
   data-testid="modal"
 >
   <div
     data-testid="trigger"
   >
     <span
-      className="claim claim-green-400"
+      className="claim claim-green-500"
     >
       something important
     </span>
@@ -131,14 +131,14 @@ exports[`ClaimModal handles claim with markdown formatting 1`] = `
 
 exports[`ClaimModal handles empty text array 1`] = `
 <div
-  className="claim-modal claim-green-400"
+  className="claim-modal claim-green-500"
   data-testid="modal"
 >
   <div
     data-testid="trigger"
   >
     <span
-      className="claim claim-green-400"
+      className="claim claim-green-500"
     />
   </div>
   <div
@@ -516,14 +516,14 @@ exports[`ClaimModal handles zero score 1`] = `
 
 exports[`ClaimModal renders the claim modal with high score 1`] = `
 <div
-  className="claim-modal claim-green-400"
+  className="claim-modal claim-green-500"
   data-testid="modal"
 >
   <div
     data-testid="trigger"
   >
     <span
-      className="claim claim-green-400"
+      className="claim claim-green-500"
     >
       something important
     </span>
@@ -645,14 +645,14 @@ exports[`ClaimModal renders the claim modal with high score 1`] = `
 
 exports[`ClaimModal renders with empty markers 1`] = `
 <div
-  className="claim-modal claim-green-400"
+  className="claim-modal claim-green-500"
   data-testid="modal"
 >
   <div
     data-testid="trigger"
   >
     <span
-      className="claim claim-green-400"
+      className="claim claim-green-500"
     >
       something important
     </span>
@@ -774,14 +774,14 @@ exports[`ClaimModal renders with empty markers 1`] = `
 
 exports[`ClaimModal renders with low score 1`] = `
 <div
-  className="claim-modal claim-red-300"
+  className="claim-modal claim-gray-500"
   data-testid="modal"
 >
   <div
     data-testid="trigger"
   >
     <span
-      className="claim claim-red-300"
+      className="claim claim-gray-500"
     >
       something important
     </span>
@@ -903,14 +903,14 @@ exports[`ClaimModal renders with low score 1`] = `
 
 exports[`ClaimModal renders with medium score 1`] = `
 <div
-  className="claim-modal claim-green-200"
+  className="claim-modal claim-gray-500"
   data-testid="modal"
 >
   <div
     data-testid="trigger"
   >
     <span
-      className="claim claim-green-200"
+      className="claim claim-gray-500"
     >
       something important
     </span>

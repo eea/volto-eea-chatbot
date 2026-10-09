@@ -96,54 +96,73 @@ describe('HalloumiFeedback', () => {
   });
 
   describe('context quality', () => {
-    const checked = {
+    const checked = (claims) => ({
       ...defaultProps,
       halloumiMessage: 'Answer verified',
-      markers: {
-        claims: [{ score: 40, rationale: 'Not found in the snippets' }],
-      },
+      markers: { claims },
+    });
+
+    const partial = {
+      level: 'partial',
+      sources: 4,
+      chunk_sources: 3,
+      snippet_sources: 1,
+      note: '1 of 4 sources were search snippets, not full document text.',
     };
 
-    it('warns when the fact-checker only saw part of the sources', () => {
+    it('names the affected claims instead of the plumbing', () => {
       render(
         <HalloumiFeedback
-          {...checked}
-          contextQuality={{
-            level: 'partial',
-            sources: 4,
-            chunk_sources: 3,
-            snippet_sources: 1,
-            note: '1 of 4 sources were search snippets, not full document text.',
-          }}
+          {...checked([
+            { score: 40, rationale: 'Not found', context_limited: true },
+            { score: 40, rationale: 'Not found', context_limited: true },
+            { score: 100, rationale: 'Found' },
+          ])}
+          contextQuality={partial}
         />,
       );
-      expect(screen.getByText('Partial context.')).toBeInTheDocument();
       expect(
-        screen.getByText(/1 of 4 sources were search snippets/),
+        screen.getByText('Some sources could not be loaded in full.'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/2 claims were checked against short excerpts/),
+      ).toBeInTheDocument();
+      // the backend note is an API diagnostic, not product copy
+      expect(
+        screen.queryByText(/search snippets, not full document text/),
+      ).not.toBeInTheDocument();
+    });
+
+    it('agrees with the claim when only one was affected', () => {
+      render(
+        <HalloumiFeedback
+          {...checked([
+            { score: 40, rationale: 'Not found', context_limited: true },
+          ])}
+          contextQuality={partial}
+        />,
+      );
+      expect(
+        screen.getByText(/1 claim was checked against short excerpts/),
       ).toBeInTheDocument();
     });
 
-    it('builds its own note when the backend sends none', () => {
+    it('says plainly when no claim was affected', () => {
       render(
         <HalloumiFeedback
-          {...checked}
-          contextQuality={{
-            level: 'partial',
-            sources: 2,
-            chunk_sources: 0,
-            snippet_sources: 2,
-          }}
+          {...checked([{ score: 100, rationale: 'Found' }])}
+          contextQuality={partial}
         />,
       );
       expect(
-        screen.getByText(/2 of 2 sources were search snippets/),
+        screen.getByText(/Every claim was still matched/),
       ).toBeInTheDocument();
     });
 
     it('stays quiet when every source was full chunk text', () => {
       render(
         <HalloumiFeedback
-          {...checked}
+          {...checked([{ score: 40, rationale: 'Not found' }])}
           contextQuality={{
             level: 'full',
             sources: 3,
@@ -153,12 +172,16 @@ describe('HalloumiFeedback', () => {
           }}
         />,
       );
-      expect(screen.queryByText(/Partial context/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/could not be loaded in full/),
+      ).not.toBeInTheDocument();
     });
 
     it('stays quiet for backends that do not report context quality', () => {
-      render(<HalloumiFeedback {...checked} />);
-      expect(screen.queryByText(/Partial context/)).not.toBeInTheDocument();
+      render(<HalloumiFeedback {...checked([{ score: 40 }])} />);
+      expect(
+        screen.queryByText(/could not be loaded in full/),
+      ).not.toBeInTheDocument();
     });
   });
 });

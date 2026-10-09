@@ -138,7 +138,7 @@ describe('ClaimModal', () => {
     expect(json).toMatchSnapshot();
   });
 
-  it('labels a context-limited claim as unverified rather than low', () => {
+  it('labels a context-limited claim as unverified, not as a verdict', () => {
     const props = {
       ...defaultProps,
       claim: {
@@ -149,23 +149,47 @@ describe('ClaimModal', () => {
     };
     render(<ClaimModal {...props} />);
     expect(screen.getByText('Unverified')).toBeInTheDocument();
-    expect(screen.getByText('Partial context')).toBeInTheDocument();
+    expect(screen.getByText("Couldn't be checked")).toBeInTheDocument();
     expect(
       screen.getByText(/not evidence that the answer is wrong/),
     ).toBeInTheDocument();
-    expect(screen.queryByText('Low')).not.toBeInTheDocument();
+    expect(screen.queryByText('Not confirmed')).not.toBeInTheDocument();
   });
 
-  it('keeps the normal label when the claim was checked against real text', () => {
+  it('names the verdict when the claim was checked against real text', () => {
     const props = {
       ...defaultProps,
       claim: { ...defaultProps.claim, score: 0.4 },
     };
     render(<ClaimModal {...props} />);
-    expect(screen.getByText('Low')).toBeInTheDocument();
-    expect(screen.getByText('Verification')).toBeInTheDocument();
+    expect(
+      screen.getByText('Not confirmed by the sources'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Not confirmed')).toBeInTheDocument();
+    expect(screen.queryByText("Couldn't be checked")).not.toBeInTheDocument();
     expect(
       screen.queryByText(/not evidence that the answer is wrong/),
     ).not.toBeInTheDocument();
+  });
+
+  it('never titles a contradicted claim "Verified"', () => {
+    const props = {
+      ...defaultProps,
+      claim: { ...defaultProps.claim, score: 0.0 },
+    };
+    render(<ClaimModal {...props} />);
+    expect(screen.getByText('Contradicted by the sources')).toBeInTheDocument();
+    expect(screen.getByText('Contradicted')).toBeInTheDocument();
+    expect(screen.queryByText('Verified Claim')).not.toBeInTheDocument();
+  });
+
+  it('titles a supported claim by its outcome', () => {
+    const props = {
+      ...defaultProps,
+      claim: { ...defaultProps.claim, score: 1.0 },
+    };
+    render(<ClaimModal {...props} />);
+    expect(screen.getByText('Supported by the sources')).toBeInTheDocument();
+    expect(screen.getByText('Supported')).toBeInTheDocument();
   });
 });

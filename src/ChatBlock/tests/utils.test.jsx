@@ -7,7 +7,9 @@ import {
   debounce,
   useCopyToClipboard,
   convertToPercentage,
-  scoreToLabel,
+  claimBadgeLabel,
+  claimHeaderLabel,
+  scoreToVerdict,
   createChatMessageFeedback,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 
@@ -171,21 +173,39 @@ describe('utils', () => {
     });
   });
 
-  describe('scoreToLabel', () => {
-    it('maps supported claims to High', () => {
-      expect(scoreToLabel(1.0)).toBe('High');
-      expect(scoreToLabel(0.9)).toBe('High');
-      expect(scoreToLabel(0.8)).toBe('High');
+  describe('scoreToVerdict', () => {
+    it('maps the backend verdict scores back to verdicts', () => {
+      expect(scoreToVerdict(1.0)).toBe('supported');
+      expect(scoreToVerdict(0.8)).toBe('supported');
+      expect(scoreToVerdict(0.4)).toBe('not_enough_info');
+      expect(scoreToVerdict(0.1)).toBe('not_enough_info');
+      expect(scoreToVerdict(0.0)).toBe('contradicted');
+    });
+  });
+
+  describe('claimHeaderLabel', () => {
+    it('names the outcome, not the verification process', () => {
+      expect(claimHeaderLabel(1.0)).toBe('Supported by the sources');
+      expect(claimHeaderLabel(0.4)).toBe('Not confirmed by the sources');
+      expect(claimHeaderLabel(0.0)).toBe('Contradicted by the sources');
     });
 
-    it('maps not_enough_info claims to Low', () => {
-      expect(scoreToLabel(0.4)).toBe('Low');
-      expect(scoreToLabel(0.5)).toBe('Low');
-      expect(scoreToLabel(0.1)).toBe('Low');
+    it('withholds the verdict when only snippets were checked', () => {
+      expect(claimHeaderLabel(0.4, true)).toBe("Couldn't be checked");
+      // even a supported verdict is not claimed over snippet-only sources
+      expect(claimHeaderLabel(1.0, true)).toBe("Couldn't be checked");
+    });
+  });
+
+  describe('claimBadgeLabel', () => {
+    it('uses verdict words instead of confidence words', () => {
+      expect(claimBadgeLabel(1.0)).toBe('Supported');
+      expect(claimBadgeLabel(0.4)).toBe('Not confirmed');
+      expect(claimBadgeLabel(0.0)).toBe('Contradicted');
     });
 
-    it('maps contradicted claims to Failed', () => {
-      expect(scoreToLabel(0.0)).toBe('Failed');
+    it('marks snippet-only checks as unverified', () => {
+      expect(claimBadgeLabel(0.4, true)).toBe('Unverified');
     });
   });
 

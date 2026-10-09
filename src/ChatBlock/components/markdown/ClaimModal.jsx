@@ -1,6 +1,9 @@
 import { Modal, ModalContent, ModalHeader } from 'semantic-ui-react';
 import cx from 'classnames';
-import { scoreToLabel } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
+import {
+  claimBadgeLabel,
+  claimHeaderLabel,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import { getSupportedBgColor } from './colors';
 import { ClaimSegments } from './ClaimSegments';
@@ -49,7 +52,9 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
             <div className="circle assistant">
               <SVGIcon name={BotIcon} size="20" color="white" />
             </div>
-            <span className="claim-label">Verified Claim</span>
+            <span className="claim-label">
+              {claimHeaderLabel(claim.score, claim.context_limited)}
+            </span>
           </div>
           <blockquote className="claim-quote">
             &ldquo;
@@ -70,13 +75,9 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
           <div className="score-badge-section">
             <div className="score-badge">
               <span className="score-percentage">
-                {claim.context_limited
-                  ? 'Unverified'
-                  : scoreToLabel(claim.score)}
+                {claimBadgeLabel(claim.score, claim.context_limited)}
               </span>
-              <span className="score-label">
-                {claim.context_limited ? 'Partial context' : 'Verification'}
-              </span>
+              <span className="score-label">Fact check</span>
             </div>
             <div className="score-progress-bar">
               <div

@@ -833,10 +833,11 @@ mark {
     background-color: @red-500;
   }
 
-  // Neutral, not red: sources saying nothing is not the same finding as sources
-  // saying something else.
+  // Yellow, not red: sources saying nothing is not the same finding as sources
+  // saying something else. Grey is reserved for the `unknown` state below, where
+  // there is no verdict at all.
   .verdict-scale[data-verdict='not_enough_info'] .verdict-step:nth-child(2) {
-    background-color: @gray-500;
+    background-color: @yellow-500;
   }
 
   .verdict-scale[data-verdict='supported'] .verdict-step:nth-child(3) {

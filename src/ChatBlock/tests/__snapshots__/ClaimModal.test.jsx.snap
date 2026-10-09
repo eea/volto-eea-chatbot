@@ -774,14 +774,14 @@ exports[`ClaimModal renders with empty markers 1`] = `
 
 exports[`ClaimModal renders with low score 1`] = `
 <div
-  className="claim-modal claim-gray-500"
+  className="claim-modal claim-yellow-500"
   data-testid="modal"
 >
   <div
     data-testid="trigger"
   >
     <span
-      className="claim claim-gray-500"
+      className="claim claim-yellow-500"
     >
       something important
     </span>
@@ -903,14 +903,14 @@ exports[`ClaimModal renders with low score 1`] = `
 
 exports[`ClaimModal renders with medium score 1`] = `
 <div
-  className="claim-modal claim-gray-500"
+  className="claim-modal claim-yellow-500"
   data-testid="modal"
 >
   <div
     data-testid="trigger"
   >
     <span
-      className="claim claim-gray-500"
+      className="claim claim-yellow-500"
     >
       something important
     </span>

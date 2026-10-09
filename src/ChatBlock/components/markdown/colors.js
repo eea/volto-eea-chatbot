@@ -15,11 +15,13 @@ export function getSupportedTextColor(score) {
  * in `getSupportedBgColor` implied a confidence level that was never computed -
  * and it put `not_enough_info` in the red family, which reads as "the sources
  * contradict this" when they actually said nothing. Three bands, one per verdict:
- * red for a conflict, grey for silence, green for support.
+ * red for a conflict, yellow for silence, green for support. The yellow band needs a
+ * matching `.generate-colors(claim, yellow-500, …)` call in `colors.less` — the
+ * `claim-*` utilities are an explicit list, and an unlisted class renders unstyled.
  */
 export function getVerdictBgColor(score, prefix = 'claim') {
   if (score >= 0.8) return `${prefix}-green-500`;
-  if (score >= 0.1) return `${prefix}-gray-500`;
+  if (score >= 0.1) return `${prefix}-yellow-500`;
   return `${prefix}-red-500`;
 }
 

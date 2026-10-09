@@ -18,6 +18,9 @@ const ALLOWED_PROXY_PATHS = [
   { path: '/chat/send-message', methods: ['POST'] },
   { path: '/chat/send-chat-message', methods: ['POST'] },
   { path: '/chat/create-chat-message-feedback', methods: ['POST'] },
+  // Real document text behind an answer, used to give the fact-checker the same
+  // text the answer generator read (see ChatBlock/services/chunkEvidence.ts).
+  { pathPattern: /^\/document\/chunk-info$/, methods: ['GET'] },
 ];
 
 /**
@@ -258,6 +261,12 @@ async function send_onyx_request(
       response.body.pipe(writer);
       log(`Dumped LLM response to: ${filePath}`);
     }
+
+    // Propagate the upstream status. Without this, Express defaults to 200 and
+    // every Onyx error (404 chunk not found, 429 rate limit, 401 revoked key)
+    // reaches the browser as a successful response, which makes the evidence
+    // client unable to tell "missing" from "found".
+    res.status(response.status);
 
     if (!api_key) {
       if (response.headers.get('transfer-encoding') === 'chunked') {

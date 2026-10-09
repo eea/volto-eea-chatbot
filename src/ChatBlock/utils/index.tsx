@@ -59,13 +59,63 @@ export const useCopyToClipboard = (text: string): [boolean, () => void] => {
 };
 
 /**
- * Map a 0-1 claim score to a categorical label.
- * Scores: 1.0 = supported, 0.4 = not_enough_info, 0.0 = contradicted.
+ * The fact-checker collapses its three verdicts into a per-claim score and does
+ * not send the verdict itself (`verdict_scores` in `rag_facts_check/server.py`:
+ * supported 1.0, not_enough_info 0.4, contradicted 0.0). The thresholds below are
+ * therefore part of the contract — keep them in step with the backend.
  */
-export function scoreToLabel(score: number): string {
-  if (score >= 0.8) return 'High';
-  if (score >= 0.1) return 'Low';
-  return 'Failed';
+export type ClaimVerdict = 'supported' | 'not_enough_info' | 'contradicted';
+
+export function scoreToVerdict(score: number): ClaimVerdict {
+  if (score >= 0.8) return 'supported';
+  if (score >= 0.1) return 'not_enough_info';
+  return 'contradicted';
+}
+
+/**
+ * Modal header copy. Names the outcome, never the process: "Verified Claim"
+ * reads as "this is true" even when the check contradicted the claim, and the
+ * old High/Low/Failed badge read as confidence levels for what are three
+ * discrete verdicts.
+ */
+const VERDICT_HEADER: Record<ClaimVerdict, string> = {
+  supported: 'Supported by the sources',
+  not_enough_info: 'Not confirmed by the sources',
+  contradicted: 'Contradicted by the sources',
+};
+
+const VERDICT_BADGE: Record<ClaimVerdict, string> = {
+  supported: 'Supported',
+  not_enough_info: 'Not confirmed',
+  contradicted: 'Contradicted',
+};
+
+export function claimHeaderLabel(
+  score: number,
+  contextLimited = false,
+): string {
+  // Checked over search snippets only: the supporting text may simply have been
+  // missing, so the verdict is not trustworthy enough to name.
+  if (contextLimited) return "Couldn't be checked";
+  return VERDICT_HEADER[scoreToVerdict(score)];
+}
+
+export function claimBadgeLabel(score: number, contextLimited = false): string {
+  if (contextLimited) return 'Unverified';
+  return VERDICT_BADGE[scoreToVerdict(score)];
+}
+
+/**
+ * Which of the three positions the verdict indicator marks, or `unknown` when the
+ * check ran over snippets only and no verdict can be named.
+ */
+export type ClaimScaleState = ClaimVerdict | 'unknown';
+
+export function claimScaleState(
+  score: number,
+  contextLimited = false,
+): ClaimScaleState {
+  return contextLimited ? 'unknown' : scoreToVerdict(score);
 }
 
 export function convertToPercentage(

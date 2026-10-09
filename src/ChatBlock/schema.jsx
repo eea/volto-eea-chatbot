@@ -95,6 +95,7 @@ export function ChatBlockSchema({ assistants, data }) {
                 'batchSize',
                 'noSupportDocumentsMessage',
                 'qualityCheckContext',
+                'chunkEvidenceWindow',
                 'qualityCheckStages',
               ]
             : []),
@@ -213,6 +214,17 @@ export function ChatBlockSchema({ assistants, data }) {
           ['citations', 'Only cited documents'],
           ['all', 'All documents passed to LLM'],
         ],
+      },
+      chunkEvidenceWindow: {
+        title: 'Evidence window (chunks around each source)',
+        type: 'number',
+        default: 2,
+        description:
+          'How many Onyx chunks to fetch on each side of the matched chunk before ' +
+          'fact-checking. 0 = centre chunk only (usually not enough), 2 = what Onyx ' +
+          'feeds the answer generator by default, 5 = Onyx at its widest. Each extra ' +
+          'step costs two more chunk requests per document, and values above 20 are ' +
+          'clamped.',
       },
       qualityCheckStages: {
         title: 'Score ranges',

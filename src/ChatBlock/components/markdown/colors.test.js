@@ -1,4 +1,41 @@
-import { getSupportedTextColor, getSupportedBgColor } from './colors';
+import {
+  getSupportedTextColor,
+  getSupportedBgColor,
+  getVerdictBgColor,
+} from './colors';
+
+describe('getVerdictBgColor', () => {
+  it('gives each verdict one colour band', () => {
+    expect(getVerdictBgColor(1.0)).toBe('claim-green-500');
+    expect(getVerdictBgColor(0.8)).toBe('claim-green-500');
+    expect(getVerdictBgColor(0.4)).toBe('claim-yellow-500');
+    expect(getVerdictBgColor(0.1)).toBe('claim-yellow-500');
+    expect(getVerdictBgColor(0.0)).toBe('claim-red-500');
+  });
+
+  it('keeps not_enough_info out of the red family', () => {
+    // red reads as "the sources contradict this"; they said nothing
+    expect(getVerdictBgColor(0.4)).not.toContain('red');
+  });
+
+  it('only emits classes that colors.less actually generates', () => {
+    // an unlisted .generate-colors() call means the class renders unstyled, which
+    // fails silently - no colour, no error
+    const less = require('fs').readFileSync(
+      require('path').join(__dirname, 'colors.less'),
+      'utf-8',
+    );
+    for (const cls of [
+      getVerdictBgColor(1.0),
+      getVerdictBgColor(0.4),
+      getVerdictBgColor(0.0),
+    ]) {
+      expect(less).toContain(
+        `.generate-colors(claim, ${cls.replace('claim-', '')},`,
+      );
+    }
+  });
+});
 
 describe('getSupportedTextColor', () => {
   it('should return "text-red-500" for scores between 0 and 0.5', () => {

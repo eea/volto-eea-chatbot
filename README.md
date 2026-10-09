@@ -2,12 +2,6 @@
 
 [![Releases](https://img.shields.io/github/v/release/eea/volto-eea-chatbot)](https://github.com/eea/volto-eea-chatbot/releases)
 
-[![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-eea-chatbot%2Fmaster&subject=master)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-eea-chatbot/job/master/display/redirect)
-[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
-[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
-[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
-[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot)
-
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-eea-chatbot%2Fdevelop&subject=develop)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-eea-chatbot/job/develop/display/redirect)
 [![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
 [![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-eea-chatbot&branch=develop&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-eea-chatbot&branch=develop)
@@ -22,7 +16,7 @@
 
 ## Features
 
-https://github.com/user-attachments/assets/f9b5f813-672f-4e4d-81d0-bf2aec35b587
+![Volto Chatbot](https://raw.githubusercontent.com/eea/volto-eea-chatbot/master/docs/volto-eea-chatbot.gif)
 
 The **Volto Chatbot** block allows the integration of an AI-powered chatbot into your Volto project. It offers a customizable interface and advanced settings to tailor the chatbot's behavior to your needs. Below is an overview of its features and configuration options.
 
@@ -334,11 +328,4 @@ See [LICENSE.md](https://github.com/eea/volto-eea-chatbot/blob/master/LICENSE.md
 ## Funding
 
 [European Environment Agency (EU)](http://eea.europa.eu)
-de is European Environment Agency (EEA).
-All Rights Reserved.
 
-See [LICENSE.md](https://github.com/eea/volto-addon-template/blob/master/LICENSE.md) for details.
-
-## Funding
-
-[European Environment Agency (EU)](http://eea.europa.eu)

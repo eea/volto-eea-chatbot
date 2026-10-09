@@ -1,8 +1,12 @@
 import { Modal, ModalContent, ModalHeader } from 'semantic-ui-react';
 import cx from 'classnames';
-import { scoreToLabel } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
+import {
+  claimBadgeLabel,
+  claimHeaderLabel,
+  claimScaleState,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
-import { getSupportedBgColor } from './colors';
+import { getVerdictBgColor } from './colors';
 import { ClaimSegments } from './ClaimSegments';
 
 import BotIcon from '@eeacms/volto-eea-chatbot/icons/bot.svg';
@@ -34,11 +38,9 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
 
   return (
     <Modal
-      className={cx('claim-modal', getSupportedBgColor(claim.score, 'claim'))}
+      className={cx('claim-modal', getVerdictBgColor(claim.score))}
       trigger={
-        <span
-          className={cx('claim', getSupportedBgColor(claim.score, 'claim'))}
-        >
+        <span className={cx('claim', getVerdictBgColor(claim.score))}>
           {text}
         </span>
       }
@@ -49,7 +51,9 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
             <div className="circle assistant">
               <SVGIcon name={BotIcon} size="20" color="white" />
             </div>
-            <span className="claim-label">Verified Claim</span>
+            <span className="claim-label">
+              {claimHeaderLabel(claim.score, claim.context_limited)}
+            </span>
           </div>
           <blockquote className="claim-quote">
             &ldquo;
@@ -70,20 +74,30 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
           <div className="score-badge-section">
             <div className="score-badge">
               <span className="score-percentage">
-                {scoreToLabel(claim.score)}
+                {claimBadgeLabel(claim.score, claim.context_limited)}
               </span>
-              <span className="score-label">Verification</span>
+              <span className="score-label">Fact check</span>
             </div>
-            <div className="score-progress-bar">
-              <div
-                className="score-progress-fill"
-                style={{ width: `${claim.score * 100}%` }}
-              />
+            {/* Three discrete positions, not a fill. The per-claim score is a
+                verdict, not a probability: the old proportional bar made
+                not_enough_info look like "40% verified", which was never
+                measured. Decorative — the badge text carries the verdict. */}
+            <div
+              className="verdict-scale"
+              data-verdict={claimScaleState(claim.score, claim.context_limited)}
+              aria-hidden="true"
+            >
+              <span className="verdict-step" />
+              <span className="verdict-step" />
+              <span className="verdict-step" />
             </div>
           </div>
           <div className="rationale-section">
             <h5 className="rationale-header">Rationale</h5>
             <p className="claim-rationale">{claim.rationale}</p>
+            {/* No snippet caveat here: the header already says "Couldn't be
+                checked" and the badge says "Unverified". The explanation lives
+                once, at answer level, in HalloumiFeedback. */}
           </div>
         </div>
 

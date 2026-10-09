@@ -813,19 +813,42 @@ mark {
     text-transform: uppercase;
   }
 
-  .score-progress-bar {
-    overflow: hidden;
+  // Three discrete positions instead of a proportional fill: a per-claim score is
+  // a verdict, not a probability. The old bar made not_enough_info read as
+  // "40% verified", which was never measured.
+  .verdict-scale {
+    display: flex;
     width: 100%;
+    gap: 4px;
+  }
+
+  .verdict-step {
     height: 6px;
+    flex: 1;
     border-radius: 3px;
     background-color: @gray-200;
   }
 
-  .score-progress-fill {
-    height: 100%;
-    border-radius: 3px;
-    background-color: var(--claim-color);
-    transition: width 0.3s ease;
+  .verdict-scale[data-verdict='contradicted'] .verdict-step:nth-child(1) {
+    background-color: @red-500;
+  }
+
+  // Yellow, not red: sources saying nothing is not the same finding as sources
+  // saying something else. Grey is reserved for the `unknown` state below, where
+  // there is no verdict at all.
+  .verdict-scale[data-verdict='not_enough_info'] .verdict-step:nth-child(2) {
+    background-color: @yellow-500;
+  }
+
+  .verdict-scale[data-verdict='supported'] .verdict-step:nth-child(3) {
+    background-color: @green-500;
+  }
+
+  // Checked over search snippets only: no position can be claimed.
+  .verdict-scale[data-verdict='unknown'] .verdict-step {
+    height: 4px;
+    border: 1px dashed @gray-400;
+    background-color: transparent;
   }
 
   .rationale-section {

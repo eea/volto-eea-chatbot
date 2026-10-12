@@ -153,6 +153,12 @@ export interface ChatMessageProps {
   persona?: number;
   maxContextSegments?: number;
   batchSize?: number;
+  /**
+   * How many Onyx chunks to pull around the matched one when resolving real
+   * document text for the fact-checker (0 = centre chunk only, 5 = the widest
+   * expansion Onyx itself uses). See `services/chunkEvidence.ts`.
+   */
+  chunkEvidenceWindow?: number;
   isLastMessage?: boolean;
   className?: string;
   chatWindowRef?: React.RefObject<HTMLDivElement>;

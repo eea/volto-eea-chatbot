@@ -27,18 +27,50 @@ export function ClaimSegments({ segmentIds, segments, citedSources }) {
     .map((segment) => {
       const startOffset = Math.max(0, segment.startOffset); // sometimes startOffset comes as -1
       const endOffset = segment.endOffset;
-      const text = joinedSources.slice(startOffset, endOffset);
-      const source = citedSources.find(
-        (source) =>
-          startOffset >= source.startIndex &&
-          endOffset <= source.halloumiContext.length + source.startIndex,
+
+      // A claim can cite several passages, possibly in different documents.
+      // Attribute by containment instead of requiring the segment to fit
+      // entirely inside one source — a segment that straddles a boundary
+      // would otherwise disappear from the modal without any warning.
+      const source =
+        citedSources.find(
+          (source) =>
+            startOffset >= source.startIndex &&
+            startOffset < source.startIndex + source.halloumiContext.length,
+        ) ||
+        citedSources.find(
+          (source) =>
+            endOffset > source.startIndex &&
+            endOffset <= source.startIndex + source.halloumiContext.length,
+        );
+
+      if (!source) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Could not attribute segment ${segment.id} to a source`,
+          { startOffset, endOffset },
+          citedSources,
+        );
+        return null;
+      }
+
+      // Clamp to the attributed source so the snippet never renders text that
+      // belongs to the neighbouring document.
+      const clippedStart = Math.max(startOffset, source.startIndex);
+      const clippedEnd = Math.min(
+        endOffset,
+        source.startIndex + source.halloumiContext.length,
       );
+
       return {
         ...segment,
-        text,
-        source_id: source?.id,
+        startOffset: clippedStart,
+        endOffset: clippedEnd,
+        text: joinedSources.slice(clippedStart, clippedEnd),
+        source_id: source.id,
       };
-    });
+    })
+    .filter((snippet) => !!snippet && snippet.endOffset > snippet.startOffset);
 
   const sourcesWithSnippets = citedSources
     .map((source) => ({

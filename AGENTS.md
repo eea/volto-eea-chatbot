@@ -84,6 +84,10 @@ and consistency.
 - **Git Workflow:** When committing changes, always use `git status` to review
   changes and then `git add <relevant files changed>` to stage specific files,
   instead of `git add .`.
+- **Documentation & Badges:** Keep a single set of develop badges in `README.md`
+  to avoid badge duplication. Store demo animations in `docs/volto-eea-chatbot.gif`
+  and reference via `https://raw.githubusercontent.com/eea/volto-eea-chatbot/master/docs/volto-eea-chatbot.gif`.
+
 
 For more detailed contribution guidelines, refer to `DEVELOP.md`.
 For release procedures, refer to `RELEASE.md`.

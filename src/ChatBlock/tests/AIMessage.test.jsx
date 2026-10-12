@@ -299,5 +299,26 @@ describe('AIMessage', () => {
       expect(result[0].id).toBe('tool_doc_1');
       expect(result[1].id).toBe('tool_doc_2');
     });
+
+    it('reads the singular toolCall emitted by messageProcessor', () => {
+      // messageProcessor.getMessage() returns `toolCall`; reading only the
+      // plural made 'all' mode send zero sources.
+      const v3Message = {
+        toolCall: {
+          tool_result: [
+            { document_id: 'v3_doc_1', content: 'V3 doc 1' },
+            { document_id: 'v3_doc_2', content: 'V3 doc 2' },
+          ],
+        },
+      };
+      const result = getContextSources(v3Message, [], 'all');
+      expect(result).toHaveLength(2);
+      expect(result.map((src) => src.id)).toEqual(['v3_doc_1', 'v3_doc_2']);
+    });
+
+    it('flags sources built from blurbs as snippets', () => {
+      const result = getContextSources(mockMessage, mockCitedSources);
+      expect(result[0].halloumiSource.kind).toBe('snippet');
+    });
   });
 });

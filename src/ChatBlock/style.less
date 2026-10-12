@@ -813,19 +813,47 @@ mark {
     text-transform: uppercase;
   }
 
-  .score-progress-bar {
-    overflow: hidden;
+  // Three discrete positions instead of a proportional fill: a per-claim score is
+  // a verdict, not a probability. The old bar made not_enough_info read as
+  // "40% verified", which was never measured.
+  .verdict-scale {
+    display: flex;
     width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background-color: @gray-200;
+    gap: 4px;
   }
 
-  .score-progress-fill {
-    height: 100%;
+  .verdict-step {
+    height: 6px;
+    flex: 1;
     border-radius: 3px;
-    background-color: var(--claim-color);
-    transition: width 0.3s ease;
+    background-color: @gray-200;
+    // An inset ring rather than a border: the green of `not_enough_info` is about
+    // 2.8:1 against white, so without an outline the middle position - the one that
+    // needs pointing out most - reads as empty. No layout shift, unlike a border.
+    box-shadow: inset 0 0 0 1px @gray-300;
+  }
+
+  .verdict-scale[data-verdict='contradicted'] .verdict-step:nth-child(1) {
+    background-color: @red-500;
+  }
+
+  // Not red: sources saying nothing is not the same finding as sources saying
+  // something else. green-500 rather than the chip's green-300 because a solid bar
+  // on white needs more weight than a pale background does (green-300 is 1.7:1).
+  .verdict-scale[data-verdict='not_enough_info'] .verdict-step:nth-child(2) {
+    background-color: @green-500;
+  }
+
+  .verdict-scale[data-verdict='supported'] .verdict-step:nth-child(3) {
+    background-color: @green-700;
+  }
+
+  // Checked over search snippets only: no position can be claimed.
+  .verdict-scale[data-verdict='unknown'] .verdict-step {
+    height: 4px;
+    border: 1px dashed @gray-400;
+    background-color: transparent;
+    box-shadow: none; // the dashed outline already carries the shape
   }
 
   .rationale-section {

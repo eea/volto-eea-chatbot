@@ -54,6 +54,7 @@ interface ChatWindowProps {
   onDemandInputToggle?: boolean;
   maxContextSegments?: number;
   batchSize?: number;
+  chunkEvidenceWindow?: number;
   onyxVersion?: '2' | '3';
   isPlaywrightTest?: boolean;
   initialQuery?: string | null;
@@ -97,6 +98,7 @@ function ChatWindow({
     onDemandInputToggle = true,
     maxContextSegments = 0,
     batchSize,
+    chunkEvidenceWindow,
     onyxVersion = '3',
     hideSourcesTab,
     extraRemarkPlugins,
@@ -253,6 +255,7 @@ function ChatWindow({
                     persona={persona.id}
                     maxContextSegments={maxContextSegments}
                     batchSize={batchSize}
+                    chunkEvidenceWindow={chunkEvidenceWindow}
                     isLastMessage={index === messages.length - 1}
                     className={
                       index === messages.length - 1 ? 'most-recent' : ''

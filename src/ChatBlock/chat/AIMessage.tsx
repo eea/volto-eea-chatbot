@@ -11,10 +11,12 @@ import {
 } from 'semantic-ui-react';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
 import {
+  useChunkEvidence,
   useDeepCompareMemoize,
   useQualityMarkers,
   useScrollonStream,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
+import { CHUNK_EVIDENCE_WINDOW } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chunkEvidence';
 import {
   MultiToolRenderer,
   RendererComponent,
@@ -90,14 +92,19 @@ function addQualityMarkersPlugin() {
  * The backend accepts {text, title, source_type} dicts so it can
  * include document titles in LLM prompts without polluting the raw
  * text (which would break span-offset matching).
+ *
+ * `kind` tells the fact-checker how much text it actually got:
+ * `chunk` = real Onyx chunk text, `snippet` = a search blurb, which can
+ * never prove a claim false.
  */
-export function buildHalloumiSource(doc: any, text: string) {
+export function buildHalloumiSource(doc: any, text: string, kind = 'snippet') {
   const cleanedText = text.replace(/\u00A0/g, ' ');
   return {
     text: cleanedText,
     title: doc.semantic_identifier || null,
     source_type: doc.source_type || null,
     link: doc.link || null,
+    kind,
   };
 }
 
@@ -145,10 +152,14 @@ export function getContextSources(
           halloumiSource: buildHalloumiSource(doc, text),
         };
       })
-    : (message.toolCalls || []).reduce(
+    : // `messageProcessor.getMessage()` emits `toolCall` (singular); older
+      // Onyx v2 message shapes used `toolCalls`. Accept both — reading only the
+      // plural made 'all' mode send zero sources, which the fact-checker then
+      // reported as "Answer cannot be verified due to empty sources."
+      [message.toolCall, ...(message.toolCalls || [])].reduce(
         (acc: any, cur: any) => [
           ...acc,
-          ...(cur.tool_result || []).map((doc: any) => {
+          ...((cur && cur.tool_result) || []).map((doc: any) => {
             const cleanedText = (doc.content || '').replace(/\u00A0/g, ' ');
             return {
               ...doc,
@@ -209,6 +220,7 @@ export function AIMessage({
   persona,
   maxContextSegments,
   batchSize,
+  chunkEvidenceWindow = CHUNK_EVIDENCE_WINDOW,
   isLastMessage,
   className = '',
   chatWindowEndRef,
@@ -293,32 +305,12 @@ export function AIMessage({
   // logic intact.
   const showSourcesTab = showSources && !hideSourcesTab;
 
-  const contextSources = getContextSources(
-    message,
-    sources,
-    qualityCheckContext,
+  const contextSources = useMemo(
+    () => getContextSources(message, sources, qualityCheckContext),
+    [message, sources, qualityCheckContext],
   );
 
-  // Deduplicate sources by text content. The streaming backend often sends
-  // the same document in multiple packets (MESSAGE_START, SEARCH_TOOL_DELTA,
-  // etc.), resulting in 40+ copies of the same text. Dedup keeps the first
-  // occurrence, preserving order. Critical: texts must remain identical
-  // between frontend (span highlighting) and backend (evidence spans).
-  const dedupedSources = useMemo(() => {
-    const seen = new Set<string>();
-    return contextSources.filter((src: any) => {
-      const key = src.halloumiContext || src.halloumiSource?.text || '';
-      if (key && !seen.has(key)) {
-        seen.add(key);
-        return true;
-      }
-      return false;
-    });
-  }, [contextSources]);
-
-  const stableContextSources = useDeepCompareMemoize(dedupedSources);
-
-  const doQualityControl =
+  const qualityControlRequested =
     messageDisplayed &&
     qualityCheck &&
     qualityCheck !== 'disabled' &&
@@ -329,6 +321,63 @@ export function AIMessage({
     (qualityCheck === 'enabled' ||
       qualityCheckEnabled ||
       verificationTriggered);
+
+  // The Onyx stream only carries search blurbs (~600 chars per document), while
+  // the answer was written from full chunk text. Resolve the real text for
+  // exactly the documents we are about to send, otherwise the fact-checker
+  // marks supported claims as unsupported. See services/chunkEvidence.ts.
+  const { evidence, isFetchingEvidence, evidenceSettled } = useChunkEvidence(
+    contextSources,
+    { enabled: qualityControlRequested, window: chunkEvidenceWindow },
+  );
+
+  const enrichedSources = useMemo(
+    () =>
+      contextSources.map((src: any) => {
+        const resolved = src.document_id ? evidence[src.document_id] : null;
+        if (!resolved || !resolved.text) {
+          return src;
+        }
+        // Same nbsp cleaning as the blurb path: the frontend joins these
+        // strings to highlight segments, the backend indexes the same text, so
+        // both sides must stay byte-identical.
+        const cleanedText = resolved.text.replace(/\u00A0/g, ' ');
+        return {
+          ...src,
+          text: resolved.text,
+          halloumiContext: cleanedText,
+          halloumiSource: {
+            ...(src.halloumiSource || {}),
+            text: cleanedText,
+            kind: resolved.kind,
+          },
+          evidenceChunks: resolved.chunks,
+        };
+      }),
+    [contextSources, evidence],
+  );
+
+  // Deduplicate sources by text content. The streaming backend often sends
+  // the same document in multiple packets (MESSAGE_START, SEARCH_TOOL_DELTA,
+  // etc.), resulting in 40+ copies of the same text. Dedup keeps the first
+  // occurrence, preserving order. Critical: texts must remain identical
+  // between frontend (span highlighting) and backend (evidence spans).
+  const dedupedSources = useMemo(() => {
+    const seen = new Set<string>();
+    return enrichedSources.filter((src: any) => {
+      const key = src.halloumiContext || src.halloumiSource?.text || '';
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        return true;
+      }
+      return false;
+    });
+  }, [enrichedSources]);
+
+  const stableContextSources = useDeepCompareMemoize(dedupedSources);
+
+  // Don't spend a fact-check call on blurbs while the real text is in flight.
+  const doQualityControl = qualityControlRequested && evidenceSettled;
 
   const { markers, isLoadingHalloumi, retryHalloumi }: any = useQualityMarkers(
     doQualityControl,
@@ -345,7 +394,7 @@ export function AIMessage({
     qualityCheckStages,
   );
 
-  const isFetching = isLoadingHalloumi || isLoading;
+  const isFetching = isLoadingHalloumi || isLoading || isFetchingEvidence;
   const halloumiMessage =
     isMessageVerified || doQualityControl ? scoreStage?.label : '';
 
@@ -536,6 +585,7 @@ export function AIMessage({
           showVerifyClaimsButton={showVerifyClaimsButton}
           retryHalloumi={retryHalloumi}
           emptyClaims={emptyClaims}
+          contextQuality={markers?.context_quality}
         />
       )}
 

@@ -14,14 +14,18 @@ export function getSupportedTextColor(score) {
  * contradicted 0.0), not a measurement on a 0-1 scale, so the eight-step gradient
  * in `getSupportedBgColor` implied a confidence level that was never computed -
  * and it put `not_enough_info` in the red family, which reads as "the sources
- * contradict this" when they actually said nothing. Three bands, one per verdict:
- * red for a conflict, yellow for silence, green for support. The yellow band needs a
- * matching `.generate-colors(claim, yellow-500, …)` call in `colors.less` — the
- * `claim-*` utilities are an explicit list, and an unlisted class renders unstyled.
+ * contradict this" when they actually said nothing. Three bands on one green ladder
+ * plus red: dark green for support, pale green for sources that said nothing, red for
+ * a conflict. The two greens are far apart in lightness on purpose - adjacent greens
+ * read as one colour.
+ *
+ * The class names must exist in `colors.less`: the `claim-*` utilities come from an
+ * explicit list of `.generate-colors()` calls, and an unlisted class renders unstyled,
+ * silently. `colors.test.js` asserts the two stay in step.
  */
 export function getVerdictBgColor(score, prefix = 'claim') {
-  if (score >= 0.8) return `${prefix}-green-500`;
-  if (score >= 0.1) return `${prefix}-yellow-500`;
+  if (score >= 0.8) return `${prefix}-green-700`;
+  if (score >= 0.1) return `${prefix}-green-300`;
   return `${prefix}-red-500`;
 }
 

@@ -6,16 +6,24 @@ import {
 
 describe('getVerdictBgColor', () => {
   it('gives each verdict one colour band', () => {
-    expect(getVerdictBgColor(1.0)).toBe('claim-green-500');
-    expect(getVerdictBgColor(0.8)).toBe('claim-green-500');
-    expect(getVerdictBgColor(0.4)).toBe('claim-yellow-500');
-    expect(getVerdictBgColor(0.1)).toBe('claim-yellow-500');
+    expect(getVerdictBgColor(1.0)).toBe('claim-green-700');
+    expect(getVerdictBgColor(0.8)).toBe('claim-green-700');
+    expect(getVerdictBgColor(0.4)).toBe('claim-green-300');
+    expect(getVerdictBgColor(0.1)).toBe('claim-green-300');
     expect(getVerdictBgColor(0.0)).toBe('claim-red-500');
   });
 
   it('keeps not_enough_info out of the red family', () => {
     // red reads as "the sources contradict this"; they said nothing
     expect(getVerdictBgColor(0.4)).not.toContain('red');
+  });
+
+  it('separates the two greens by more than one step', () => {
+    // adjacent greens read as one colour, which would erase the distinction
+    const step = (cls) => Number(cls.match(/green-(\d+)/)[1]);
+    expect(
+      step(getVerdictBgColor(1.0)) - step(getVerdictBgColor(0.4)),
+    ).toBeGreaterThanOrEqual(300);
   });
 
   it('only emits classes that colors.less actually generates', () => {

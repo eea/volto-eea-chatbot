@@ -42,14 +42,20 @@
 }
 
 .generate-colors(claim, gray-500, @gray-500, 45, 20);
-// not_enough_info: sources said nothing. Yellow, not red - and not gray, which
-// reads as "no information shown" rather than "a finding about the sources".
-.generate-colors(claim, yellow-500, @yellow-500, 45, 20);
 .generate-colors(claim, red-500, @red-500, 35, 20);
 .generate-colors(claim, red-400, @red-400, 25, 25);
 .generate-colors(claim, red-300, @red-300, 15, 25);
 .generate-colors(claim, red-200, @red-200, 8, 30);
 .generate-colors(claim, green-500, @green-500, 45, 20);
 .generate-colors(claim, green-400, @green-400, 35, 25);
-.generate-colors(claim, green-300, @green-300, 20, 35);
+.generate-colors(claim, green-300, @green-300, 20, 48);
 .generate-colors(claim, green-200, @green-200, 10, 45);
+
+// The three claim verdicts are a green ladder plus red: green-700 = supported, the
+// darkest, green-300 = not confirmed by the sources, red-500 = contradicted. Kept
+// deliberately far apart in lightness - two adjacent greens read as one colour and the
+// distinction is lost. The darken value on green-300 is high (48) because it is the
+// chip's text colour on a pale background: at 35 the pair was 2.7:1, unreadable.
+// `getVerdictBgColor` emits these class names, and a test asserts every emitted class
+// is generated here.
+.generate-colors(claim, green-700, @green-700, 32, 8);

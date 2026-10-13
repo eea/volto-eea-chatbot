@@ -4,7 +4,7 @@ import { Button, Message, MessageContent } from 'semantic-ui-react';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
 import Spinner from './Spinner';
 import SVGIcon from './Icon';
-import { getSupportedBgColor } from './markdown/colors';
+import { getVerdictBgColor } from './markdown/colors';
 
 import GlassesIcon from '@eeacms/volto-eea-chatbot/icons/glasses.svg';
 import RotateIcon from '@eeacms/volto-eea-chatbot/icons/rotate.svg';
@@ -114,9 +114,13 @@ const HalloumiFeedback = ({
           color={scoreColor}
           className={cx(
             'claim-message',
+            // The summary chip wears the same three hues as the claims it
+            // summarises - the old eight-step red-to-green gradient implied a
+            // precision the score never had, skipped yellow entirely, and gave a
+            // colour-blind reader one ramp instead of three findings.
             emptyClaims
               ? 'claim-empty claim-gray-500'
-              : getSupportedBgColor(score / 100, 'claim'),
+              : getVerdictBgColor(score / 100),
           )}
           icon
         >

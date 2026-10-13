@@ -693,13 +693,35 @@ mark {
   font-size: 14px;
 }
 
+// The underline on a checked claim carries the verdict, and hue alone cannot do
+// that job: for red-green colour blindness the good and the bad end of the ramp
+// are the same colour. So hue and line style change together -
+//   contradicted     ~~~~ wavy ~~~~    red
+//   not_enough_info  ···· dotted ····  yellow
+//   supported        ---- dashed ----  green
+// The stroke uses `--claim-stroke-color` (see `components/markdown/colors.less`),
+// a darkened variant of the hue: these hues are fine as large fills but a 2px
+// line of yellow-500 is 1.92:1 against white and green-500 is 2.28:1.
 .claim {
   position: relative;
   display: inline;
   cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: var(--claim-color);
-  text-decoration-style: wavy;
+  text-decoration-color: var(--claim-stroke-color);
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+
+  &.claim-red-500 {
+    text-decoration-style: wavy;
+  }
+
+  &.claim-yellow-500 {
+    text-decoration-style: dotted;
+  }
+
+  &.claim-green-500 {
+    text-decoration-style: dashed;
+  }
 
   &:hover {
     background-color: var(--claim-lighter-color);
@@ -753,7 +775,7 @@ mark {
     padding: 1em 1.25em;
     border: none;
     border-radius: 0 @borderRadius @borderRadius 0;
-    border-left: 4px solid var(--claim-color);
+    border-left: 4px solid var(--claim-stroke-color);
     margin: 0;
     background-color: @gray-50;
     color: @grey;
@@ -827,25 +849,29 @@ mark {
     flex: 1;
     border-radius: 3px;
     background-color: @gray-200;
-    // An inset ring rather than a border: the green of `not_enough_info` is about
-    // 2.8:1 against white, so without an outline the middle position - the one that
-    // needs pointing out most - reads as empty. No layout shift, unlike a border.
+    // An inset ring rather than a border: the filled step is a thin bar of a hue
+    // that is under 3:1 against white (yellow-500 is 1.92:1), so without an
+    // outline the middle position - the one that needs pointing out most - reads
+    // as empty. No layout shift, unlike a border.
     box-shadow: inset 0 0 0 1px @gray-300;
   }
 
+  // The three hues match the claim underlines: red contradicted, yellow
+  // not_enough_info, green supported. Colour is decoration here - which step is
+  // filled is the finding, and it reads with no colour vision at all.
   .verdict-scale[data-verdict='contradicted'] .verdict-step:nth-child(1) {
     background-color: @red-500;
   }
 
-  // Not red: sources saying nothing is not the same finding as sources saying
-  // something else. green-500 rather than the chip's green-300 because a solid bar
-  // on white needs more weight than a pale background does (green-300 is 1.7:1).
+  // Yellow, not red: sources saying nothing is not the same finding as sources
+  // saying something else. Grey is reserved for the `unknown` state below, where
+  // there is no verdict at all.
   .verdict-scale[data-verdict='not_enough_info'] .verdict-step:nth-child(2) {
-    background-color: @green-500;
+    background-color: @yellow-500;
   }
 
   .verdict-scale[data-verdict='supported'] .verdict-step:nth-child(3) {
-    background-color: @green-700;
+    background-color: @green-500;
   }
 
   // Checked over search snippets only: no position can be claimed.

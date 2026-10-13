@@ -16,7 +16,6 @@
 @green-400: #4ade80;
 @green-500: #22c55e;
 @green-100: #dcfce7; //
-@green-700: #166534; //
 
 @yellow-500: #eab308; //
 @yellow-400: #facc15; //
@@ -30,7 +29,7 @@
 
 @lime-500: #84cc16; //
 
-.generate-colors(@namespace, @name, @color, @lighter-value: 20, @darker-value: 20) {
+.generate-colors(@namespace, @name, @color, @lighter-value: 20, @darker-value: 20, @stroke-value: 0) {
   @var-name: ~'--@{namespace}-color';
 
   .@{namespace}-@{name} {
@@ -38,24 +37,34 @@
     --@{namespace}-color: @color;
     --@{namespace}-lighter-color: lighten(@color, @lighter-value);
     --@{namespace}-darker-color: darken(@color, @darker-value);
+    // The colour for thin strokes - the claim underline, the verdict scale. A hue
+    // that is a fine fill is too light as a 2px line on white: yellow-500 is
+    // 1.92:1 there and green-500 2.28:1. Each call below darkens its stroke just
+    // enough to clear 3:1 (WCAG 1.4.11, non-text contrast) without moving the
+    // hue: red-500 3.76:1 untouched, green-500 -8 -> 3.32:1, yellow-500 -12 ->
+    // 3.37:1.
+    --@{namespace}-stroke-color: darken(@color, @stroke-value);
   }
 }
 
+// Only the classes `getVerdictBgColor` emits are generated - an unlisted class
+// renders unstyled, silently, with no colour and no error. `colors.test.js`
+// asserts the two lists stay in step.
+//
+// The three verdicts get three hues, not a ladder: red = contradicted, yellow =
+// not_enough_info, green = supported. Two greens were tried and failed - they
+// read as one colour, and for red-green colour blindness red and green read as
+// one colour too, which is why the underline *style* also changes per verdict
+// (see `.claim` in `../style.less`).
+//
+// lighter/darker are set so the chip's text (`--claim-darker-color`) on the
+// chip's background (`--claim-lighter-color`) clears WCAG AA: 5.51:1 red,
+// 4.81:1 yellow, 5.55:1 green.
 .generate-colors(claim, gray-500, @gray-500, 45, 20);
 .generate-colors(claim, red-500, @red-500, 35, 20);
-.generate-colors(claim, red-400, @red-400, 25, 25);
-.generate-colors(claim, red-300, @red-300, 15, 25);
-.generate-colors(claim, red-200, @red-200, 8, 30);
-.generate-colors(claim, green-500, @green-500, 45, 20);
-.generate-colors(claim, green-400, @green-400, 35, 25);
-.generate-colors(claim, green-300, @green-300, 20, 48);
-.generate-colors(claim, green-200, @green-200, 10, 45);
-
-// The three claim verdicts are a green ladder plus red: green-700 = supported, the
-// darkest, green-300 = not confirmed by the sources, red-500 = contradicted. Kept
-// deliberately far apart in lightness - two adjacent greens read as one colour and the
-// distinction is lost. The darken value on green-300 is high (48) because it is the
-// chip's text colour on a pale background: at 35 the pair was 2.7:1, unreadable.
-// `getVerdictBgColor` emits these class names, and a test asserts every emitted class
-// is generated here.
-.generate-colors(claim, green-700, @green-700, 32, 8);
+// not_enough_info: the sources said nothing. Not red - that means they said
+// something else - and not gray, which is reserved for the no-verdict-at-all
+// state. It sits alongside the yellow citation highlights, which are fills
+// (@yellow-100/200) while a claim is a stroke, so the two do not read alike.
+.generate-colors(claim, yellow-500, @yellow-500, 45, 20, 12);
+.generate-colors(claim, green-500, @green-500, 45, 20, 8);

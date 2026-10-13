@@ -694,14 +694,15 @@ mark {
 }
 
 // The underline on a checked claim carries the verdict, and hue alone cannot do
-// that job: for red-green colour blindness the good and the bad end of the ramp
-// are the same colour. So hue and line style change together -
+// that job: red-versus-green is exactly the pair a red-green colour blind reader
+// cannot separate, and even with the good end pushed towards yellow (lime)
+// red and it differ mostly in lightness. So hue and line style change together -
 //   contradicted     ~~~~ wavy ~~~~    red
-//   not_enough_info  ···· dotted ····  yellow
-//   supported        ---- dashed ----  green
+//   not_enough_info  ···· dotted ····  gray
+//   supported        ---- dashed ----  lime
 // The stroke uses `--claim-stroke-color` (see `components/markdown/colors.less`),
 // a darkened variant of the hue: these hues are fine as large fills but a 2px
-// line of yellow-500 is 1.92:1 against white and green-500 is 2.28:1.
+// line of lime-500 is 1.98:1 against white.
 .claim {
   position: relative;
   display: inline;
@@ -715,11 +716,11 @@ mark {
     text-decoration-style: wavy;
   }
 
-  &.claim-yellow-500 {
+  &.claim-gray-500 {
     text-decoration-style: dotted;
   }
 
-  &.claim-green-500 {
+  &.claim-lime-500 {
     text-decoration-style: dashed;
   }
 
@@ -850,28 +851,29 @@ mark {
     border-radius: 3px;
     background-color: @gray-200;
     // An inset ring rather than a border: the filled step is a thin bar of a hue
-    // that is under 3:1 against white (yellow-500 is 1.92:1), so without an
-    // outline the middle position - the one that needs pointing out most - reads
+    // that is under 3:1 against white (lime-500 is 1.98:1), so without an
+    // outline the good position - the one that needs pointing out most - reads
     // as empty. No layout shift, unlike a border.
     box-shadow: inset 0 0 0 1px @gray-300;
   }
 
-  // The three hues match the claim underlines: red contradicted, yellow
-  // not_enough_info, green supported. Colour is decoration here - which step is
+  // The three hues match the claim underlines: red contradicted, gray
+  // not_enough_info, lime supported. Colour is decoration here - which step is
   // filled is the finding, and it reads with no colour vision at all.
   .verdict-scale[data-verdict='contradicted'] .verdict-step:nth-child(1) {
     background-color: @red-500;
   }
 
-  // Yellow, not red: sources saying nothing is not the same finding as sources
-  // saying something else. Grey is reserved for the `unknown` state below, where
-  // there is no verdict at all.
+  // Gray, not red: sources saying nothing is not the same finding as sources
+  // saying something else. It is also the colour of the `unknown` state below,
+  // which is honest - neither one is a verdict about the claim. Position and the
+  // solid-versus-dashed fill keep the two apart without colour.
   .verdict-scale[data-verdict='not_enough_info'] .verdict-step:nth-child(2) {
-    background-color: @yellow-500;
+    background-color: @gray-500;
   }
 
   .verdict-scale[data-verdict='supported'] .verdict-step:nth-child(3) {
-    background-color: @green-500;
+    background-color: @lime-500;
   }
 
   // Checked over search snippets only: no position can be claimed.

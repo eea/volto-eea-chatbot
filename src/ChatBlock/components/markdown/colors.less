@@ -38,11 +38,10 @@
     --@{namespace}-lighter-color: lighten(@color, @lighter-value);
     --@{namespace}-darker-color: darken(@color, @darker-value);
     // The colour for thin strokes - the claim underline, the verdict scale. A hue
-    // that is a fine fill is too light as a 2px line on white: yellow-500 is
-    // 1.92:1 there and green-500 2.28:1. Each call below darkens its stroke just
-    // enough to clear 3:1 (WCAG 1.4.11, non-text contrast) without moving the
-    // hue: red-500 3.76:1 untouched, green-500 -8 -> 3.32:1, yellow-500 -12 ->
-    // 3.37:1.
+    // that is a fine fill is too light as a 2px line on white: lime-500 is
+    // 1.98:1 there. Each call below darkens its stroke just enough to clear 3:1
+    // (WCAG 1.4.11, non-text contrast) without moving the hue: red-500 3.76:1
+    // and gray-500 4.83:1 untouched, lime-500 -10 -> 3.25:1.
     --@{namespace}-stroke-color: darken(@color, @stroke-value);
   }
 }
@@ -51,20 +50,19 @@
 // renders unstyled, silently, with no colour and no error. `colors.test.js`
 // asserts the two lists stay in step.
 //
-// The three verdicts get three hues, not a ladder: red = contradicted, yellow =
-// not_enough_info, green = supported. Two greens were tried and failed - they
-// read as one colour, and for red-green colour blindness red and green read as
-// one colour too, which is why the underline *style* also changes per verdict
-// (see `.claim` in `../style.less`).
+// Three verdicts, three hues picked to be as far apart as a red-green colour
+// blind reader can get: red = contradicted, gray = not_enough_info, lime =
+// supported. Lime rather than green-500 because red-versus-green is exactly the
+// pair they cannot separate, so the good end leans towards yellow instead; the
+// middle verdict leaves the argument entirely. Hue is still not the only
+// signal - each verdict also has its own underline style (see `.claim` in
+// `../style.less`).
 //
 // lighter/darker are set so the chip's text (`--claim-darker-color`) on the
 // chip's background (`--claim-lighter-color`) clears WCAG AA: 5.51:1 red,
-// 4.81:1 yellow, 5.55:1 green.
+// 8.35:1 gray, 5.28:1 lime.
+// gray-500 doubles as the "no claims at all" state (`claim-empty`): both mean
+// "the check has nothing to report", so reading alike is on purpose.
 .generate-colors(claim, gray-500, @gray-500, 45, 20);
 .generate-colors(claim, red-500, @red-500, 35, 20);
-// not_enough_info: the sources said nothing. Not red - that means they said
-// something else - and not gray, which is reserved for the no-verdict-at-all
-// state. It sits alongside the yellow citation highlights, which are fills
-// (@yellow-100/200) while a claim is a stroke, so the two do not read alike.
-.generate-colors(claim, yellow-500, @yellow-500, 45, 20, 12);
-.generate-colors(claim, green-500, @green-500, 45, 20, 8);
+.generate-colors(claim, lime-500, @lime-500, 45, 20, 10);

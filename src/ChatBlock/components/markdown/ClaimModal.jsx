@@ -38,9 +38,17 @@ export function ClaimModal({ claim, markers, text, citedSources }) {
 
   return (
     <Modal
-      className={cx('claim-modal', getVerdictBgColor(claim.score))}
+      className={cx(
+        'claim-modal',
+        getVerdictBgColor(claim.score, claim.context_limited),
+      )}
       trigger={
-        <span className={cx('claim', getVerdictBgColor(claim.score))}>
+        <span
+          className={cx(
+            'claim',
+            getVerdictBgColor(claim.score, claim.context_limited),
+          )}
+        >
           {text}
         </span>
       }

@@ -195,6 +195,22 @@ function normaliseV3Chunk(raw: any): Packet | null {
     } as Packet;
   }
 
+  // Handle Error format (special case without ind/obj)
+  if ('error' in raw) {
+    return {
+      ind: -1,
+      obj: {
+        type: PacketType.ERROR,
+        error: raw.error,
+      },
+    } as Packet;
+  }
+
+  // Already normalised or v2 format: { ind: number, obj: { type: string, ... } }
+  if ('ind' in raw && typeof raw.obj === 'object' && raw.obj !== null) {
+    return raw as Packet;
+  }
+
   if (!raw.placement || typeof raw.obj !== 'object') return null;
 
   const ind: number = raw.placement.turn_index ?? 0;

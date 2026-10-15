@@ -95,11 +95,13 @@ export function ChatBlockSchema({ assistants, data }) {
                 'batchSize',
                 'noSupportDocumentsMessage',
                 'qualityCheckContext',
+                'chunkEvidenceWindow',
                 'qualityCheckStages',
               ]
             : []),
           'enableFeedback',
           ...(data.enableFeedback ? ['feedbackReasons'] : []),
+          'stopButton',
           'showTools',
           'enableMatomoTracking',
           'scrollToInput',
@@ -175,6 +177,18 @@ export function ChatBlockSchema({ assistants, data }) {
         type: 'boolean',
         default: true,
       },
+      stopButton: {
+        title: 'Stop generation button',
+        choices: [
+          ['disabled', 'Disabled'],
+          ['input', 'Inline text input'],
+          ['floating', 'Floating pill'],
+          ['message_loader', 'Inline message loader'],
+        ],
+        default: 'floating',
+        description:
+          'Choose where and how the stop generation button appears during response generation',
+      },
       qualityCheck: {
         title: 'Quality checks',
         choices: [
@@ -200,6 +214,17 @@ export function ChatBlockSchema({ assistants, data }) {
           ['citations', 'Only cited documents'],
           ['all', 'All documents passed to LLM'],
         ],
+      },
+      chunkEvidenceWindow: {
+        title: 'Evidence window (chunks around each source)',
+        type: 'number',
+        default: 2,
+        description:
+          'How many Onyx chunks to fetch on each side of the matched chunk before ' +
+          'fact-checking. 0 = centre chunk only (usually not enough), 2 = what Onyx ' +
+          'feeds the answer generator by default, 5 = Onyx at its widest. Each extra ' +
+          'step costs two more chunk requests per document, and values above 20 are ' +
+          'clamped.',
       },
       qualityCheckStages: {
         title: 'Score ranges',
@@ -388,7 +413,7 @@ range is from 0 to 100`,
           ['2', 'Onyx 2.x'],
           ['3', 'Onyx 3.x'],
         ],
-        default: '2',
+        default: '3',
         description:
           'Select which Onyx API version the backend is running. ' +
           'Onyx 2.x uses the legacy send-message payload; ' +

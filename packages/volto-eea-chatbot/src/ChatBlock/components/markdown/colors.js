@@ -1,29 +1,32 @@
-export function getSupportedTextColor(score) {
-  if (0 <= score && score < 0.5) {
-    return 'text-red-500';
-  } else if (0.5 <= score && score <= 1) {
-    return 'text-green-500';
-  }
-  return 'text-gray-500';
-}
-
-export function getSupportedBgColor(score, prefix = 'bg') {
-  if (0 <= score && score < 0.125) {
-    return `${prefix}-red-500`;
-  } else if (0.125 <= score && score < 0.25) {
-    return `${prefix}-red-400`;
-  } else if (0.25 <= score && score < 0.375) {
-    return `${prefix}-red-300`;
-  } else if (0.375 <= score && score < 0.5) {
-    return `${prefix}-red-200`;
-  } else if (0.5 <= score && score < 0.625) {
-    return `${prefix}-green-200`;
-  } else if (0.625 <= score && score < 0.75) {
-    return `${prefix}-green-300`;
-  } else if (0.75 <= score && score < 0.875) {
-    return `${prefix}-green-400`;
-  } else if (0.875 <= score && score <= 1) {
-    return `${prefix}-green-500`;
-  }
-  return `${prefix}-gray-500`;
+/**
+ * Colour for a verdict: one per claim (`ClaimModal`) and one for the
+ * answer-level summary (`HalloumiFeedback`).
+ *
+ * A per-claim score is a verdict (supported 1.0, not_enough_info 0.4,
+ * contradicted 0.0 - see `scoreToVerdict`), not a measurement on a 0-1 scale, so
+ * the eight-step red-to-green gradient that used to live in this file implied a
+ * confidence level that was never computed, and it put `not_enough_info` in the
+ * red family, which reads as "the sources contradict this" when they actually
+ * said nothing.
+ *
+ * Three verdicts, three hues: red for a conflict, yellow for silence, green for
+ * support. Hue alone is not enough - for red-green colour blindness the two ends
+ * of that ramp are the same colour - so each hue also gets its own underline
+ * style (see `.claim` in `ChatBlock/style.less`) and the modal names the verdict
+ * in words.
+ *
+ * A claim whose sources were only partly loaded (`contextLimited`) is yellow
+ * whatever score it got: the header already refuses to name a verdict for it
+ * ("Couldn't be checked"), so colouring it green or red would claim more than the
+ * check established.
+ *
+ * The class names must exist in `colors.less`: the `claim-*` utilities come from
+ * an explicit list of `.generate-colors()` calls, and an unlisted class renders
+ * unstyled, silently. `colors.test.js` asserts the two stay in step.
+ */
+export function getVerdictBgColor(score, contextLimited = false) {
+  if (contextLimited) return 'claim-yellow-500';
+  if (score >= 0.8) return 'claim-green-500';
+  if (score >= 0.1) return 'claim-yellow-500';
+  return 'claim-red-500';
 }

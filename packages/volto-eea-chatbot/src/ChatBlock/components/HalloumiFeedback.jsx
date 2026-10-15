@@ -4,7 +4,7 @@ import { Button, Message, MessageContent } from 'semantic-ui-react';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
 import Spinner from './Spinner';
 import SVGIcon from './Icon';
-import { getSupportedBgColor } from './markdown/colors';
+import { getVerdictBgColor } from './markdown/colors';
 
 import GlassesIcon from '@eeacms/volto-eea-chatbot/icons/glasses.svg';
 import RotateIcon from '@eeacms/volto-eea-chatbot/icons/rotate.svg';
@@ -73,8 +73,10 @@ const HalloumiFeedback = ({
   sources,
   retryHalloumi,
   emptyClaims,
+  contextQuality,
 }) => {
   const claims = (markers?.claims || []).filter((claim) => !claim.skipped);
+  const limitedClaims = claims.filter((claim) => claim.context_limited);
   const noClaimsScore = claims[0]?.score === null;
   const messageBySource =
     'Please allow a few minutes for claim verification when many references are involved.';
@@ -112,14 +114,35 @@ const HalloumiFeedback = ({
           color={scoreColor}
           className={cx(
             'claim-message',
+            // The summary chip wears the same three hues as the claims it
+            // summarises - the old eight-step red-to-green gradient implied a
+            // precision the score never had, skipped yellow entirely, and gave a
+            // colour-blind reader one ramp instead of three findings.
             emptyClaims
               ? 'claim-empty claim-gray-500'
-              : getSupportedBgColor(score / 100, 'claim'),
+              : getVerdictBgColor(score / 100),
           )}
           icon
         >
           <MessageContent>
             {emptyClaims || printSlate(halloumiMessage, `${score}%`)}
+          </MessageContent>
+        </Message>
+      )}
+
+      {/* The fact-checker only saw part of the answer's sources, so a "not
+          confirmed" verdict may mean missing text rather than a mistake. Said
+          once, at answer level - the claim modal already says "Couldn't be
+          checked" and needs no repeat of this. */}
+      {contextQuality?.level === 'partial' && (
+        <Message color="yellow" className="context-quality-message">
+          <MessageContent>
+            <strong>Some sources could not be loaded in full.</strong>{' '}
+            {limitedClaims.length > 0
+              ? `${limitedClaims.length} ${
+                  limitedClaims.length === 1 ? 'claim was' : 'claims were'
+                } checked against short excerpts, so “not confirmed” may mean missing text rather than a mistake.`
+              : 'Every claim was still matched against the text that was available, so this did not change the result.'}
           </MessageContent>
         </Message>
       )}

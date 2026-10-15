@@ -224,6 +224,54 @@ describe('AIMessage', () => {
     });
   });
 
+  it('renders inline stop button when stopButton is message_loader, isLoading is true and isFinalMessageComing is true', () => {
+    const mockCancel = vi.fn();
+    const props = {
+      message: {
+        messageId: 1,
+        message: 'Generating response...',
+        type: 'assistant',
+        isFinalMessageComing: true,
+      },
+      isLoading: true,
+      isLastMessage: true,
+      stopButton: 'message_loader',
+      onCancel: mockCancel,
+    };
+
+    const component = renderComponent(props);
+    const stopBtn = component.root.findByProps({
+      className: 'inline-message-stop-btn',
+    });
+    expect(stopBtn).toBeDefined();
+    act(() => {
+      stopBtn.props.onClick();
+    });
+    expect(mockCancel).toHaveBeenCalled();
+  });
+
+  it('does not render inline stop button when isFinalMessageComing is false (loader in ChatWindow handles it)', () => {
+    const mockCancel = vi.fn();
+    const props = {
+      message: {
+        messageId: 1,
+        message: 'Generating response...',
+        type: 'assistant',
+        isFinalMessageComing: false,
+      },
+      isLoading: true,
+      isLastMessage: true,
+      stopButton: 'message_loader',
+      onCancel: mockCancel,
+    };
+
+    const component = renderComponent(props);
+    const stopBtns = component.root.findAllByProps({
+      className: 'inline-message-stop-btn',
+    });
+    expect(stopBtns.length).toBe(0);
+  });
+
   describe('getContextSources', () => {
     const mockMessage = {
       toolCalls: [
@@ -264,6 +312,27 @@ describe('AIMessage', () => {
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe('tool_doc_1');
       expect(result[1].id).toBe('tool_doc_2');
+    });
+
+    it('reads the singular toolCall emitted by messageProcessor', () => {
+      // messageProcessor.getMessage() returns `toolCall`; reading only the
+      // plural made 'all' mode send zero sources.
+      const v3Message = {
+        toolCall: {
+          tool_result: [
+            { document_id: 'v3_doc_1', content: 'V3 doc 1' },
+            { document_id: 'v3_doc_2', content: 'V3 doc 2' },
+          ],
+        },
+      };
+      const result = getContextSources(v3Message, [], 'all');
+      expect(result).toHaveLength(2);
+      expect(result.map((src) => src.id)).toEqual(['v3_doc_1', 'v3_doc_2']);
+    });
+
+    it('flags sources built from blurbs as snippets', () => {
+      const result = getContextSources(mockMessage, mockCitedSources);
+      expect(result[0].halloumiSource.kind).toBe('snippet');
     });
   });
 });

@@ -65,7 +65,7 @@ async function fetchRelatedQuestions(
   query: string,
   answer: string,
   qgenAsistantId: number,
-  onyxVersion: '2' | '3' = '2',
+  onyxVersion: '2' | '3' = '3',
 ): Promise<RelatedQuestion[]> {
   try {
     console.log(
@@ -124,7 +124,7 @@ export function useChatController({
   enableQgen = false,
   qgenAsistantId,
   deepResearch,
-  onyxVersion = '2',
+  onyxVersion = '3',
 }: UseChatControllerProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);

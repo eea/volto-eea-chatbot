@@ -88,9 +88,7 @@ describe('ChatBlock/services/chunkEvidence', () => {
     });
 
     it('returns null on transport errors', async () => {
-      const fetchImpl = vi.fn(() =>
-        Promise.reject(new Error('network down')),
-      );
+      const fetchImpl = vi.fn(() => Promise.reject(new Error('network down')));
       await expect(fetchChunk('doc-1', 0, { fetchImpl })).resolves.toBeNull();
     });
 

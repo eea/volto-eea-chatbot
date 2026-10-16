@@ -100,7 +100,7 @@
     ]
   },
   "scripts": {
-    "prepare": "cd ../.. && husky install || true",
+    "husky:install": "cd ../.. && husky install || true",
     "release": "release-it",
     "release-major-beta": "release-it major --preRelease=beta",
     "release-beta": "release-it --preRelease=beta",

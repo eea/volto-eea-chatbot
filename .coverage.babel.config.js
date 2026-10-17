@@ -21,6 +21,10 @@ module.exports = function (api) {
     {
       cwd: workspaceRoot,
       include: ['packages/*/src/**'],
+      // Type-only modules were ignored by jest before the migration
+      // (coveragePathIgnorePatterns: ['/types/']); without this they come back
+      // through the integration lcov inside Sonar's coverage ratio.
+      exclude: ['packages/*/src/**/types/**'],
     },
   ]);
   return voltoBabel;

@@ -274,6 +274,9 @@ export default defineConfig({
         'src/**/index.{js,jsx,ts,tsx}',
         'src/**/*config.{js,jsx,ts,tsx}',
         'src/**/*schema.{js,jsx,ts,tsx}',
+        // Type-only modules: jest's coveragePathIgnorePatterns had '/types/'
+        // before the migration, so they were never part of the Sonar ratio.
+        'src/**/types/**',
       ],
       thresholds: {
         branches: 5,

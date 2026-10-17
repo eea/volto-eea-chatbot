@@ -274,6 +274,9 @@ export default defineConfig({
         'src/**/index.{js,jsx,ts,tsx}',
         'src/**/*config.{js,jsx,ts,tsx}',
         'src/**/*schema.{js,jsx,ts,tsx}',
+        // Type-only modules, ignored by the pre-migration jest
+        // `coveragePathIgnorePatterns: ['/types/']`.
+        'src/**/types/**',
       ],
       thresholds: {
         branches: 5,

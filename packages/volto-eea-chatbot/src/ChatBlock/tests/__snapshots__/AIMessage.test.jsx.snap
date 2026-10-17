@@ -1,0 +1,233 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AIMessage > renders AI message with content 1`] = `
+<div
+  className="comment "
+>
+  <div
+    className="circle assistant"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        {
+          "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
+        }
+      }
+      fill="none"
+      height={20}
+      stroke="white"
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    />
+  </div>
+  <div
+    className="comment-content"
+  >
+    <div
+      className="comment-tabs"
+    >
+      <div>
+        <div
+          className="ui fluid pointing secondary without-sources menu"
+        >
+          <a
+            className="active item answer-tab"
+            onClick={[Function]}
+          >
+            Answer
+          </a>
+        </div>
+        <div
+          className="ui bottom attached segment active tab"
+        >
+          <div
+            className="answer-tab"
+          >
+            <div
+              className="message-content"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`AIMessage > renders AI message with feedback options 1`] = `
+<div
+  className="comment "
+>
+  <div
+    className="circle assistant"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        {
+          "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
+        }
+      }
+      fill="none"
+      height={20}
+      stroke="white"
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    />
+  </div>
+  <div
+    className="comment-content"
+  >
+    <div
+      className="comment-tabs"
+    >
+      <div>
+        <div
+          className="ui fluid pointing secondary without-sources menu"
+        >
+          <a
+            className="active item answer-tab"
+            onClick={[Function]}
+          >
+            Answer
+          </a>
+        </div>
+        <div
+          className="ui bottom attached segment active tab"
+        >
+          <div
+            className="answer-tab"
+          >
+            <div
+              className="message-content"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`AIMessage > renders AI message with sources 1`] = `
+<div
+  className="comment "
+>
+  <div
+    className="circle assistant"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        {
+          "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
+        }
+      }
+      fill="none"
+      height={20}
+      stroke="white"
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    />
+  </div>
+  <div
+    className="comment-content"
+  >
+    <div
+      className="comment-tabs"
+    >
+      <div>
+        <div
+          className="ui fluid pointing secondary without-sources menu"
+        >
+          <a
+            className="active item answer-tab"
+            onClick={[Function]}
+          >
+            Answer
+          </a>
+        </div>
+        <div
+          className="ui bottom attached segment active tab"
+        >
+          <div
+            className="answer-tab"
+          >
+            <div
+              className="message-content"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`AIMessage > renders empty AI message 1`] = `
+<div
+  className="comment "
+>
+  <div
+    className="circle assistant"
+  >
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        {
+          "__html": "<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/>",
+        }
+      }
+      fill="none"
+      height={20}
+      stroke="white"
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    />
+  </div>
+  <div
+    className="comment-content"
+  >
+    <div
+      className="comment-tabs"
+    >
+      <div>
+        <div
+          className="ui fluid pointing secondary without-sources menu"
+        >
+          <a
+            className="active item answer-tab"
+            onClick={[Function]}
+          >
+            Answer
+          </a>
+        </div>
+        <div
+          className="ui bottom attached segment active tab"
+        >
+          <div
+            className="answer-tab"
+          >
+            <div
+              className="message-content"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

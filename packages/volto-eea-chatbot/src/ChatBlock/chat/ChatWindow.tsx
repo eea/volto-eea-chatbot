@@ -167,6 +167,7 @@ function ChatWindow({
       const enabled = initialDeepResearch.toLowerCase() === 'true';
       setIsDeepResearchEnabled(enabled);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-submit query from URL parameter on mount
@@ -176,6 +177,7 @@ function ChatWindow({
       setShowLandingPage(false);
       history.replace(window.location.pathname);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStarterPromptChoice = useCallback(

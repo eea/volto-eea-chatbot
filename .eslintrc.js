@@ -20,6 +20,9 @@ module.exports = {
   extends: `${coreLocation}/packages/volto/.eslintrc`,
   rules: {
     'import/no-unresolved': 1,
+    // The add-on keeps verbose [RQ]/[Onyx] debug logging while in alpha;
+    // revisit before the major release (see docs/ TODO).
+    'no-console': 'off',
   },
   settings: {
     'import/resolver': {
@@ -28,10 +31,7 @@ module.exports = {
           ['@plone/volto', `${coreLocation}/packages/volto/src`],
           ['@plone/volto-slate', `${coreLocation}/packages/volto-slate/src`],
           ['@plone/registry', `${coreLocation}/packages/registry/src`],
-          [
-            '@eeacms/volto-eea-chatbot',
-            './packages/volto-eea-chatbot/src',
-          ],
+          ['@eeacms/volto-eea-chatbot', './packages/volto-eea-chatbot/src'],
           ...addonAliases,
         ],
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],

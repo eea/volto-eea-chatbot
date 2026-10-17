@@ -54,7 +54,7 @@ function extractRelatedQuestions(str: string): RelatedQuestion[] {
     .filter((line) => line.length > 0)
     .map((line) => {
       // Remove leading numbers or bullets like "1. ", "- ", "* ", etc.
-      const cleaned = line.replace(/^[\d\.\-\*\s]+/, '').trim();
+      const cleaned = line.replace(/^[\d.\-*\s]+/, '').trim();
       return cleaned ? { question: cleaned } : null;
     })
     .filter((i): i is RelatedQuestion => i !== null);
@@ -288,6 +288,7 @@ export function useChatController({
         setChatSessionLoading(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       chatSessionId,
       personaId,

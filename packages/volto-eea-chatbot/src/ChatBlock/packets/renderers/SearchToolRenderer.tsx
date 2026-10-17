@@ -1,7 +1,6 @@
 import type {
   SearchToolPacket,
   SearchToolStart,
-  SearchToolDelta,
   SectionEnd,
   OnyxDocument,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';

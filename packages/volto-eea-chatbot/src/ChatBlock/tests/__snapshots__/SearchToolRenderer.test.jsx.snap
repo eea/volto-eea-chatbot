@@ -1,0 +1,740 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SearchToolRenderer > handles empty packets array 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  />
+  <div
+    data-testid="content"
+  >
+    <div />
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer > handles web results with favicon 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searched the web
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Web Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                web search
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Web Results
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <div
+            className="result-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+              onClick={[Function]}
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <img
+                  alt="favicon"
+                  height={16}
+                  onError={[Function]}
+                  src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://example.com&size=128"
+                  style={
+                    {
+                      "height": "16px",
+                      "objectFit": "contain",
+                      "width": "16px",
+                    }
+                  }
+                  width={16}
+                />
+              </div>
+              <span>
+                Web Result
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer > removes duplicate documents by document_id 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searched internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Internal Search Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                query
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Documents
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <div
+            className="result-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+              onClick={[Function]}
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                Doc 1
+              </span>
+            </button>
+          </div>
+          <div
+            className="result-item"
+            style={
+              {
+                "animationDelay": "30ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+              onClick={[Function]}
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                Doc 2
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer > removes duplicate queries 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searching internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Internal Search Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                duplicate
+              </span>
+            </button>
+          </div>
+          <div
+            className="query-item"
+            style={
+              {
+                "animationDelay": "30ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                unique
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Documents
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <span
+            className="blinking-dot "
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer > renders empty state when no queries 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searching internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div />
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer > renders searching state for internal documents 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searching internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Internal Search Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                test query
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Documents
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <span
+            className="blinking-dot "
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer > renders searching state for internet search 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searching the web
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Web Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                web query
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Web Results
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <span
+            className="blinking-dot "
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SearchToolRenderer > renders with search results 1`] = `
+<div
+  data-testid="renderer-result"
+>
+  <div
+    data-testid="status"
+  >
+    Searched internal documents
+  </div>
+  <div
+    data-testid="content"
+  >
+    <div
+      className="search-tool-renderer"
+    >
+      <div
+        className="queries-section"
+      >
+        <div
+          className="queries-header"
+        >
+          <strong>
+            Internal Search Queries
+          </strong>
+        </div>
+        <div
+          className="queries-list"
+        >
+          <div
+            className="query-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                query
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="results-section"
+      >
+        <div
+          className="results-header"
+        >
+          <strong>
+            Documents
+          </strong>
+        </div>
+        <div
+          className="results-list"
+        >
+          <div
+            className="result-item"
+            style={
+              {
+                "animationDelay": "0ms",
+              }
+            }
+          >
+            <button
+              className="source-chip "
+              onClick={[Function]}
+            >
+              <div
+                className="source-chip-icon"
+              >
+                <svg
+                  className="icon"
+                  dangerouslySetInnerHTML={
+                    {
+                      "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
+                    }
+                  }
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={16}
+                  xmlns="http://www.w3.org/2000/svg"
+                />
+              </div>
+              <span>
+                Document 1
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

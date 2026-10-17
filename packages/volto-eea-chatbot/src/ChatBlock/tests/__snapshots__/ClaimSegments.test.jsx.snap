@@ -1,0 +1,773 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ClaimSegments > filters out sources without matching snippets 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="tab"
+        tabIndex={0}
+      >
+        <span
+          title="Source 1"
+        >
+          Source 1
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
+                }
+              }
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                web
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments > handles empty segmentIds 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    />
+    <div
+      data-testid="tab-content"
+    />
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments > handles missing segments in segments object 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="tab"
+        tabIndex={0}
+      >
+        <span
+          title="Source Document 1"
+        >
+          Source Document 1
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
+                }
+              }
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source Document 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                web
+              </span>
+            </div>
+          </div>
+          <a
+            className="source-external-link"
+            href="https://example.com/1"
+            rel="noreferrer"
+            target="_blank"
+            title="Open source"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>",
+                }
+              }
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+          </a>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments > handles null segmentIds 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    />
+    <div
+      data-testid="tab-content"
+    />
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments > renders source without link 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="tab"
+        tabIndex={0}
+      >
+        <span
+          title="Source 1"
+        >
+          Source 1
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
+                }
+              }
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                file
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              2
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments > renders with basic props 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="tab"
+        tabIndex={0}
+      >
+        <span
+          title="Source Document 1"
+        >
+          Source Document 1
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
+                }
+              }
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source Document 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                web
+              </span>
+            </div>
+          </div>
+          <a
+            className="source-external-link"
+            href="https://example.com/1"
+            rel="noreferrer"
+            target="_blank"
+            title="Open source"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>",
+                }
+              }
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+          </a>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              2
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments > renders with file source type icon 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="tab"
+        tabIndex={0}
+      >
+        <span
+          title="Internal Document"
+        >
+          Internal Document
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
+                }
+              }
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Internal Document
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                file
+              </span>
+            </div>
+          </div>
+          <a
+            className="source-external-link"
+            href="https://example.com/1"
+            rel="noreferrer"
+            target="_blank"
+            title="Open source"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>",
+                }
+              }
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+          </a>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ClaimSegments > renders with multiple sources 1`] = `
+<div
+  className="chat-window"
+>
+  <div
+    data-testid="tab"
+  >
+    <div
+      data-testid="tab-menu"
+    >
+      <div
+        aria-controls="tab-pane-0"
+        aria-selected={true}
+        className="active"
+        data-testid="menu-item-0"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="tab"
+        tabIndex={0}
+      >
+        <span
+          title="Source 1"
+        >
+          Source 1
+        </span>
+      </div>
+      <div
+        aria-controls="tab-pane-1"
+        aria-selected={false}
+        className=""
+        data-testid="menu-item-1"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="tab"
+        tabIndex={-1}
+      >
+        <span
+          title="Source 2"
+        >
+          Source 2
+        </span>
+      </div>
+    </div>
+    <div
+      data-testid="tab-content"
+    >
+      <div
+        data-testid="tab-pane"
+      >
+        <div
+          className="source-card-header"
+        >
+          <div
+            className="source-card-info"
+          >
+            <svg
+              className="icon source-icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
+                }
+              }
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+            <div
+              className="source-card-details"
+            >
+              <h5
+                className="source-card-title"
+              >
+                Source 1
+              </h5>
+              <span
+                className="source-type-badge"
+              >
+                web
+              </span>
+            </div>
+          </div>
+          <a
+            className="source-external-link"
+            href="https://example.com/1"
+            rel="noreferrer"
+            target="_blank"
+            title="Open source"
+          >
+            <svg
+              className="icon"
+              dangerouslySetInnerHTML={
+                {
+                  "__html": "<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>",
+                }
+              }
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            />
+          </a>
+        </div>
+        <div
+          className="citation-chips-section"
+        >
+          <h5
+            className="citation-chips-header"
+          >
+            Jump to Citation
+          </h5>
+          <div
+            className="citation-chips-container"
+          >
+            <button
+              className="citation-chip "
+              onClick={[Function]}
+            >
+              #
+              1
+            </button>
+          </div>
+        </div>
+        <div
+          data-testid="render-claim-view"
+        >
+          RenderClaimView
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

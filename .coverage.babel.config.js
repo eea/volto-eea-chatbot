@@ -21,10 +21,19 @@ module.exports = function (api) {
     {
       cwd: workspaceRoot,
       include: ['packages/*/src/**'],
-      // Type-only modules were ignored by jest before the migration
-      // (coveragePathIgnorePatterns: ['/types/']); without this they come back
-      // through the integration lcov inside Sonar's coverage ratio.
-      exclude: ['packages/*/src/**/types/**'],
+      // Mirror the vitest coverage excludes. Without this the integration lcov
+      // brings those files back as freshly uncovered entries (measured on PR #45:
+      // markdown/index.jsx 56 lines at 0%, utils/index.tsx 49 lines at 5%,
+      // schema.jsx 9 lines) and drags the SonarQube ratio down to 79.3.
+      exclude: [
+        'packages/*/src/**/types/**',
+        'packages/*/src/**/index.{js,jsx,ts,tsx}',
+        'packages/*/src/**/*config.{js,jsx,ts,tsx}',
+        'packages/*/src/**/*schema.{js,jsx,ts,tsx}',
+        'packages/*/src/**/*.d.ts',
+        'packages/*/src/**/__mocks__/**',
+        'packages/*/src/**/{tests,__tests__}/**',
+      ],
     },
   ]);
   return voltoBabel;

@@ -1248,6 +1248,51 @@ mark {
 }
 
 .feedback-modal {
+  // Announce progress outside the busy button without adding a visible row.
+  .feedback-submit-status {
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ui.button.feedback-submit-button {
+    display: inline-grid;
+    grid-template-areas: 'label';
+
+    // Both labels occupy the same cell, reserving the larger label's size.
+    .feedback-submit-label,
+    .feedback-submit-progress {
+      grid-area: label;
+    }
+
+    .feedback-submit-progress {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+
+      // Avoid the global .spinner border and Semantic UI icon glyph styles.
+      .feedback-submit-spinner {
+        width: 1em;
+        height: 1em;
+        box-sizing: border-box;
+        flex: 0 0 auto;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        border-right-color: transparent;
+        animation: spin-rotate 0.75s linear infinite;
+      }
+    }
+
+    .feedback-submit-label[aria-hidden='true'],
+    .feedback-submit-progress[aria-hidden='true'] {
+      visibility: hidden;
+    }
+  }
+
   h3 {
     color: @grey;
   }

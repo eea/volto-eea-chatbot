@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Plone\n"
-"POT-Creation-Date: 2026-09-17T10:07:41.673Z\n"
+"POT-Creation-Date: 2026-10-18T22:51:01.212Z\n"
 "Last-Translator: Plone i18n <plone-i18n@lists.sourceforge.net>\n"
 "Language-Team: Plone i18n <plone-i18n@lists.sourceforge.net>\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -60,10 +60,20 @@ msgstr ""
 msgid "Stop generating"
 msgstr ""
 
+#. Default: "Submit Feedback"
+#: ChatBlock/components/FeedbackModal
+msgid "Submit Feedback"
+msgstr ""
+
 #. Default: "Submit question"
 #: AISearchInput/components/SearchInput
 #: AISearchInput/messages
 msgid "Submit question"
+msgstr ""
+
+#. Default: "Submitting..."
+#: ChatBlock/components/FeedbackModal
+msgid "Submitting..."
 msgstr ""
 
 #. Default: "This assistant uses AI. Responses may contain inaccuracies."

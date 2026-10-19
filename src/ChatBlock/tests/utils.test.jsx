@@ -140,6 +140,17 @@ describe('utils', () => {
       expect(result.current[0]).toBe(false);
     });
 
+    it('returns false without throwing when the clipboard API is unavailable', async () => {
+      delete navigator.clipboard;
+      const { result } = renderHook(() => useCopyToClipboard('test'));
+      let success;
+      await act(async () => {
+        success = await result.current[1]();
+      });
+      expect(success).toBe(false);
+      expect(result.current[0]).toBe(false);
+    });
+
     it('handles clipboard write failure', async () => {
       navigator.clipboard.writeText = jest.fn().mockRejectedValue(new Error());
 

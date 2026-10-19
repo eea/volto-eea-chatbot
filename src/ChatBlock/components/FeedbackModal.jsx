@@ -25,6 +25,7 @@ const FeedbackModal = ({
   setIsToastActive,
   feedbackReasons,
   enableMatomoTracking,
+  matomoCategory,
   persona,
 }) => {
   const [feedbackText, setFeedbackText] = useState('');
@@ -62,11 +63,12 @@ const FeedbackModal = ({
       });
       if (enableMatomoTracking) {
         trackEvent({
-          category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+          category:
+            matomoCategory ??
+            (persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot'),
           action: isPositive
-            ? 'Chatbot: Positive feedback submitted'
-            : 'Chatbot: Negative feedback submitted',
-          name: 'Feedback submitted',
+            ? 'Positive feedback submitted'
+            : 'Negative feedback submitted',
         });
       }
       setIsToastActive(true);

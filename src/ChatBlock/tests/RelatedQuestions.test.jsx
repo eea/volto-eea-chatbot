@@ -162,6 +162,50 @@ describe('RelatedQuestions', () => {
     expect(trackEvent).not.toHaveBeenCalled();
   });
 
+  it.each(['Enter', ' '])(
+    'tracks exactly one keyboard activation (%j)',
+    (key) => {
+      const { getByText } = render(
+        <RelatedQuestions
+          message={{
+            relatedQuestions: [{ question: 'Private suggested question' }],
+          }}
+          onChoice={mockOnChoice}
+          isLoading={false}
+          enableMatomoTracking
+          persona={{ name: 'Environment' }}
+        />,
+      );
+      fireEvent.keyDown(getByText('Private suggested question'), { key });
+      expect(mockOnChoice).toHaveBeenCalledTimes(1);
+      expect(trackEvent).toHaveBeenCalledTimes(1);
+      expect(trackEvent).toHaveBeenCalledWith({
+        category: 'Chatbot - Environment',
+        action: 'Chatbot: Related question click',
+        name: 'Message submitted',
+      });
+    },
+  );
+
+  it('does not track or submit related questions while loading', () => {
+    const { getByText } = render(
+      <RelatedQuestions
+        message={{
+          relatedQuestions: [{ question: 'Private suggested question' }],
+        }}
+        onChoice={mockOnChoice}
+        isLoading
+        enableMatomoTracking
+      />,
+    );
+    fireEvent.click(getByText('Private suggested question'));
+    fireEvent.keyDown(getByText('Private suggested question'), {
+      key: 'Enter',
+    });
+    expect(mockOnChoice).not.toHaveBeenCalled();
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
   it('handles keyboard Enter key', () => {
     const message = {
       relatedQuestions: [{ question: 'Keyboard Question' }],

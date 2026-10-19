@@ -538,7 +538,9 @@ export function AIMessage({
                 onClick={() => {
                   if (enableMatomoTracking) {
                     trackEvent({
-                      category: persona ? `Chatbot - ${persona}` : 'Chatbot',
+                      category: persona?.name
+                        ? `Chatbot - ${persona.name}`
+                        : 'Chatbot',
                       action: 'Chatbot: Stop generating',
                       name: 'Message generation stopped',
                     });

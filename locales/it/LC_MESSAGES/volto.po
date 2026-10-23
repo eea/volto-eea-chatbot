@@ -58,10 +58,20 @@ msgstr ""
 msgid "Stop generating"
 msgstr ""
 
+#. Default: "Submit Feedback"
+#: ChatBlock/components/FeedbackModal
+msgid "Submit Feedback"
+msgstr ""
+
 #. Default: "Submit question"
 #: AISearchInput/components/SearchInput
 #: AISearchInput/messages
 msgid "Submit question"
+msgstr ""
+
+#. Default: "Submitting..."
+#: ChatBlock/components/FeedbackModal
+msgid "Submitting..."
 msgstr ""
 
 #. Default: "This assistant uses AI. Responses may contain inaccuracies."

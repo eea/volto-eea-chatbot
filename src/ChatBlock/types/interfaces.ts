@@ -150,7 +150,7 @@ export interface ChatMessageProps {
   isFetchingRelatedQuestions?: boolean;
   enableShowTotalFailMessage?: boolean;
   enableMatomoTracking?: boolean;
-  persona?: number;
+  persona?: Persona;
   maxContextSegments?: number;
   batchSize?: number;
   /**

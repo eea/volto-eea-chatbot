@@ -1,4 +1,6 @@
+import { useRef } from 'react';
 import cx from 'classnames';
+import { trackEvent } from '@eeacms/volto-matomo/utils';
 import { Button } from 'semantic-ui-react';
 import { useCopyToClipboard } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
 import SVGIcon from './Icon';
@@ -13,15 +15,28 @@ const UserActionsToolbar = ({
   enableFeedback,
   feedbackReasons,
   enableMatomoTracking,
+  matomoCategory,
   persona,
 }) => {
   const [copied, handleCopy] = useCopyToClipboard(message?.message || '');
+  const trackingEnabled = useRef(enableMatomoTracking);
+  trackingEnabled.current = enableMatomoTracking;
 
   return (
     <div className={cx('message-actions', className)}>
       <Button
         basic
-        onClick={() => handleCopy()}
+        onClick={async () => {
+          const success = await handleCopy();
+          if (success && trackingEnabled.current) {
+            trackEvent({
+              category:
+                matomoCategory ||
+                (persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot'),
+              action: 'Response copied',
+            });
+          }
+        }}
         title="Copy"
         aria-label="Copy"
         disabled={copied}
@@ -34,6 +49,7 @@ const UserActionsToolbar = ({
           message={message}
           feedbackReasons={feedbackReasons}
           enableMatomoTracking={enableMatomoTracking}
+          matomoCategory={matomoCategory}
           persona={persona}
         />
       )}

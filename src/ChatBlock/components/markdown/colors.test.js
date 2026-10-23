@@ -74,26 +74,46 @@ describe('getVerdictBgColor', () => {
     }
   });
 
-  it('gives each verdict class its own underline style in style.less', () => {
-    // colour is not the only signal: each hue also has a line style (wavy /
-    // dotted / dashed). Renaming a class here without renaming the LESS selector
+  it('gives each verdict class its own underline style and weight in style.less', () => {
+    // colour is not the only signal: each hue also has a line style and a line
+    // weight, ranked by how much attention the finding asks for - a heavy wavy
+    // line for a conflict, a medium dashed one for silence, a faint dotted one
+    // for support. Renaming a class here without renaming the LESS selector
     // would drop the shape distinction silently, so assert both lists agree.
     const less = fs.readFileSync(
       path.join(__dirname, '..', '..', 'style.less'),
       'utf-8',
     );
-    const styles = {};
+    const expected = {
+      'claim-red-500': { style: 'wavy', thickness: 3 },
+      'claim-yellow-500': { style: 'dashed', thickness: 2.5 },
+      'claim-green-500': { style: 'dotted', thickness: 1.5 },
+    };
+    const rules = {};
     for (const cls of [
       getVerdictBgColor(1.0),
       getVerdictBgColor(0.4),
       getVerdictBgColor(0.0),
     ]) {
-      const rule = less.match(
-        new RegExp(`&\\.${cls} \\{\\s*text-decoration-style: ([a-z]+);`),
-      );
-      expect(rule).not.toBeNull();
-      styles[cls] = rule[1];
+      const block = less.match(new RegExp(`&\\.${cls} \\{([^}]*)\\}`));
+      expect(block).not.toBeNull();
+      rules[cls] = {
+        style: /text-decoration-style:\s*([a-z]+);/.exec(block[1])?.[1],
+        thickness: parseFloat(
+          /text-decoration-thickness:\s*([\d.]+)px;/.exec(block[1])?.[1],
+        ),
+      };
+      expect(rules[cls].style).toBe(expected[cls].style);
+      expect(rules[cls].thickness).toBe(expected[cls].thickness);
     }
-    expect(new Set(Object.values(styles)).size).toBe(3);
+    // no two verdicts may share a style, and the weights must rank the same way
+    // the verdicts do, otherwise the hierarchy is decoration
+    expect(new Set(Object.values(rules).map((r) => r.style)).size).toBe(3);
+    expect(rules['claim-red-500'].thickness).toBeGreaterThan(
+      rules['claim-yellow-500'].thickness,
+    );
+    expect(rules['claim-yellow-500'].thickness).toBeGreaterThan(
+      rules['claim-green-500'].thickness,
+    );
   });
 });

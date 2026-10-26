@@ -252,7 +252,7 @@ function ChatWindow({
                     isFetchingRelatedQuestions={isFetchingRelatedQuestions}
                     enableShowTotalFailMessage={enableShowTotalFailMessage}
                     enableMatomoTracking={enableMatomoTracking}
-                    persona={persona.id}
+                    persona={persona}
                     maxContextSegments={maxContextSegments}
                     batchSize={batchSize}
                     chunkEvidenceWindow={chunkEvidenceWindow}

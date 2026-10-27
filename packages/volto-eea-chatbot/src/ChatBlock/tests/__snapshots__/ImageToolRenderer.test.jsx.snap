@@ -61,6 +61,8 @@ exports[`ImageToolRenderer > handles image without revised_prompt 1`] = `
           <img
             alt=""
             className="image-shape-square"
+            decoding="async"
+            loading="lazy"
             src="https://example.com/image1.png"
           />
         </div>
@@ -101,6 +103,8 @@ exports[`ImageToolRenderer > handles image without shape (defaults to square) 1`
           <img
             alt="Test"
             className="image-shape-square"
+            decoding="async"
+            loading="lazy"
             src="https://example.com/image1.png"
           />
           <div
@@ -146,6 +150,8 @@ exports[`ImageToolRenderer > renders complete state with images 1`] = `
           <img
             alt="A beautiful landscape"
             className="image-shape-landscape"
+            decoding="async"
+            loading="lazy"
             src="https://example.com/image1.png"
           />
           <div
@@ -221,6 +227,8 @@ exports[`ImageToolRenderer > renders multiple images 1`] = `
           <img
             alt="First image"
             className="image-shape-square"
+            decoding="async"
+            loading="lazy"
             src="https://example.com/image1.png"
           />
           <div
@@ -235,6 +243,8 @@ exports[`ImageToolRenderer > renders multiple images 1`] = `
           <img
             alt="Second image"
             className="image-shape-portrait"
+            decoding="async"
+            loading="lazy"
             src="https://example.com/image2.png"
           />
           <div

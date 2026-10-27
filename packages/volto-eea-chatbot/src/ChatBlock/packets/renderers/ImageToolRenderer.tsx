@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import Image from '@plone/volto/components/theme/Image/Image';
 import type {
   ImageGenerationToolPacket,
   ImageGenerationToolDelta,
@@ -40,9 +41,10 @@ export const ImageToolRenderer: MessageRenderer<ImageGenerationToolPacket> = ({
       <div className="images-grid">
         {images.map((image, i) => (
           <div key={image.file_id} className="image-item">
-            <img
+            <Image
               src={image.url}
-              alt={image.revised_prompt}
+              alt={image.revised_prompt || ''}
+              loading="lazy"
               className={`image-shape-${image.shape || 'square'}`}
             />
             {image.revised_prompt ? (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Image from '@plone/volto/components/theme/Image/Image';
 import SVGIcon from './Icon';
 import FileIcon from '@eeacms/volto-eea-chatbot/icons/file.svg';
 import GlobeIcon from '@eeacms/volto-eea-chatbot/icons/globe.svg';
@@ -26,9 +27,10 @@ export function WebResultIcon({ url, size = 10 }: WebResultIconProps) {
 
   // Use Google's advanced favicon service
   return (
-    <img
+    <Image
       src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${hostname}&size=128`}
       alt="favicon"
+      loading="lazy"
       height={size}
       width={size}
       onError={() => setError(true)}

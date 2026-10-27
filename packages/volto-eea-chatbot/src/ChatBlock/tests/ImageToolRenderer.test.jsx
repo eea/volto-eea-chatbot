@@ -1,8 +1,14 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import '@testing-library/jest-dom';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import { ImageToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/ImageToolRenderer';
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+
+// The Volto Image component reads the site image scales from the store.
+const store = configureStore()({ site: { data: {} } });
+const withStore = (children) => <Provider store={store}>{children}</Provider>;
 
 describe('ImageToolRenderer', () => {
   const mockChildRenderer = (result) => (
@@ -21,7 +27,9 @@ describe('ImageToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<ImageToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<ImageToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
     expect(props.onComplete).not.toHaveBeenCalled();
@@ -51,7 +59,9 @@ describe('ImageToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<ImageToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<ImageToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -86,7 +96,9 @@ describe('ImageToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<ImageToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<ImageToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -114,7 +126,9 @@ describe('ImageToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<ImageToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<ImageToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -142,7 +156,9 @@ describe('ImageToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<ImageToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<ImageToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -154,7 +170,9 @@ describe('ImageToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<ImageToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<ImageToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -171,7 +189,7 @@ describe('ImageToolRenderer', () => {
     };
 
     act(() => {
-      renderer.create(<ImageToolRenderer {...props} />);
+      renderer.create(withStore(<ImageToolRenderer {...props} />));
     });
     expect(onComplete).toHaveBeenCalled();
   });

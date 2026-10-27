@@ -1,8 +1,14 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import '@testing-library/jest-dom';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import { SearchToolRenderer } from '@eeacms/volto-eea-chatbot/ChatBlock/packets/renderers/SearchToolRenderer';
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
+
+// The Volto Image component reads the site image scales from the store.
+const store = configureStore()({ site: { data: {} } });
+const withStore = (children) => <Provider store={store}>{children}</Provider>;
 
 describe('SearchToolRenderer', () => {
   beforeEach(() => {
@@ -44,7 +50,9 @@ describe('SearchToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<SearchToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<SearchToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -73,7 +81,9 @@ describe('SearchToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<SearchToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<SearchToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -112,7 +122,7 @@ describe('SearchToolRenderer', () => {
 
     let component;
     act(() => {
-      component = renderer.create(<SearchToolRenderer {...props} />);
+      component = renderer.create(withStore(<SearchToolRenderer {...props} />));
     });
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
@@ -134,7 +144,9 @@ describe('SearchToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<SearchToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<SearchToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -163,7 +175,9 @@ describe('SearchToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<SearchToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<SearchToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -199,7 +213,7 @@ describe('SearchToolRenderer', () => {
 
     let component;
     act(() => {
-      component = renderer.create(<SearchToolRenderer {...props} />);
+      component = renderer.create(withStore(<SearchToolRenderer {...props} />));
     });
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
@@ -239,7 +253,7 @@ describe('SearchToolRenderer', () => {
 
     let component;
     act(() => {
-      component = renderer.create(<SearchToolRenderer {...props} />);
+      component = renderer.create(withStore(<SearchToolRenderer {...props} />));
     });
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
@@ -253,7 +267,9 @@ describe('SearchToolRenderer', () => {
       children: mockChildRenderer,
     };
 
-    const component = renderer.create(<SearchToolRenderer {...props} />);
+    const component = renderer.create(
+      withStore(<SearchToolRenderer {...props} />),
+    );
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
@@ -279,7 +295,7 @@ describe('SearchToolRenderer', () => {
     };
 
     act(() => {
-      renderer.create(<SearchToolRenderer {...props} />);
+      renderer.create(withStore(<SearchToolRenderer {...props} />));
     });
 
     // Initially not called

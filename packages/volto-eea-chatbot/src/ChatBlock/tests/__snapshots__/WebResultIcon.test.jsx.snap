@@ -22,7 +22,9 @@ exports[`WebResultIcon > renders FileIcon for invalid URL 1`] = `
 exports[`WebResultIcon > renders favicon for valid URL 1`] = `
 <img
   alt="favicon"
+  decoding="async"
   height={16}
+  loading="lazy"
   onError={[Function]}
   src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://example.com&size=128"
   style={
@@ -39,7 +41,9 @@ exports[`WebResultIcon > renders favicon for valid URL 1`] = `
 exports[`WebResultIcon > renders with default size 1`] = `
 <img
   alt="favicon"
+  decoding="async"
   height={10}
+  loading="lazy"
   onError={[Function]}
   src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://example.com&size=128"
   style={

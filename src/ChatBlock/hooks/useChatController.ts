@@ -1,5 +1,10 @@
-import type { Message } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
-import { useState, useCallback, useRef, useEffect } from 'react';
+import type {
+  Message,
+  Persona,
+  ToolSnapshot,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useDeepCompareMemoize } from './useDeepCompareMemoize';
 import { useChatStreaming } from './useChatStreaming';
 import {
   createChatSession,
@@ -10,10 +15,13 @@ import { ResearchType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfac
 
 interface UseChatControllerProps {
   personaId: number;
+  persona?: Persona;
   enableQgen?: boolean;
   qgenAsistantId?: number;
   deepResearch?: string;
   onyxVersion?: '2' | '3';
+  defaultEnabledToolIds?: (number | string)[];
+  allowedToolIds?: (number | string)[];
 }
 
 interface RelatedQuestion {
@@ -119,11 +127,109 @@ async function fetchRelatedQuestions(
 
 export function useChatController({
   personaId,
+  persona,
   enableQgen = false,
   qgenAsistantId,
   deepResearch,
   onyxVersion = '3',
+  defaultEnabledToolIds,
+  allowedToolIds,
 }: UseChatControllerProps) {
+  const memoizedAllowedToolIds = useDeepCompareMemoize(allowedToolIds);
+  const memoizedDefaultEnabledToolIds = useDeepCompareMemoize(
+    defaultEnabledToolIds,
+  );
+
+  const availableTools: ToolSnapshot[] = useMemo(() => {
+    const rawTools = persona?.tools || [];
+    return rawTools.filter((t) => {
+      if (t.chat_selectable === false) return false;
+      if (t.enabled === false) return false;
+      if (memoizedAllowedToolIds && memoizedAllowedToolIds.length > 0) {
+        return memoizedAllowedToolIds.some((id) => String(id) === String(t.id));
+      }
+      return true;
+    });
+  }, [persona?.tools, memoizedAllowedToolIds]);
+
+  const initialToolIds = useMemo(() => {
+    if (
+      memoizedDefaultEnabledToolIds &&
+      memoizedDefaultEnabledToolIds.length > 0
+    ) {
+      const mapped = memoizedDefaultEnabledToolIds.map((id) => Number(id));
+      const matched = mapped.filter((id) =>
+        availableTools.some((t) => t.id === id),
+      );
+      if (matched.length > 0) {
+        return matched;
+      }
+    }
+    const defaultEnabled = availableTools
+      .filter((t) => t.default_enabled)
+      .map((t) => t.id);
+    if (defaultEnabled.length > 0) {
+      return defaultEnabled;
+    }
+    // Onyx personas return default_enabled: false on all tools.
+    // Default to the primary internal search tool so standard queries work out
+    // of the box, but keep specialized tools (Code Interpreter, Image Generation,
+    // Coding Agent, MCP connectors) disabled by default so they can be enabled
+    // on demand or suggested when relevant questions are typed.
+    const searchTools = availableTools
+      .filter(
+        (t) =>
+          t.in_code_tool_id === 'SearchTool' ||
+          t.name === 'internal_search' ||
+          t.id === 1,
+      )
+      .map((t) => t.id);
+    if (searchTools.length > 0) {
+      return searchTools;
+    }
+    return [];
+  }, [availableTools, memoizedDefaultEnabledToolIds]);
+
+  const [selectedToolIds, setSelectedToolIds] = useState<number[]>(initialToolIds);
+  const [forcedToolId, setForcedToolId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setSelectedToolIds((prev) => {
+      if (prev.length === 0 && initialToolIds.length > 0) {
+        return initialToolIds;
+      }
+      const filtered = prev.filter((id) =>
+        availableTools.some((t) => t.id === id),
+      );
+      const next = filtered.length > 0 ? filtered : initialToolIds;
+      if (
+        prev.length === next.length &&
+        prev.every((val, idx) => val === next[idx])
+      ) {
+        return prev;
+      }
+      return next;
+    });
+  }, [initialToolIds, availableTools]);
+
+  const toggleTool = useCallback((toolId: number) => {
+    setSelectedToolIds((prev) =>
+      prev.includes(toolId)
+        ? prev.filter((id) => id !== toolId)
+        : [...prev, toolId],
+    );
+  }, []);
+
+  const enableTool = useCallback((toolId: number) => {
+    setSelectedToolIds((prev) =>
+      prev.includes(toolId) ? prev : [...prev, toolId],
+    );
+  }, []);
+
+  const disableTool = useCallback((toolId: number) => {
+    setSelectedToolIds((prev) => prev.filter((id) => id !== toolId));
+  }, []);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [chatSessionLoading, setChatSessionLoading] = useState(false);
@@ -214,7 +320,15 @@ export function useChatController({
   });
 
   const onSubmit = useCallback(
-    async ({ message }: { message?: string }) => {
+    async ({
+      message,
+      enabledToolIds: customToolIds,
+      forcedToolId: customForcedId,
+    }: {
+      message?: string;
+      enabledToolIds?: number[];
+      forcedToolId?: number | null;
+    } = {}) => {
       if (isStreaming) return;
 
       try {
@@ -264,6 +378,11 @@ export function useChatController({
 
         setMessages((prev) => [...prev, userMessage]);
 
+        const effectiveToolIds =
+          customToolIds !== undefined ? customToolIds : selectedToolIds;
+        const effectiveForcedId =
+          customForcedId !== undefined ? customForcedId : forcedToolId;
+
         // Start streaming assistant response
         const assistantNodeId = nodeIdCounter.current++;
         await startStreaming(
@@ -276,6 +395,9 @@ export function useChatController({
             filters: null,
             selectedDocumentIds: [],
             onyxVersion,
+            enabledToolIds: effectiveToolIds,
+            forcedToolIds:
+              effectiveForcedId != null ? [effectiveForcedId] : undefined,
           },
           assistantNodeId,
           userNodeId,
@@ -293,6 +415,9 @@ export function useChatController({
       isDeepResearchEnabled,
       startStreaming,
       messages,
+      selectedToolIds,
+      forcedToolId,
+      onyxVersion,
     ],
   );
 
@@ -375,5 +500,13 @@ export function useChatController({
     isDeepResearchEnabled,
     setIsDeepResearchEnabled,
     chatSessionId,
+    selectedToolIds,
+    setSelectedToolIds,
+    forcedToolId,
+    setForcedToolId,
+    toggleTool,
+    enableTool,
+    disableTool,
+    availableTools,
   };
 }

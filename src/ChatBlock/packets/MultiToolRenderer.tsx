@@ -19,7 +19,7 @@ interface MultiToolRendererProps {
 
 export function MultiToolRenderer({
   toolGroups,
-  showTools = [PacketType.SEARCH_TOOL_START, PacketType.REASONING_START],
+  showTools,
   message,
   libs,
   onAllToolsDisplayed,
@@ -27,14 +27,13 @@ export function MultiToolRenderer({
   const [isExpanded, setIsExpanded] = useState(false);
   const { isFinalMessageComing = false, isComplete = false } = message;
 
-  // Filter tool groups based on allowed tool types
+  // Filter tool groups based on allowed tool types (if showTools is provided for backwards compatibility)
   const filteredToolGroups = useMemo(() => {
-    const activeShowTools =
-      Array.isArray(showTools) && showTools.length > 0
-        ? showTools
-        : [PacketType.SEARCH_TOOL_START, PacketType.REASONING_START];
-    const expandedShowTools = [...activeShowTools];
-    if (activeShowTools.includes(PacketType.SEARCH_TOOL_START)) {
+    if (!showTools || showTools.length === 0) {
+      return toolGroups;
+    }
+    const expandedShowTools = [...showTools];
+    if (expandedShowTools.includes(PacketType.SEARCH_TOOL_START)) {
       expandedShowTools.push(
         PacketType.SEARCH_TOOL_START_V3,
         PacketType.SEARCH_TOOL_QUERIES_DELTA,
@@ -42,7 +41,7 @@ export function MultiToolRenderer({
         PacketType.SEARCH_TOOL_DELTA,
       );
     }
-    if (activeShowTools.includes(PacketType.REASONING_START)) {
+    if (expandedShowTools.includes(PacketType.REASONING_START)) {
       expandedShowTools.push(
         PacketType.REASONING_DELTA,
         PacketType.REASONING_DONE,

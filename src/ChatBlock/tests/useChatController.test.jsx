@@ -506,4 +506,115 @@ describe('useChatController', () => {
       { question: 'Question B' },
     ]);
   });
+
+  it('manages tool selection and passes enabledToolIds to streaming', async () => {
+    createChatSession.mockResolvedValue('session-123');
+
+    const mockPersona = {
+      id: 1,
+      name: 'Test Persona',
+      tools: [
+        {
+          id: 1,
+          name: 'internal_search',
+          display_name: 'Search',
+          chat_selectable: true,
+          default_enabled: true,
+        },
+        {
+          id: 6,
+          name: 'python',
+          display_name: 'Python',
+          chat_selectable: true,
+          default_enabled: false,
+        },
+        {
+          id: 10,
+          name: 'data_mcp',
+          display_name: 'Data MCP',
+          mcp_server_id: 1,
+          chat_selectable: true,
+        },
+      ],
+    };
+
+    const { result } = renderHook(() =>
+      useChatController({
+        personaId: 1,
+        persona: mockPersona,
+      }),
+    );
+
+    expect(result.current.availableTools).toHaveLength(3);
+    expect(result.current.selectedToolIds).toEqual([1]);
+
+    act(() => {
+      result.current.toggleTool(10);
+    });
+    expect(result.current.selectedToolIds).toEqual([1, 10]);
+
+    await act(async () => {
+      await result.current.onSubmit({ message: 'Run data query' });
+    });
+
+    expect(mockSendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Run data query',
+        enabledToolIds: [1, 10],
+      }),
+    );
+
+    act(() => {
+      result.current.disableTool(1);
+    });
+    expect(result.current.selectedToolIds).toEqual([10]);
+
+    act(() => {
+      result.current.enableTool(6);
+    });
+    expect(result.current.selectedToolIds).toEqual([10, 6]);
+  });
+
+  it('respects allowedToolIds and defaultEnabledToolIds from block config', () => {
+    const mockPersona = {
+      id: 1,
+      name: 'Test Persona',
+      tools: [
+        {
+          id: 1,
+          name: 'internal_search',
+          display_name: 'Search',
+          chat_selectable: true,
+        },
+        {
+          id: 6,
+          name: 'python',
+          display_name: 'Python',
+          chat_selectable: true,
+        },
+        {
+          id: 10,
+          name: 'data_mcp',
+          display_name: 'Data MCP',
+          mcp_server_id: 1,
+          chat_selectable: true,
+        },
+      ],
+    };
+
+    // Pass string IDs as returned by Volto multi-select fields: ['6', '10']
+    const { result } = renderHook(() =>
+      useChatController({
+        personaId: 1,
+        persona: mockPersona,
+        allowedToolIds: ['6', '10'],
+        defaultEnabledToolIds: ['10'],
+      }),
+    );
+
+    // Only tool 6 and 10 should be exposed
+    expect(result.current.availableTools.map((t) => t.id)).toEqual([6, 10]);
+    // Only tool 10 should be enabled by default
+    expect(result.current.selectedToolIds).toEqual([10]);
+  });
 });

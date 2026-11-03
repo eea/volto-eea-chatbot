@@ -104,4 +104,54 @@ describe('AutoResizeTextarea', () => {
     expect(queryByLabelText('Stop generating')).not.toBeInTheDocument();
     expect(getByLabelText('Send')).toBeDisabled();
   });
+
+  it('renders no-toolbar class and reclaims toolbar space when toolbarLeft is empty or falsy', () => {
+    const { container, rerender } = render(
+      <AutoResizeTextarea onSubmit={jest.fn()} />,
+    );
+
+    expect(container.querySelector('.chat-composer')).toHaveClass('no-toolbar');
+    expect(
+      container.querySelector('.chat-composer-toolbar'),
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <AutoResizeTextarea
+        onSubmit={jest.fn()}
+        toolbarLeft={
+          <>
+            {false && <div />}
+            {null}
+          </>
+        }
+      />,
+    );
+    expect(container.querySelector('.chat-composer')).toHaveClass('no-toolbar');
+    expect(
+      container.querySelector('.chat-composer-toolbar'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders has-toolbar class and toolbar row when toolbarLeft contains elements', () => {
+    const { container } = render(
+      <AutoResizeTextarea
+        onSubmit={jest.fn()}
+        toolbarLeft={
+          <>
+            <button type="button">Tool</button>
+          </>
+        }
+      />,
+    );
+
+    expect(container.querySelector('.chat-composer')).toHaveClass(
+      'has-toolbar',
+    );
+    expect(
+      container.querySelector('.chat-composer-toolbar'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('.chat-composer-toolbar-left'),
+    ).toHaveTextContent('Tool');
+  });
 });

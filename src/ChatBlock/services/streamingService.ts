@@ -160,9 +160,10 @@ function buildPayloadV3(params: SendMessageParams): Record<string, unknown> {
       tags: params.filters?.tags ?? [],
     },
     deep_research: params.useAgentSearch ?? false,
-    allowed_tool_ids: params.enabledToolIds?.length
-      ? params.enabledToolIds
-      : [1],
+    allowed_tool_ids:
+      params.enabledToolIds !== undefined
+        ? params.enabledToolIds
+        : [1],
     forced_tool_id: params.forcedToolIds?.[0] ?? null,
     llm_override: {
       temperature: params.temperature ?? 0.5,

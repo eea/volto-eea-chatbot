@@ -36,7 +36,9 @@ The **Volto Chatbot** block allows the integration of an AI-powered chatbot into
 | `showAssistantDescription`   | Display or hide the assistant's description in the chat interface.              | Boolean  | `true`                           |
 | `qualityCheck`               | Show automated fact-checking of AI answers against source documents.            | Dropdown | `Disabled`                       |
 | `onDemandInputToggle`        | Sets the default state of the fact-check AI toggle.                             | Boolean  | `true`                           |
-| `showTools`                  | Show or hide tools in the chat interface.                                       | Array    | `["internal_search_tool_start"]` |
+| `enableToolSelection`        | Allow users to enable or disable tools and MCP connectors from the chat UI.     | Boolean  | `true`                           |
+| `allowedTools`               | Select which tools and MCP connectors to expose to users in the tools dropdown. | Array    | `[]` (all exposed)               |
+| `defaultEnabledTools`        | Select which exposed tools are enabled by default for new conversations.        | Array    | `[]` (internal search default)   |
 | `scrollToInput`              | Automatically scroll the page to focus on the chat input when interacting.      | Boolean  | `false`                          |
 | `showAssistantPrompts`       | Show or hide predefined prompts provided by the assistant.                      | Boolean  | `true`                           |
 | `enableStarterPrompts`       | Define custom prompts to initiate a chat with the assistant.                    | Boolean  | `false`                          |

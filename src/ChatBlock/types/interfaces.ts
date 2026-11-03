@@ -163,7 +163,6 @@ export interface ChatMessageProps {
   className?: string;
   chatWindowRef?: React.RefObject<HTMLDivElement>;
   chatWindowEndRef?: React.RefObject<HTMLDivElement>;
-  showTools?: PacketType[];
   /**
    * Hide the classic "Sources" tab, sidebar and inline source list for this
    * presentation (the answer text still renders, and any injected markdown
@@ -181,8 +180,23 @@ export interface ChatMessageProps {
   onCancel?: () => void;
 }
 
+export interface ToolSnapshot {
+  id: number;
+  name: string;
+  display_name: string;
+  description?: string;
+  in_code_tool_id?: string | null;
+  mcp_server_id?: number | null;
+  enabled?: boolean;
+  chat_selectable?: boolean;
+  agent_creation_selectable?: boolean;
+  default_enabled?: boolean;
+  [key: string]: any;
+}
+
 export interface Persona {
   id: number;
   name: string;
   description?: string;
+  tools?: ToolSnapshot[];
 }

@@ -39,6 +39,10 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/hooks', () => ({
     cancelStreaming: jest.fn(),
     setIsDeepResearchEnabled: jest.fn(),
     isDeepResearchEnabled: false,
+    selectedToolIds: [],
+    availableTools: [],
+    toggleTool: jest.fn(),
+    enableTool: jest.fn(),
   })),
 }));
 
@@ -46,9 +50,18 @@ jest.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea',
   () => ({
     __esModule: true,
-    default: ({ placeholder, isStreaming, stopButton, onCancel }) => (
+    default: ({
+      placeholder,
+      isStreaming,
+      stopButton,
+      onCancel,
+      toolbarLeft,
+    }) => (
       <div>
         <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
+        {toolbarLeft && (
+          <div data-testid="mock-toolbar-left">{toolbarLeft}</div>
+        )}
         {stopButton === 'input' && isStreaming && (
           <button data-testid="mock-stop-button" onClick={onCancel}>
             Stop
@@ -581,5 +594,36 @@ describe('ChatWindow', () => {
     expect(
       container.querySelector('.message-loader-stop-btn'),
     ).not.toBeInTheDocument();
+  });
+
+  it('renders McpToolSelector when availableTools are present', () => {
+    useChatController.mockReturnValueOnce({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [1],
+      availableTools: [
+        { id: 1, name: 'search', display_name: 'Search' },
+        {
+          id: 10,
+          name: 'data',
+          display_name: 'Data Connector',
+          mcp_server_id: 1,
+        },
+      ],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+
+    render(
+      <ChatWindowWrapped persona={mockPersona} enableToolSelection={true} />,
+    );
+    expect(screen.getByRole('button', { name: /Tools/i })).toBeInTheDocument();
   });
 });

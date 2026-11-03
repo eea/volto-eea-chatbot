@@ -1,5 +1,4 @@
-import { PacketType } from './types/streamingModels';
-
+// Schema for ChatBlock
 const ScoreRangeSchema = {
   title: 'Score Range',
   fieldsets: [
@@ -58,11 +57,43 @@ const ScoreRangeSchema = {
     },
   },
 };
-export function ChatBlockSchema({ assistants, data }) {
+export function ChatBlockSchema({ assistants, data = {} }) {
   const assistantChoices = () =>
     Array.isArray(assistants)
       ? assistants.map(({ id, name }) => [id.toString(), name])
       : [];
+
+  const selectedAssistant = Array.isArray(assistants)
+    ? assistants.find((a) => a.id?.toString() === data.assistant?.toString())
+    : null;
+
+  const getAvailableTools = () => {
+    if (selectedAssistant?.tools && Array.isArray(selectedAssistant.tools)) {
+      return selectedAssistant.tools.filter((t) => t.chat_selectable !== false);
+    }
+    if (Array.isArray(assistants)) {
+      const seen = new Set();
+      const tools = [];
+      assistants.forEach((a) => {
+        (a.tools || []).forEach((t) => {
+          if (t.chat_selectable !== false && !seen.has(t.id)) {
+            seen.add(t.id);
+            tools.push(t);
+          }
+        });
+      });
+      return tools;
+    }
+    return [];
+  };
+
+  const toolChoices = () =>
+    getAvailableTools().map((t) => [
+      t.id.toString(),
+      t.mcp_server_id
+        ? `${t.display_name || t.name} (MCP)`
+        : t.display_name || t.name,
+    ]);
 
   return {
     title: 'Chatbot',
@@ -101,8 +132,11 @@ export function ChatBlockSchema({ assistants, data }) {
             : []),
           'enableFeedback',
           ...(data.enableFeedback ? ['feedbackReasons'] : []),
+          'enableToolSelection',
+          ...(data.enableToolSelection
+            ? ['allowedTools', 'defaultEnabledTools']
+            : []),
           'stopButton',
-          'showTools',
           'enableMatomoTracking',
           'scrollToInput',
           'showAssistantTitle',
@@ -384,13 +418,25 @@ range is from 0 to 100`,
           'Enable tracking of user interactions via Matomo Analytics. When enabled, the chatbot will send events for: ' +
           'starter prompt clicks, user-submitted questions, clicks on related questions, and feedback on answers (positive/negative).',
       },
-      showTools: {
-        title: 'Show tools',
-        type: 'string',
-        choices: [
-          [PacketType.SEARCH_TOOL_START, 'Search tool'],
-          [PacketType.REASONING_START, 'Reasoning tool'],
-        ],
+      enableToolSelection: {
+        title: 'Enable tool selection',
+        type: 'boolean',
+        default: true,
+        description:
+          'Allow users to enable or disable tools and MCP connectors from the chat UI.',
+      },
+      allowedTools: {
+        title: 'Exposed tools',
+        description:
+          'Select which tools and MCP connectors to expose to users in the tools dropdown. If none selected, all tools configured on the assistant are exposed.',
+        choices: toolChoices(),
+        isMulti: true,
+      },
+      defaultEnabledTools: {
+        title: 'Default active tools',
+        description:
+          'Select which exposed tools are enabled by default for new conversations. If none selected, only internal search is active by default.',
+        choices: toolChoices(),
         isMulti: true,
       },
       placeholderPrompt: {

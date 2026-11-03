@@ -224,7 +224,6 @@ export function AIMessage({
   isLastMessage,
   className = '',
   chatWindowEndRef,
-  showTools,
   hideSourcesTab,
   extraRemarkPlugins,
   extraMarkdownComponents,
@@ -480,7 +479,6 @@ export function AIMessage({
         {toolGroups.length > 0 && (
           <MultiToolRenderer
             toolGroups={toolGroups}
-            showTools={showTools}
             onAllToolsDisplayed={onAllToolsDisplayed}
             message={message}
             libs={libs}

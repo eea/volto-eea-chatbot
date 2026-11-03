@@ -186,4 +186,80 @@ describe('ChatBlockSchema', () => {
       'Always on',
     ]);
   });
+
+  it('includes enableToolSelection in default fields', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: { enableToolSelection: true },
+    });
+    expect(schema.fieldsets[0].fields).toContain('enableToolSelection');
+    expect(schema.properties.enableToolSelection.default).toBe(true);
+  });
+
+  it('does not include obsolete showTools in schema', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: {},
+    });
+    expect(schema.fieldsets[0].fields).not.toContain('showTools');
+    expect(schema.properties.showTools).toBeUndefined();
+  });
+
+  it('includes allowedTools and defaultEnabledTools when enableToolSelection is true', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: { enableToolSelection: true },
+    });
+    expect(schema.fieldsets[0].fields).toContain('allowedTools');
+    expect(schema.fieldsets[0].fields).toContain('defaultEnabledTools');
+    expect(schema.properties.allowedTools.isMulti).toBe(true);
+    expect(schema.properties.defaultEnabledTools.isMulti).toBe(true);
+  });
+
+  it('excludes allowedTools and defaultEnabledTools when enableToolSelection is false', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: { enableToolSelection: false },
+    });
+    expect(schema.fieldsets[0].fields).not.toContain('allowedTools');
+    expect(schema.fieldsets[0].fields).not.toContain('defaultEnabledTools');
+  });
+
+  it('populates tool choices from selected assistant including MCP badge', () => {
+    const assistantsWithTools = [
+      {
+        id: 1,
+        name: 'Assistant 1',
+        tools: [
+          { id: 10, name: 'internal_search', display_name: 'Internal Search' },
+          {
+            id: 20,
+            name: 'eea_mcp',
+            display_name: 'EEA Indicators',
+            mcp_server_id: 5,
+          },
+          {
+            id: 30,
+            name: 'hidden_tool',
+            display_name: 'Hidden Tool',
+            chat_selectable: false,
+          },
+        ],
+      },
+    ];
+
+    const schema = ChatBlockSchema({
+      assistants: assistantsWithTools,
+      data: { assistant: '1', enableToolSelection: true },
+    });
+
+    expect(schema.properties.allowedTools.choices).toEqual([
+      ['10', 'Internal Search'],
+      ['20', 'EEA Indicators (MCP)'],
+    ]);
+    expect(schema.properties.defaultEnabledTools.choices).toEqual([
+      ['10', 'Internal Search'],
+      ['20', 'EEA Indicators (MCP)'],
+    ]);
+  });
 });

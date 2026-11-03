@@ -5,7 +5,7 @@ import { trackEvent } from '@eeacms/volto-matomo/utils';
 import TextareaAutosize from 'react-textarea-autosize';
 
 import SVGIcon from './Icon';
-import SendIcon from '@eeacms/volto-eea-chatbot/icons/send.svg';
+import ArrowUpIcon from '@eeacms/volto-eea-chatbot/icons/arrow-up.svg';
 import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
 
 const messages = defineMessages({
@@ -19,6 +19,19 @@ const messages = defineMessages({
   },
 });
 
+function hasValidChildren(children) {
+  return React.Children.toArray(children).some((child) => {
+    if (!child) return false;
+    if (React.isValidElement(child)) {
+      if (child.type === React.Fragment) {
+        return hasValidChildren(child.props.children);
+      }
+      return true;
+    }
+    return true;
+  });
+}
+
 export default React.forwardRef(function AutoResizeTextarea(props, ref) {
   const {
     onSubmit,
@@ -28,6 +41,7 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
     onCancel,
     enableMatomoTracking,
     persona,
+    toolbarLeft,
     ...rest
   } = props;
   const intl = useIntl();
@@ -66,56 +80,72 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
   const resolvedStopButton =
     stopButton || (enableStopButton === false ? 'disabled' : 'floating');
   const showStopButton = Boolean(resolvedStopButton === 'input' && isStreaming);
+  const hasToolbar = hasValidChildren(toolbarLeft);
+
+  const actions = (
+    <div className="chat-composer-toolbar-right chat-right-actions">
+      {showStopButton ? (
+        <Button
+          className="stop-btn"
+          type="button"
+          aria-label={intl.formatMessage(messages.stopGenerating)}
+          onClick={handleCancel}
+        >
+          <div className="btn-icon">
+            <SVGIcon name={StopIcon} size={14} color="#fff" />
+          </div>
+        </Button>
+      ) : (
+        <Button
+          className="submit-btn"
+          type="submit"
+          aria-label={intl.formatMessage(messages.send)}
+          onKeyDown={(e) => {
+            handleSubmit(e);
+          }}
+          disabled={isStreaming || input.trim() === ''}
+          onClick={(e) => {
+            handleSubmit(e);
+          }}
+        >
+          <div className="btn-icon">
+            <SVGIcon name={ArrowUpIcon} size={18} />
+          </div>
+        </Button>
+      )}
+    </div>
+  );
 
   return (
-    <>
-      <TextareaAutosize
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            handleSubmit(e);
-          } else if (e.key === 'Enter' && e.shiftKey) {
-            e.preventDefault();
-            setInput(input + '\n');
-          }
-        }}
-        disabled={isStreaming}
-        {...rest}
-        ref={ref}
-      />
-
-      <div className="chat-right-actions">
-        {showStopButton ? (
-          <Button
-            className="stop-btn"
-            type="button"
-            aria-label={intl.formatMessage(messages.stopGenerating)}
-            onClick={handleCancel}
-          >
-            <div className="btn-icon">
-              <SVGIcon name={StopIcon} size={14} color="#fff" />
-            </div>
-          </Button>
-        ) : (
-          <Button
-            className="submit-btn"
-            type="submit"
-            aria-label={intl.formatMessage(messages.send)}
-            onKeyDown={(e) => {
+    <div
+      className={`chat-composer ${hasToolbar ? 'has-toolbar' : 'no-toolbar'}`}
+    >
+      <div className="chat-composer-input">
+        <TextareaAutosize
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
               handleSubmit(e);
-            }}
-            disabled={isStreaming || input.trim() === ''}
-            onClick={(e) => {
-              handleSubmit(e);
-            }}
-          >
-            <div className="btn-icon">
-              <SVGIcon name={SendIcon} size="28" />
-            </div>
-          </Button>
-        )}
+            } else if (e.key === 'Enter' && e.shiftKey) {
+              e.preventDefault();
+              setInput(input + '\n');
+            }
+          }}
+          disabled={isStreaming}
+          {...rest}
+          ref={ref}
+        />
       </div>
-    </>
+
+      {hasToolbar ? (
+        <div className="chat-composer-toolbar">
+          <div className="chat-composer-toolbar-left">{toolbarLeft}</div>
+          {actions}
+        </div>
+      ) : (
+        actions
+      )}
+    </div>
   );
 });

@@ -31,12 +31,14 @@ msgstr ""
 #. Default: "Deep research"
 #: AISearchInput/components/DeepResearchToggle
 #: AISearchInput/messages
+#: ChatBlock/components/DeepResearchButton
 msgid "Deep research"
 msgstr ""
 
 #. Default: "Deep research on"
 #: AISearchInput/components/DeepResearchToggle
 #: AISearchInput/messages
+#: ChatBlock/components/DeepResearchButton
 msgid "Deep research on"
 msgstr ""
 
@@ -77,4 +79,14 @@ msgstr ""
 #. Default: "This assistant uses AI. Responses may contain inaccuracies."
 #: AISearchInput/messages
 msgid "This assistant uses AI. Responses may contain inaccuracies."
+msgstr ""
+
+#. Default: "Tools & MCP Connectors"
+#: ChatBlock/components/McpToolSelector
+msgid "Tools & MCP Connectors"
+msgstr ""
+
+#. Default: "Tools ({count})"
+#: ChatBlock/components/McpToolSelector
+msgid "Tools ({count})"
 msgstr ""

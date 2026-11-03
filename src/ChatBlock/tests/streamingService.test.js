@@ -434,6 +434,58 @@ describe('sendMessage', () => {
       }),
     );
   });
+
+  it('includes allowed_tool_ids in v3 payload when enabledToolIds provided', async () => {
+    const chunk = JSON.stringify({
+      ind: 1,
+      obj: { type: 'stop' },
+    });
+    global.fetch.mockResolvedValue(makeStreamResponse([chunk]));
+
+    // eslint-disable-next-line no-unused-vars
+    for await (const _ of sendMessage({
+      message: 'test tools',
+      chatSessionId: 'session-1',
+      parentMessageId: null,
+      regenerate: false,
+      filters: null,
+      selectedDocumentIds: [],
+      onyxVersion: '3',
+      enabledToolIds: [1, 6, 10],
+      forcedToolIds: [6],
+    })) {
+      // consume
+    }
+
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    expect(body.allowed_tool_ids).toEqual([1, 6, 10]);
+    expect(body.forced_tool_id).toBe(6);
+  });
+
+  it('preserves empty allowed_tool_ids array in v3 payload', async () => {
+    const chunk = JSON.stringify({
+      ind: 1,
+      obj: { type: 'stop' },
+    });
+    global.fetch.mockResolvedValue(makeStreamResponse([chunk]));
+
+    // eslint-disable-next-line no-unused-vars
+    for await (const _ of sendMessage({
+      message: 'no tools',
+      chatSessionId: 'session-1',
+      parentMessageId: null,
+      regenerate: false,
+      filters: null,
+      selectedDocumentIds: [],
+      onyxVersion: '3',
+      enabledToolIds: [],
+    })) {
+      // consume
+    }
+
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    expect(body.allowed_tool_ids).toEqual([]);
+  });
 });
 
 // ── regenerateMessage ──────────────────────────────────────────────────

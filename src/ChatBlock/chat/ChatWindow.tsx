@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { useHistory } from 'react-router-dom';
 import type { Persona } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
-import { Button, Form, Segment, Checkbox } from 'semantic-ui-react';
+import { Button, Form, Segment } from 'semantic-ui-react';
 import { injectLazyLibs } from '@plone/volto/helpers/Loadable';
 import { trackEvent } from '@eeacms/volto-matomo/utils';
 import { FormattedMessage } from 'react-intl';
@@ -18,6 +18,8 @@ import AutoResizeTextarea from '@eeacms/volto-eea-chatbot/ChatBlock/components/A
 import QualityCheckToggle from '@eeacms/volto-eea-chatbot/ChatBlock/components/QualityCheckToggle';
 import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState';
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
+import McpToolSelector from '@eeacms/volto-eea-chatbot/ChatBlock/components/McpToolSelector';
+import DeepResearchButton from '@eeacms/volto-eea-chatbot/ChatBlock/components/DeepResearchButton';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
 import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
@@ -46,7 +48,6 @@ interface ChatWindowProps {
   totalFailMessage?: string;
   enableShowTotalFailMessage?: boolean;
   deepResearch?: string;
-  showTools?: PacketType[];
   showAssistantTitle?: boolean;
   showAssistantDescription?: boolean;
   starterPromptsPosition?: 'top' | 'bottom';
@@ -56,6 +57,9 @@ interface ChatWindowProps {
   batchSize?: number;
   chunkEvidenceWindow?: number;
   onyxVersion?: '2' | '3';
+  enableToolSelection?: boolean;
+  allowedTools?: (number | string)[];
+  defaultEnabledTools?: (number | string)[];
   isPlaywrightTest?: boolean;
   initialQuery?: string | null;
   initialDeepResearch?: string | null;
@@ -90,7 +94,6 @@ function ChatWindow({
     totalFailMessage,
     enableShowTotalFailMessage,
     deepResearch,
-    showTools,
     showAssistantTitle,
     showAssistantDescription,
     starterPromptsPosition = 'top',
@@ -100,6 +103,9 @@ function ChatWindow({
     batchSize,
     chunkEvidenceWindow,
     onyxVersion = '3',
+    enableToolSelection = true,
+    allowedTools,
+    defaultEnabledTools,
     hideSourcesTab,
     extraRemarkPlugins,
     extraMarkdownComponents,
@@ -142,12 +148,18 @@ function ChatWindow({
     cancelStreaming,
     setIsDeepResearchEnabled,
     isDeepResearchEnabled,
+    selectedToolIds,
+    toggleTool,
+    availableTools,
   } = useChatController({
     personaId: persona.id,
+    persona,
     qgenAsistantId,
     enableQgen,
     deepResearch,
     onyxVersion,
+    allowedToolIds: allowedTools,
+    defaultEnabledToolIds: defaultEnabledTools,
   });
 
   const [showLandingPage, setShowLandingPage] = useState(true);
@@ -262,7 +274,6 @@ function ChatWindow({
                     }
                     chatWindowRef={chatWindowRef}
                     chatWindowEndRef={chatWindowEndRef}
-                    showTools={showTools}
                     hideSourcesTab={hideSourcesTab}
                     extraRemarkPlugins={extraRemarkPlugins}
                     extraMarkdownComponents={extraMarkdownComponents}
@@ -363,52 +374,61 @@ function ChatWindow({
         )}
         {/* @ts-ignore */}
         <Form>
-          <div className="textarea-wrapper">
-            <AutoResizeTextarea
-              // @ts-ignore TODO: convert AutoResizeTextarea to TypeScript
-              maxRows={8}
-              minRows={1}
-              ref={textareaRef}
-              placeholder={
-                messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
-              }
-              isStreaming={isStreaming}
-              stopButton={stopButtonSetting}
-              onCancel={cancelStreaming}
-              enableMatomoTracking={enableMatomoTracking}
-              persona={persona}
-              onSubmit={onSubmit}
-            />
-          </div>
+          <AutoResizeTextarea
+            // @ts-ignore TODO: convert AutoResizeTextarea to TypeScript
+            maxRows={8}
+            minRows={1}
+            ref={textareaRef}
+            placeholder={
+              messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
+            }
+            isStreaming={isStreaming}
+            stopButton={stopButtonSetting}
+            onCancel={cancelStreaming}
+            enableMatomoTracking={enableMatomoTracking}
+            persona={persona}
+            onSubmit={onSubmit}
+            toolbarLeft={
+              <>
+                {enableToolSelection && availableTools?.length > 0 && (
+                  <McpToolSelector
+                    availableTools={availableTools}
+                    selectedToolIds={selectedToolIds}
+                    onToggleTool={toggleTool}
+                    disabled={isStreaming}
+                  />
+                )}
+
+                {showDeepResearchToggle && (
+                  <DeepResearchButton
+                    enabled={isDeepResearchEnabled}
+                    onToggle={() => {
+                      setIsDeepResearchEnabled((prev) => !prev);
+                      textareaRef.current?.focus();
+                    }}
+                    disabled={isStreaming}
+                  />
+                )}
+
+                {deepResearch === 'always_on' && (
+                  <DeepResearchButton
+                    enabled={true}
+                    disabled={true}
+                    alwaysOn={true}
+                  />
+                )}
+
+                {qualityCheck === 'ondemand_toggle' && (
+                  <QualityCheckToggle
+                    isEditMode={isEditMode}
+                    enabled={qualityCheckEnabled}
+                    setEnabled={setQualityCheckEnabled}
+                  />
+                )}
+              </>
+            }
+          />
         </Form>
-        <div className="chat-controls">
-          {qualityCheck === 'ondemand_toggle' && (
-            <QualityCheckToggle
-              isEditMode={isEditMode}
-              enabled={qualityCheckEnabled}
-              setEnabled={setQualityCheckEnabled}
-            />
-          )}
-
-          {showDeepResearchToggle && (
-            <div className="deep-research-toggle">
-              <Checkbox
-                id="deep-research-toggle"
-                toggle
-                checked={isDeepResearchEnabled}
-                label="Deep research"
-                onChange={(_, { checked }) => {
-                  setIsDeepResearchEnabled(checked ?? false);
-                  textareaRef.current?.focus();
-                }}
-              />
-            </div>
-          )}
-
-          {deepResearch === 'always_on' && (
-            <small className="deep-research-toggle">Deep research on</small>
-          )}
-        </div>
         <div ref={chatWindowEndRef} /> {/* End div to mark the bottom */}
       </div>
 

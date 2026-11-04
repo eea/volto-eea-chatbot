@@ -42,6 +42,7 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
     enableMatomoTracking,
     persona,
     toolbarLeft,
+    toolbarRight,
     ...rest
   } = props;
   const intl = useIntl();
@@ -84,6 +85,7 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
 
   const actions = (
     <div className="chat-composer-toolbar-right chat-right-actions">
+      {toolbarRight}
       {showStopButton ? (
         <Button
           className="stop-btn"

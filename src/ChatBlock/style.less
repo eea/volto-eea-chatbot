@@ -2524,3 +2524,223 @@ body > textarea {
     cursor: default;
   }
 }
+
+.chat-window-top-toolbar {
+  padding: 0 0 1em 0 !important;
+}
+
+.chat-export-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  .chat-export-trigger.icon-only {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    background: #fff;
+    color: #475569;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+
+    &:hover:not(:disabled) {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #004b87;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    .export-icon {
+      flex-shrink: 0;
+    }
+  }
+
+  .chat-export-menu {
+    position: absolute;
+    z-index: 1000;
+    right: 0;
+    bottom: calc(100% + 8px);
+    min-width: 170px;
+    padding: 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+    .chat-export-item {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      padding: 8px 10px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #1e293b;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      gap: 8px;
+      text-align: left;
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+
+      &:hover:not(:disabled) {
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      .export-format-badge {
+        padding: 2px 5px;
+        border-radius: 4px;
+        background: #e2e8f0;
+        color: #475569;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .export-format-name {
+        flex: 1;
+      }
+    }
+  }
+}
+
+@media print {
+  header,
+  footer,
+  #toolbar,
+  .breadcrumbs,
+  .header-wrapper,
+  .footer-wrapper,
+  .pastanaga-menu,
+  .skiplinks-wrapper,
+  .eea.banner,
+  .banner,
+  .documentFirstHeading,
+  .page-header,
+  .page-meta,
+  .content-header {
+    display: none !important;
+  }
+
+  .chat-window {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    .chat-window-top-toolbar,
+    .clear-chat,
+    .chat-export-dropdown,
+    .chat-form,
+    .chat-composer,
+    .chat-controls,
+    .user-actions-toolbar,
+    .chat-actions,
+    .message-actions,
+    .feedback-buttons,
+    .halloumi-feedback,
+    .claim-verification-card,
+    .related-questions,
+    .chat-related-questions,
+    .answer-tab > h5,
+    .starter-prompts,
+    .message-loader-stop,
+    .inline-message-stop,
+    .chat-floating-stop,
+    .citation-modal,
+    .claim-modal,
+    .sources-sidebar,
+    .sources,
+    .sources-listing,
+    .sources-tab,
+    .source,
+    .show-all-sources-btn,
+    .tools-summary-header,
+    .tools-collapsed-header,
+    .tools-container,
+    .multi-tool-renderer,
+    .comment-tabs > .ui.menu,
+    .comment-tabs .ui.menu,
+    .comment-tabs .menu,
+    .ui.menu.pointing.secondary,
+    .circle.assistant {
+      display: none !important;
+    }
+
+    .ui.segment.active.tab {
+      display: block !important;
+      padding: 0 !important;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
+    .ui.segment.tab:not(.active) {
+      display: none !important;
+    }
+
+    .conversation,
+    .messages {
+      overflow: visible !important;
+      height: auto !important;
+      max-height: none !important;
+    }
+
+    .comment {
+      display: block !important;
+      margin-bottom: 1.5em !important;
+      break-inside: auto !important;
+      page-break-inside: auto !important;
+
+      .comment-content {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+
+    table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      break-inside: auto !important;
+      page-break-inside: auto !important;
+
+      tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+
+      thead {
+        display: table-header-group !important;
+      }
+    }
+  }
+}

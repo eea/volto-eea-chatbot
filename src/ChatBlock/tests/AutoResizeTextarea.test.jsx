@@ -154,4 +154,18 @@ describe('AutoResizeTextarea', () => {
       container.querySelector('.chat-composer-toolbar-left'),
     ).toHaveTextContent('Tool');
   });
+
+  it('renders toolbarRight inside actions container alongside submit button', () => {
+    const { getByTestId } = render(
+      <AutoResizeTextarea
+        onSubmit={jest.fn()}
+        toolbarRight={
+          <button data-testid="custom-action" type="button">
+            Action
+          </button>
+        }
+      />,
+    );
+    expect(getByTestId('custom-action')).toBeInTheDocument();
+  });
 });

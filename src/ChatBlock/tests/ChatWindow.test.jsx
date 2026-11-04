@@ -56,11 +56,15 @@ jest.mock(
       stopButton,
       onCancel,
       toolbarLeft,
+      toolbarRight,
     }) => (
       <div>
         <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
         {toolbarLeft && (
           <div data-testid="mock-toolbar-left">{toolbarLeft}</div>
+        )}
+        {toolbarRight && (
+          <div data-testid="mock-toolbar-right">{toolbarRight}</div>
         )}
         {stopButton === 'input' && isStreaming && (
           <button data-testid="mock-stop-button" onClick={onCancel}>
@@ -220,6 +224,9 @@ describe('ChatWindow', () => {
 
     render(<ChatWindowWrapped persona={mockPersona} />);
     expect(screen.getByText('New chat')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /export conversation/i }),
+    ).toBeInTheDocument();
   });
 
   it('shows bottom EmptyState when starterPromptsPosition is bottom', () => {
@@ -625,5 +632,47 @@ describe('ChatWindow', () => {
       <ChatWindowWrapped persona={mockPersona} enableToolSelection={true} />,
     );
     expect(screen.getByRole('button', { name: /Tools/i })).toBeInTheDocument();
+  });
+
+  it('renders ChatExportDropdown in toolbarRight by default', () => {
+    useChatController.mockReturnValueOnce({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [{ role: 'user', message: 'Hi' }],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} />);
+    expect(screen.getByTestId('mock-toolbar-right')).toBeInTheDocument();
+  });
+
+  it('does not render ChatExportDropdown in toolbarRight when enableDownload is false', () => {
+    useChatController.mockReturnValueOnce({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [{ role: 'user', message: 'Hi' }],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} enableDownload={false} />);
+    expect(screen.queryByTestId('mock-toolbar-right')).not.toBeInTheDocument();
   });
 });

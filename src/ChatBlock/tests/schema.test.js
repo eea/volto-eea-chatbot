@@ -187,6 +187,16 @@ describe('ChatBlockSchema', () => {
     ]);
   });
 
+  it('includes enableDownload in default fields with default true', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: {},
+    });
+    expect(schema.fieldsets[0].fields).toContain('enableDownload');
+    expect(schema.properties.enableDownload.default).toBe(true);
+    expect(schema.properties.enableDownload.type).toBe('boolean');
+  });
+
   it('includes enableToolSelection in default fields', () => {
     const schema = ChatBlockSchema({
       assistants: mockAssistants,

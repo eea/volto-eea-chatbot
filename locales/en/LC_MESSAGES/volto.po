@@ -42,6 +42,11 @@ msgstr ""
 msgid "Deep research on"
 msgstr ""
 
+#. Default: "Generating..."
+#: ChatBlock/components/ChatExportDropdown
+msgid "Generating..."
+msgstr ""
+
 #. Default: "Invalid assistant page URL."
 #: AISearchInput/AISearchInputView
 #: AISearchInput/messages

@@ -132,6 +132,7 @@ export function ChatBlockSchema({ assistants, data = {} }) {
             : []),
           'enableFeedback',
           ...(data.enableFeedback ? ['feedbackReasons'] : []),
+          'enableDownload',
           'enableToolSelection',
           ...(data.enableToolSelection
             ? ['allowedTools', 'defaultEnabledTools']
@@ -417,6 +418,13 @@ range is from 0 to 100`,
         description:
           'Enable tracking of user interactions via Matomo Analytics. When enabled, the chatbot will send events for: ' +
           'starter prompt clicks, user-submitted questions, clicks on related questions, and feedback on answers (positive/negative).',
+      },
+      enableDownload: {
+        title: 'Enable download',
+        type: 'boolean',
+        default: true,
+        description:
+          'Allow users to export and download conversations as Markdown, Word (DOCX), or PDF.',
       },
       enableToolSelection: {
         title: 'Enable tool selection',

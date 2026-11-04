@@ -30,6 +30,7 @@ const applyConfig = (config) => {
     rehypePrism: loadable.lib(() => import('rehype-prism-plus')),
     remarkGfm: loadable.lib(() => import('remark-gfm')),
     luxon: loadable.lib(() => import('luxon')),
+    docx: loadable.lib(() => import('docx'), { ssr: false }),
 
     // highlightJs: loadable.lib(() => import('highlight.js')),
     // marked: loadable.lib(() => import('marked')),

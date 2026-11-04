@@ -20,6 +20,7 @@ import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyStat
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 import McpToolSelector from '@eeacms/volto-eea-chatbot/ChatBlock/components/McpToolSelector';
 import DeepResearchButton from '@eeacms/volto-eea-chatbot/ChatBlock/components/DeepResearchButton';
+import ChatExportDropdown from '@eeacms/volto-eea-chatbot/ChatBlock/components/ChatExportDropdown';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
 import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
@@ -57,6 +58,8 @@ interface ChatWindowProps {
   batchSize?: number;
   chunkEvidenceWindow?: number;
   onyxVersion?: '2' | '3';
+  enableDownload?: boolean;
+  enableExport?: boolean;
   enableToolSelection?: boolean;
   allowedTools?: (number | string)[];
   defaultEnabledTools?: (number | string)[];
@@ -111,6 +114,13 @@ function ChatWindow({
     extraMarkdownComponents,
     extraRehypePlugins,
   } = data;
+
+  const isDownloadEnabled =
+    typeof data.enableDownload !== 'undefined'
+      ? Boolean(data.enableDownload)
+      : typeof data.enableExport !== 'undefined'
+        ? Boolean(data.enableExport)
+        : true;
 
   const stopButtonSetting:
     | 'disabled'
@@ -227,7 +237,7 @@ function ChatWindow({
         ) : (
           <>
             {/* @ts-ignore */}
-            <Segment clearing basic>
+            <Segment clearing basic className="chat-window-top-toolbar">
               <Button
                 disabled={isStreaming}
                 onClick={clearChat}
@@ -426,6 +436,15 @@ function ChatWindow({
                   />
                 )}
               </>
+            }
+            toolbarRight={
+              isDownloadEnabled ? (
+                <ChatExportDropdown
+                  messages={messages}
+                  persona={persona}
+                  disabled={isStreaming}
+                />
+              ) : undefined
             }
           />
         </Form>

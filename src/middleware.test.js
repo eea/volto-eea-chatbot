@@ -296,7 +296,7 @@ describe('src/middleware', () => {
 
   it('automatically sets sharing_status to public when create-chat-session succeeds', async () => {
     delete process.env.MOCK_LLM_FILE_PATH;
-    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
     process.env.ONYX_URL = 'http://onyx.test';
 
     req.url = '/_da/chat/create-chat-session';
@@ -330,7 +330,7 @@ describe('src/middleware', () => {
 
   it('enforces ?is_shared=true and returns sanitized public chat session', async () => {
     delete process.env.MOCK_LLM_FILE_PATH;
-    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
     process.env.ONYX_URL = 'http://onyx.test';
 
     req.url = '/_da/chat/get-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa';
@@ -390,7 +390,7 @@ describe('src/middleware', () => {
 
   it('returns 404 if shared_status is not public for get-chat-session', async () => {
     delete process.env.MOCK_LLM_FILE_PATH;
-    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
     process.env.ONYX_URL = 'http://onyx.test';
 
     req.url = '/_da/chat/get-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa';

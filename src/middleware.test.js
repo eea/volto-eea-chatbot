@@ -14,15 +14,18 @@ jest.mock('superagent', () => ({
 // Mock node-fetch - use require() to get the mock reference in tests
 jest.mock('node-fetch', () => {
   const mockPipe = jest.fn();
+  const mockJson = jest.fn().mockResolvedValue({});
   const fn = jest.fn().mockResolvedValue({
     status: 200,
     headers: {
       get: jest.fn().mockReturnValue('application/json'),
       raw: jest.fn().mockReturnValue({}),
     },
+    json: mockJson,
     body: { pipe: mockPipe },
   });
   fn.__mockPipe = mockPipe;
+  fn.__mockJson = mockJson;
   return fn;
 });
 
@@ -291,6 +294,126 @@ describe('src/middleware', () => {
     );
   });
 
+  it('automatically sets sharing_status to public when create-chat-session succeeds', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    req.url = '/_da/chat/create-chat-session';
+    req.method = 'POST';
+    req.body = { persona_id: 1 };
+
+    nodeFetch.mockImplementation(async (url, opts) => {
+      if (url.includes('/chat/create-chat-session')) {
+        return {
+          status: 200,
+          headers: { get: () => 'application/json' },
+          json: () =>
+            Promise.resolve({ chat_session_id: 'test-session-uuid-1234' }),
+        };
+      }
+      if (url.includes('/chat/chat-session/test-session-uuid-1234')) {
+        expect(opts.method).toBe('PATCH');
+        expect(JSON.parse(opts.body)).toEqual({ sharing_status: 'public' });
+        return { ok: true, status: 200 };
+      }
+      return { status: 200, headers: { get: () => 'application/json' } };
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      JSON.stringify({ chat_session_id: 'test-session-uuid-1234' }),
+    );
+  });
+
+  it('enforces ?is_shared=true and returns sanitized public chat session', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    req.url = '/_da/chat/get-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa';
+    req.method = 'GET';
+    req.body = undefined;
+
+    const mockSession = {
+      chat_session_id: '46277749-db60-44f2-9de1-c5dca2eb68fa',
+      description: 'Shared Conversation Title',
+      persona_id: 1,
+      persona_name: 'EEA Assistant',
+      shared_status: 'public',
+      internal_secret_field: 'should-be-stripped',
+      messages: [
+        {
+          message_id: 1,
+          message_type: 'user',
+          message: 'What is air quality?',
+          parent_message: null,
+          latest_child_message: 2,
+          time_sent: '2026-11-05T00:00:00Z',
+        },
+        {
+          message_id: 2,
+          message_type: 'assistant',
+          message: 'Air quality in Europe is improving [1].',
+          parent_message: 1,
+          latest_child_message: null,
+          context_docs: [{ document_id: 'doc1', blurb: 'Blurb' }],
+          citations: { 1: 'doc1' },
+          time_sent: '2026-11-05T00:00:05Z',
+        },
+      ],
+    };
+
+    nodeFetch.mockImplementation(async (url) => {
+      expect(url).toContain(
+        '/api/chat/get-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa?is_shared=true',
+      );
+      return {
+        status: 200,
+        headers: { get: () => 'application/json' },
+        json: () => Promise.resolve(mockSession),
+      };
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    const sentData = JSON.parse(res.send.mock.calls[0][0]);
+    expect(sentData.chat_session_id).toBe(
+      '46277749-db60-44f2-9de1-c5dca2eb68fa',
+    );
+    expect(sentData.internal_secret_field).toBeUndefined();
+    expect(sentData.messages).toHaveLength(2);
+  });
+
+  it('returns 404 if shared_status is not public for get-chat-session', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key';
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    req.url = '/_da/chat/get-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa';
+    req.method = 'GET';
+
+    nodeFetch.mockImplementation(async () => ({
+      status: 200,
+      headers: { get: () => 'application/json' },
+      json: () =>
+        Promise.resolve({
+          chat_session_id: '46277749-db60-44f2-9de1-c5dca2eb68fa',
+          shared_status: 'private',
+        }),
+    }));
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith(
+      JSON.stringify({ error: 'Conversation not found or private' }),
+    );
+  });
+
   it('rejects disallowed paths with 404', async () => {
     process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
     process.env.ONYX_URL = 'http://localhost:3000';
@@ -351,6 +474,30 @@ describe('isPathAllowed', () => {
         ALLOWED_PROXY_PATHS,
       ),
     ).toBe(true);
+    expect(
+      isPathAllowed(
+        '/chat/get-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa',
+        'GET',
+        ALLOWED_PROXY_PATHS,
+      ),
+    ).toBe(true);
+  });
+
+  it('rejects invalid UUIDs for get-chat-session', () => {
+    expect(
+      isPathAllowed(
+        '/chat/get-chat-session/not-a-valid-uuid',
+        'GET',
+        ALLOWED_PROXY_PATHS,
+      ),
+    ).toBe(false);
+    expect(
+      isPathAllowed(
+        '/chat/get-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa',
+        'POST',
+        ALLOWED_PROXY_PATHS,
+      ),
+    ).toBe(false);
   });
 
   it('rejects allowed paths with wrong methods', () => {

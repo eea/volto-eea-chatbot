@@ -48,6 +48,21 @@ The **Volto Chatbot** block allows the integration of an AI-powered chatbot into
 
 ---
 
+## Copy and related-question analytics
+
+When `enableMatomoTracking` is enabled, successful answer copies emit
+`Response copied` under `Chatbot` or
+`Chatbot - <persona name>`. Failed/unavailable clipboard writes and repeated
+activations during a pending write do not emit successful-copy events.
+The shared `UserActionsToolbar` accepts an optional `matomoCategory` override;
+Advanced Search uses `Search - AI summary` for its copy and feedback events.
+
+Related questions retain the existing `Chatbot: Related question click` event
+with name `Message submitted`, including keyboard activation. Loading and
+tracking-disabled states do not emit it. Neither event includes the answer or
+suggested-question text. These events use `@eeacms/volto-matomo/utils` and the
+site's existing tracker configuration.
+
 ## Getting started
 
 ### Try volto-eea-chatbot with Docker

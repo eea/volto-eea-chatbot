@@ -1,5 +1,5 @@
 import type { ReactNode, MutableRefObject } from 'react';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 export const EMAIL_REGEX = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
 
@@ -37,14 +37,27 @@ export function debounce(
   }
 }
 
-export const useCopyToClipboard = (text: string): [boolean, () => void] => {
+export const useCopyToClipboard = (
+  text: string,
+): [boolean, () => Promise<boolean>] => {
   const [copied, setCopied] = useState(false);
+  const copying = useRef(false);
 
-  const copy = useCallback(() => {
-    navigator.clipboard.writeText(text).then(
-      () => setCopied(true),
-      () => setCopied(false),
-    );
+  const copy = useCallback(async () => {
+    // Multiple activations while the clipboard permission/write is pending
+    // must not cause duplicate writes or duplicate successful-copy events.
+    if (copying.current) return false;
+    copying.current = true;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      return true;
+    } catch {
+      setCopied(false);
+      return false;
+    } finally {
+      copying.current = false;
+    }
   }, [text]);
 
   useEffect(() => {

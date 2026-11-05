@@ -12,8 +12,8 @@
  * Three verdicts, three hues: red for a conflict, yellow for silence, green for
  * support. Hue alone is not enough - for red-green colour blindness the two ends
  * of that ramp are the same colour - so each hue also gets its own underline
- * style (see `.claim` in `ChatBlock/style.less`) and the modal names the verdict
- * in words.
+ * style and weight (see `.claim` in `ChatBlock/style.less`) and the modal names
+ * the verdict in words.
  *
  * A claim whose sources were only partly loaded (`contextLimited`) is yellow
  * whatever score it got: the header already refuses to name a verdict for it

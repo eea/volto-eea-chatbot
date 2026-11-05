@@ -1,3 +1,12 @@
+// Import color variables from colors.less.
+//
+// This has to stay the first statement in the file: an `@import` that follows
+// another rule is invalid CSS (SonarQube css:S8778, and browsers drop the
+// statement outright). Less inlines the file at compile time, so the import
+// order here only decides where the `.claim-*` colour utilities land in the
+// output - nothing below depends on the import being late.
+@import './components/markdown/colors.less';
+
 // Font imports
 @font-face {
   font-family: 'DejaVu Sans';
@@ -5,9 +14,6 @@
   font-weight: normal;
   src: url('./fonts/DejaVuSans.ttf') format('truetype');
 }
-
-// Import color variables from colors.less
-@import './components/markdown/colors.less';
 
 @blue: #005c97;
 @grey: #3d5265;
@@ -695,13 +701,21 @@ mark {
 
 // The underline on a checked claim carries the verdict, and hue alone cannot do
 // that job: for red-green colour blindness the good and the bad end of the ramp
-// are the same colour. So hue and line style change together -
-//   contradicted     ~~~~ wavy ~~~~    red
-//   not_enough_info  ···· dotted ····  yellow
-//   supported        ---- dashed ----  green
+// are the same colour. So hue, line style and line weight change together -
+//   contradicted     ~~~~ wavy, 3px ~~~~      red     (heaviest)
+//   not_enough_info  ---- dashed, 2.5px ---   yellow  (medium)
+//   supported        ···· dotted, 1.5px ···   green   (lightest)
+// The weight ranks the findings by how much attention they ask for: a conflict
+// gets the heaviest line, silence a medium one, support the faintest. Style and
+// weight are also what a greyscale print, or a colour-blind reader, is left with
+// - which is why the two lighter verdicts keep *distinct* styles rather than
+// just getting thinner versions of the same dashed line.
+//
 // The stroke uses `--claim-stroke-color` (see `components/markdown/colors.less`),
 // a darkened variant of the hue: these hues are fine as large fills but a 2px
-// line of yellow-500 is 1.92:1 against white and green-500 is 2.28:1.
+// line of yellow-500 is 1.92:1 against white and green-500 is 2.28:1. "Lighter"
+// for supported is paid for in thickness, never in hue: the 1.5px dotted line is
+// still the -8 green (3.32:1), so it clears WCAG 1.4.11 while reading faint.
 .claim {
   position: relative;
   display: inline;
@@ -713,14 +727,17 @@ mark {
 
   &.claim-red-500 {
     text-decoration-style: wavy;
+    text-decoration-thickness: 3px;
   }
 
   &.claim-yellow-500 {
-    text-decoration-style: dotted;
+    text-decoration-style: dashed;
+    text-decoration-thickness: 2.5px;
   }
 
   &.claim-green-500 {
-    text-decoration-style: dashed;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1.5px;
   }
 
   &:hover {
@@ -1248,6 +1265,51 @@ mark {
 }
 
 .feedback-modal {
+  // Announce progress outside the busy button without adding a visible row.
+  .feedback-submit-status {
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ui.button.feedback-submit-button {
+    display: inline-grid;
+    grid-template-areas: 'label';
+
+    // Both labels occupy the same cell, reserving the larger label's size.
+    .feedback-submit-label,
+    .feedback-submit-progress {
+      grid-area: label;
+    }
+
+    .feedback-submit-progress {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+
+      // Avoid the global .spinner border and Semantic UI icon glyph styles.
+      .feedback-submit-spinner {
+        width: 1em;
+        height: 1em;
+        box-sizing: border-box;
+        flex: 0 0 auto;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        border-right-color: transparent;
+        animation: spin-rotate 0.75s linear infinite;
+      }
+    }
+
+    .feedback-submit-label[aria-hidden='true'],
+    .feedback-submit-progress[aria-hidden='true'] {
+      visibility: hidden;
+    }
+  }
+
   h3 {
     color: @grey;
   }

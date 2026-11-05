@@ -76,7 +76,9 @@ async function fetchRelatedQuestions(
   onyxVersion: '2' | '3' = '3',
 ): Promise<RelatedQuestion[]> {
   try {
-    console.log(`[RQ] Creating session for assistant ${qgenAsistantId} (Onyx v${onyxVersion})`);
+    console.log(
+      `[RQ] Creating session for assistant ${qgenAsistantId} (Onyx v${onyxVersion})`,
+    );
     const chatSessionId = await createChatSession(
       qgenAsistantId,
       `Q: ${query}`,
@@ -190,7 +192,8 @@ export function useChatController({
     return [];
   }, [availableTools, memoizedDefaultEnabledToolIds]);
 
-  const [selectedToolIds, setSelectedToolIds] = useState<number[]>(initialToolIds);
+  const [selectedToolIds, setSelectedToolIds] =
+    useState<number[]>(initialToolIds);
   const [forcedToolId, setForcedToolId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -432,7 +435,9 @@ export function useChatController({
       qgenAsistantId &&
       latestAssistantMessage?.type === 'assistant'
     ) {
-      console.log(`[RQ] Criteria met: assistantNodeId=${latestAssistantMessage.nodeId}, qgenAssistant=${qgenAsistantId}`);
+      console.log(
+        `[RQ] Criteria met: assistantNodeId=${latestAssistantMessage.nodeId}, qgenAssistant=${qgenAsistantId}`,
+      );
       if (isDeepResearchEnabled) {
         setMessages((prev) => {
           return prev.map((m) =>
@@ -474,7 +479,13 @@ export function useChatController({
         setIsFetchingRelatedQuestions(false);
       }
     }
-  }, [messages, enableQgen, qgenAsistantId, isDeepResearchEnabled, onyxVersion]);
+  }, [
+    messages,
+    enableQgen,
+    qgenAsistantId,
+    isDeepResearchEnabled,
+    onyxVersion,
+  ]);
 
   const clearChat = useCallback(() => {
     setMessages([]);
@@ -482,6 +493,24 @@ export function useChatController({
     nodeIdCounter.current = 1;
     setIsCancelled(false);
   }, []);
+
+  const resetChatSessionId = useCallback(() => {
+    setChatSessionId(null);
+  }, []);
+
+  const loadChatSession = useCallback(
+    (sessionId: string, loadedMessages: Message[]) => {
+      setChatSessionId(sessionId);
+      setMessages(loadedMessages);
+      messagesRef.current = loadedMessages;
+      const maxId = loadedMessages.reduce(
+        (max, m) => Math.max(max, m.nodeId || 0),
+        0,
+      );
+      nodeIdCounter.current = maxId + 1;
+    },
+    [],
+  );
 
   const handleCancel = useCallback(() => {
     setIsCancelled(true);
@@ -496,6 +525,8 @@ export function useChatController({
     onSubmit,
     onFetchRelatedQuestions,
     clearChat,
+    resetChatSessionId,
+    loadChatSession,
     cancelStreaming: handleCancel,
     isDeepResearchEnabled,
     setIsDeepResearchEnabled,

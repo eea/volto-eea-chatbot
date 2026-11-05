@@ -16,6 +16,7 @@ function ChatBlockView(props) {
   const isPlaywrightTest = query.playwright === 'yes';
   const initialQuery = query.query || null;
   const initialDeepResearch = query.deepResearch || null;
+  const initialChatSessionId = query.chat || query.session || null;
 
   useEffect(() => {
     if (isPlaywrightTest) {
@@ -39,6 +40,7 @@ function ChatBlockView(props) {
       block_id={id}
       initialQuery={initialQuery}
       initialDeepResearch={initialDeepResearch}
+      initialChatSessionId={initialChatSessionId}
       {...data}
     />
   ) : (

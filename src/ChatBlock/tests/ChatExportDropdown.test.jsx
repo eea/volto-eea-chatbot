@@ -154,6 +154,42 @@ describe('ChatExportDropdown', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
+  it('renders Shareable link option when chatSessionId is provided and copies link on click', async () => {
+    const originalClipboard = navigator.clipboard;
+    const writeTextMock = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: writeTextMock },
+      writable: true,
+      configurable: true,
+    });
+
+    try {
+      renderComponent({
+        chatSessionId: 'test-session-uuid-1234',
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: /export/i }));
+      const shareButton = screen.getByRole('menuitem', {
+        name: /shareable link/i,
+      });
+      expect(shareButton).toBeInTheDocument();
+
+      fireEvent.click(shareButton);
+
+      await waitFor(() => {
+        expect(writeTextMock).toHaveBeenCalledWith(
+          expect.stringContaining('?chat=test-session-uuid-1234'),
+        );
+      });
+    } finally {
+      Object.defineProperty(navigator, 'clipboard', {
+        value: originalClipboard,
+        writable: true,
+        configurable: true,
+      });
+    }
+  });
+
   it('closes dropdown when clicking outside', () => {
     renderComponent();
     fireEvent.click(screen.getByRole('button', { name: /export/i }));

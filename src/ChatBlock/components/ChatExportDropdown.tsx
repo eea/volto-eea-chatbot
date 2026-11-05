@@ -1,12 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import DownloadIcon from '@eeacms/volto-eea-chatbot/icons/download.svg';
+import CopyIcon from '@eeacms/volto-eea-chatbot/icons/copy.svg';
+import CheckIcon from '@eeacms/volto-eea-chatbot/icons/check.svg';
 import {
   exportConversationAsMarkdown,
   exportConversationAsPdf,
   exportConversationAsDocx,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/exportUtils';
+import { copyShareLink } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
 import type {
   Message,
   Persona,
@@ -15,21 +18,45 @@ import type {
 export interface ChatExportDropdownProps {
   messages: Message[];
   persona?: Persona;
+  chatSessionId?: string | null;
   disabled?: boolean;
   className?: string;
   hideWhenEmpty?: boolean;
 }
 
+const messagesI18n = defineMessages({
+  exportConversation: {
+    id: 'Export conversation',
+    defaultMessage: 'Export conversation',
+  },
+  exportOrShareConversation: {
+    id: 'Export or share conversation',
+    defaultMessage: 'Export or share conversation',
+  },
+});
+
 export function ChatExportDropdown({
   messages,
   persona,
+  chatSessionId,
   disabled = false,
   className = '',
   hideWhenEmpty = true,
 }: ChatExportDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const intl = useIntl();
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const hasMessages = Array.isArray(messages) && messages.length > 0;
   const canExport = !disabled && hasMessages;
@@ -98,6 +125,21 @@ export function ChatExportDropdown({
     exportConversationAsPdf();
   };
 
+  const handleCopyLink = async () => {
+    if (!chatSessionId) return;
+    const ok = await copyShareLink(chatSessionId);
+    if (ok) {
+      setIsCopied(true);
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+      copyTimeoutRef.current = setTimeout(() => {
+        setIsCopied(false);
+        closeDropdown();
+      }, 1500);
+    }
+  };
+
   if (hideWhenEmpty && !hasMessages) {
     return null;
   }
@@ -114,8 +156,16 @@ export function ChatExportDropdown({
         disabled={!canExport}
         aria-haspopup="true"
         aria-expanded={isOpen}
-        aria-label="Export conversation"
-        title="Export conversation"
+        aria-label={intl.formatMessage(
+          chatSessionId
+            ? messagesI18n.exportOrShareConversation
+            : messagesI18n.exportConversation,
+        )}
+        title={intl.formatMessage(
+          chatSessionId
+            ? messagesI18n.exportOrShareConversation
+            : messagesI18n.exportConversation,
+        )}
       >
         <SVGIcon name={DownloadIcon} size={15} className="export-icon" />
       </button>
@@ -161,6 +211,32 @@ export function ChatExportDropdown({
             <span className="export-format-badge">PDF</span>
             <span className="export-format-name">PDF (.pdf)</span>
           </button>
+
+          {chatSessionId && (
+            <button
+              type="button"
+              className="chat-export-item chat-share-link-item"
+              role="menuitem"
+              onClick={handleCopyLink}
+            >
+              <span className="export-format-badge">
+                <SVGIcon name={isCopied ? CheckIcon : CopyIcon} size={13} />
+              </span>
+              <span className="export-format-name">
+                {isCopied ? (
+                  <FormattedMessage
+                    id="Link copied!"
+                    defaultMessage="Link copied!"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="Shareable link"
+                    defaultMessage="Shareable link"
+                  />
+                )}
+              </span>
+            </button>
+          )}
         </div>
       )}
     </div>

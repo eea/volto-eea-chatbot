@@ -7,13 +7,12 @@ import React, {
 } from 'react';
 import { useHistory } from 'react-router-dom';
 import type { Persona } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
-import { Button, Form, Segment } from 'semantic-ui-react';
+import { Button, Form } from 'semantic-ui-react';
 import { injectLazyLibs } from '@plone/volto/helpers/Loadable';
 import { trackEvent } from '@eeacms/volto-matomo/utils';
 import { FormattedMessage } from 'react-intl';
 
 import { ChatMessage } from '.';
-import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 import AutoResizeTextarea from '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea';
 import QualityCheckToggle from '@eeacms/volto-eea-chatbot/ChatBlock/components/QualityCheckToggle';
 import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState';
@@ -24,6 +23,11 @@ import ChatExportDropdown from '@eeacms/volto-eea-chatbot/ChatBlock/components/C
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
 import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
+import ExternalLinkIcon from '@eeacms/volto-eea-chatbot/icons/external-link.svg';
+import {
+  getSharedChatSession,
+  deserializeChatSession,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
 
 import '@eeacms/volto-eea-chatbot/ChatBlock/style.less';
 
@@ -66,6 +70,7 @@ interface ChatWindowProps {
   isPlaywrightTest?: boolean;
   initialQuery?: string | null;
   initialDeepResearch?: string | null;
+  initialChatSessionId?: string | null;
   [key: string]: any;
 }
 
@@ -79,6 +84,7 @@ function ChatWindow({
   isPlaywrightTest,
   initialQuery,
   initialDeepResearch,
+  initialChatSessionId,
   ...data
 }: ChatWindowProps) {
   const {
@@ -155,9 +161,11 @@ function ChatWindow({
     isStreaming,
     isFetchingRelatedQuestions,
     clearChat,
+    loadChatSession,
     cancelStreaming,
     setIsDeepResearchEnabled,
     isDeepResearchEnabled,
+    chatSessionId,
     selectedToolIds,
     toggleTool,
     availableTools,
@@ -173,11 +181,66 @@ function ChatWindow({
   });
 
   const [showLandingPage, setShowLandingPage] = useState(true);
+  const [isSharedView, setIsSharedView] = useState(false);
+  const [sharedSessionLoading, setSharedSessionLoading] = useState(false);
+  const [sharedSessionError, setSharedSessionError] = useState(false);
 
   const history = useHistory();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const chatWindowRef = useRef(null);
   const chatWindowEndRef = useRef(null);
+
+  // Load shared session from URL parameter on mount
+  useEffect(() => {
+    let isMounted = true;
+    if (initialChatSessionId && messages.length === 0) {
+      setSharedSessionLoading(true);
+      setSharedSessionError(false);
+      setShowLandingPage(false);
+
+      getSharedChatSession(initialChatSessionId)
+        .then((detail) => {
+          if (!isMounted) return;
+          const deserialized = deserializeChatSession(detail);
+          loadChatSession(initialChatSessionId, deserialized);
+          setIsSharedView(true);
+          setSharedSessionLoading(false);
+        })
+        .catch((err) => {
+          if (!isMounted) return;
+          // eslint-disable-next-line no-console
+          console.error('Failed to load shared conversation:', err);
+          setSharedSessionError(true);
+          setSharedSessionLoading(false);
+        });
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [initialChatSessionId, loadChatSession]);
+
+  const handleClearChat = useCallback(() => {
+    clearChat();
+    setIsSharedView(false);
+    setSharedSessionError(false);
+    setShowLandingPage(true);
+    if (
+      typeof window !== 'undefined' &&
+      (window.location?.search?.includes('chat=') ||
+        window.location?.search?.includes('session='))
+    ) {
+      history.replace(window.location.pathname);
+    }
+  }, [clearChat, history]);
+
+  const handleFormSubmit = useCallback(
+    ({ message }: { message: string }) => {
+      onSubmit({ message });
+      setShowLandingPage(false);
+    },
+    [onSubmit],
+  );
 
   useEffect(() => {
     setShowLandingPage(messages.length === 0);
@@ -209,10 +272,9 @@ function ChatWindow({
           name: 'Message submitted',
         });
       }
-      onSubmit({ message });
-      setShowLandingPage(false);
+      handleFormSubmit({ message });
     },
-    [persona, enableMatomoTracking, onSubmit],
+    [persona, enableMatomoTracking, handleFormSubmit],
   );
 
   return (
@@ -221,7 +283,32 @@ function ChatWindow({
       data-playwright-block-id={isPlaywrightTest ? block_id : undefined}
     >
       <div className="messages">
-        {showLandingPage ? (
+        {sharedSessionLoading ? (
+          <div className="shared-chat-loading" role="status" aria-live="polite">
+            <div className="shared-chat-spinner" />
+            <p>
+              <FormattedMessage
+                id="Loading shared conversation..."
+                defaultMessage="Loading shared conversation..."
+              />
+            </p>
+          </div>
+        ) : sharedSessionError ? (
+          <div className="shared-chat-error" role="alert">
+            <p>
+              <FormattedMessage
+                id="This shared conversation could not be found or is private."
+                defaultMessage="This shared conversation could not be found or is private."
+              />
+            </p>
+            <Button onClick={handleClearChat} primary>
+              <FormattedMessage
+                id="Start a new conversation"
+                defaultMessage="Start a new conversation"
+              />
+            </Button>
+          </div>
+        ) : showLandingPage ? (
           <>
             {showAssistantTitle && <h2>{persona.name}</h2>}
             {showAssistantDescription && <p>{persona.description}</p>}
@@ -235,116 +322,107 @@ function ChatWindow({
             )}
           </>
         ) : (
-          <>
-            {/* @ts-ignore */}
-            <Segment clearing basic className="chat-window-top-toolbar">
-              <Button
-                disabled={isStreaming}
-                onClick={clearChat}
-                className="right floated clear-chat"
-                aria-label="Clear chat"
-              >
-                <SVGIcon name={PenIcon} /> New chat
-              </Button>
-            </Segment>
-            <div
-              ref={chatWindowRef}
-              className={`conversation ${height ? 'include-scrollbar' : ''}`}
-              style={{ maxHeight: height }}
-            >
-              {messages.map((message, index) => (
-                <React.Fragment key={message.messageId}>
-                  <ChatMessage
-                    prevMessage={messages[index - 1]}
-                    message={message}
-                    isLoading={isStreaming}
-                    isDeepResearchEnabled={isDeepResearchEnabled}
-                    libs={libs}
-                    onChoice={(message) => onSubmit({ message })}
-                    onFetchRelatedQuestions={onFetchRelatedQuestions}
-                    enableFeedback={enableFeedback}
-                    scrollToInput={scrollToInput}
-                    feedbackReasons={feedbackReasons}
-                    qualityCheck={qualityCheck}
-                    qualityCheckStages={qualityCheckStages}
-                    qualityCheckContext={qualityCheckContext}
-                    qualityCheckEnabled={qualityCheckEnabled}
-                    noSupportDocumentsMessage={noSupportDocumentsMessage}
-                    totalFailMessage={totalFailMessage}
-                    isFetchingRelatedQuestions={isFetchingRelatedQuestions}
-                    enableShowTotalFailMessage={enableShowTotalFailMessage}
-                    enableMatomoTracking={enableMatomoTracking}
-                    persona={persona}
-                    maxContextSegments={maxContextSegments}
-                    batchSize={batchSize}
-                    chunkEvidenceWindow={chunkEvidenceWindow}
-                    isLastMessage={index === messages.length - 1}
-                    className={
-                      index === messages.length - 1 ? 'most-recent' : ''
-                    }
-                    chatWindowRef={chatWindowRef}
-                    chatWindowEndRef={chatWindowEndRef}
-                    hideSourcesTab={hideSourcesTab}
-                    extraRemarkPlugins={extraRemarkPlugins}
-                    extraMarkdownComponents={extraMarkdownComponents}
-                    extraRehypePlugins={extraRehypePlugins}
-                    stopButton={stopButtonSetting}
-                    onCancel={cancelStreaming}
-                  />
-                </React.Fragment>
-              ))}
+          <div
+            ref={chatWindowRef}
+            className={`conversation ${height ? 'include-scrollbar' : ''}`}
+            style={{ maxHeight: height }}
+          >
+            {messages.map((message, index) => (
+              <React.Fragment key={message.messageId}>
+                <ChatMessage
+                  prevMessage={messages[index - 1]}
+                  message={message}
+                  isLoading={isStreaming}
+                  isDeepResearchEnabled={isDeepResearchEnabled}
+                  libs={libs}
+                  onChoice={
+                    isSharedView
+                      ? undefined
+                      : (message) => handleFormSubmit({ message })
+                  }
+                  onFetchRelatedQuestions={
+                    isSharedView ? undefined : onFetchRelatedQuestions
+                  }
+                  enableFeedback={enableFeedback}
+                  scrollToInput={scrollToInput}
+                  feedbackReasons={feedbackReasons}
+                  qualityCheck={qualityCheck}
+                  qualityCheckStages={qualityCheckStages}
+                  qualityCheckContext={qualityCheckContext}
+                  qualityCheckEnabled={qualityCheckEnabled}
+                  noSupportDocumentsMessage={noSupportDocumentsMessage}
+                  totalFailMessage={totalFailMessage}
+                  isFetchingRelatedQuestions={isFetchingRelatedQuestions}
+                  enableShowTotalFailMessage={enableShowTotalFailMessage}
+                  enableMatomoTracking={enableMatomoTracking}
+                  persona={persona}
+                  maxContextSegments={maxContextSegments}
+                  batchSize={batchSize}
+                  chunkEvidenceWindow={chunkEvidenceWindow}
+                  isLastMessage={index === messages.length - 1}
+                  className={index === messages.length - 1 ? 'most-recent' : ''}
+                  chatWindowRef={chatWindowRef}
+                  chatWindowEndRef={chatWindowEndRef}
+                  hideSourcesTab={hideSourcesTab}
+                  extraRemarkPlugins={extraRemarkPlugins}
+                  extraMarkdownComponents={extraMarkdownComponents}
+                  extraRehypePlugins={extraRehypePlugins}
+                  stopButton={stopButtonSetting}
+                  onCancel={cancelStreaming}
+                />
+              </React.Fragment>
+            ))}
 
-              {isStreaming &&
-                !isFetchingRelatedQuestions &&
-                messages[messages.length - 1]?.type === 'user' && (
-                  <div className="comment">
-                    <div className="circle assistant placeholder"></div>
-                    <div className="comment-content">
-                      <div className="loader-container">
-                        <div className="loader" />
-                        {stopButtonSetting === 'message_loader' && (
-                          <div className="message-loader-stop">
-                            <Button
-                              className="message-loader-stop-btn"
-                              type="button"
-                              aria-label="Stop generating"
-                              onClick={() => {
-                                if (enableMatomoTracking) {
-                                  trackEvent({
-                                    category: persona?.name
-                                      ? `Chatbot - ${persona.name}`
-                                      : 'Chatbot',
-                                    action: 'Chatbot: Stop generating',
-                                    name: 'Message generation stopped',
-                                  });
-                                }
-                                cancelStreaming();
-                              }}
-                            >
-                              <div className="stop-btn-inner">
-                                <div className="stop-icon-circle">
-                                  <SVGIcon
-                                    name={StopIcon}
-                                    size={8}
-                                    color="#fff"
-                                  />
-                                </div>
-                                <span>
-                                  <FormattedMessage
-                                    id="Stop generating"
-                                    defaultMessage="Stop generating"
-                                  />
-                                </span>
+            {isStreaming &&
+              !isFetchingRelatedQuestions &&
+              messages[messages.length - 1]?.type === 'user' && (
+                <div className="comment">
+                  <div className="circle assistant placeholder"></div>
+                  <div className="comment-content">
+                    <div className="loader-container">
+                      <div className="loader" />
+                      {stopButtonSetting === 'message_loader' && (
+                        <div className="message-loader-stop">
+                          <Button
+                            className="message-loader-stop-btn"
+                            type="button"
+                            aria-label="Stop generating"
+                            onClick={() => {
+                              if (enableMatomoTracking) {
+                                trackEvent({
+                                  category: persona?.name
+                                    ? `Chatbot - ${persona.name}`
+                                    : 'Chatbot',
+                                  action: 'Chatbot: Stop generating',
+                                  name: 'Message generation stopped',
+                                });
+                              }
+                              cancelStreaming();
+                            }}
+                          >
+                            <div className="stop-btn-inner">
+                              <div className="stop-icon-circle">
+                                <SVGIcon
+                                  name={StopIcon}
+                                  size={8}
+                                  color="#fff"
+                                />
                               </div>
-                            </Button>
-                          </div>
-                        )}
-                      </div>
+                              <span>
+                                <FormattedMessage
+                                  id="Stop generating"
+                                  defaultMessage="Stop generating"
+                                />
+                              </span>
+                            </div>
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
-            </div>
-          </>
+                </div>
+              )}
+          </div>
         )}
       </div>
 
@@ -383,71 +461,121 @@ function ChatWindow({
           </div>
         )}
         {/* @ts-ignore */}
-        <Form>
-          <AutoResizeTextarea
-            // @ts-ignore TODO: convert AutoResizeTextarea to TypeScript
-            maxRows={8}
-            minRows={1}
-            ref={textareaRef}
-            placeholder={
-              messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
-            }
-            isStreaming={isStreaming}
-            stopButton={stopButtonSetting}
-            onCancel={cancelStreaming}
-            enableMatomoTracking={enableMatomoTracking}
-            persona={persona}
-            onSubmit={onSubmit}
-            toolbarLeft={
-              <>
-                {enableToolSelection && availableTools?.length > 0 && (
-                  <McpToolSelector
-                    availableTools={availableTools}
-                    selectedToolIds={selectedToolIds}
-                    onToggleTool={toggleTool}
-                    disabled={isStreaming}
-                  />
-                )}
-
-                {showDeepResearchToggle && (
-                  <DeepResearchButton
-                    enabled={isDeepResearchEnabled}
-                    onToggle={() => {
-                      setIsDeepResearchEnabled((prev) => !prev);
-                      textareaRef.current?.focus();
-                    }}
-                    disabled={isStreaming}
-                  />
-                )}
-
-                {deepResearch === 'always_on' && (
-                  <DeepResearchButton
-                    enabled={true}
-                    disabled={true}
-                    alwaysOn={true}
-                  />
-                )}
-
-                {qualityCheck === 'ondemand_toggle' && (
-                  <QualityCheckToggle
-                    isEditMode={isEditMode}
-                    enabled={qualityCheckEnabled}
-                    setEnabled={setQualityCheckEnabled}
-                  />
-                )}
-              </>
-            }
-            toolbarRight={
-              isDownloadEnabled ? (
+        {sharedSessionLoading || sharedSessionError ? null : isSharedView ? (
+          <div className="chat-composer is-readonly">
+            <div className="chat-composer-readonly-badge">
+              <SVGIcon name={ExternalLinkIcon} size={15} />
+              <span>
+                <FormattedMessage
+                  id="You are viewing a shared conversation (read-only)."
+                  defaultMessage="You are viewing a shared conversation (read-only)."
+                />
+              </span>
+            </div>
+            <div className="chat-composer-toolbar-right chat-right-actions">
+              {isDownloadEnabled && (
                 <ChatExportDropdown
                   messages={messages}
                   persona={persona}
-                  disabled={isStreaming}
+                  chatSessionId={chatSessionId}
                 />
-              ) : undefined
-            }
-          />
-        </Form>
+              )}
+              <Button
+                onClick={handleClearChat}
+                primary
+                className="start-new-chat-btn"
+                aria-label="Start a new conversation"
+              >
+                <SVGIcon name={PenIcon} size={14} />{' '}
+                <FormattedMessage
+                  id="Start a new conversation"
+                  defaultMessage="Start a new conversation"
+                />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Form>
+            <AutoResizeTextarea
+              // @ts-ignore TODO: convert AutoResizeTextarea to TypeScript
+              maxRows={8}
+              minRows={1}
+              ref={textareaRef}
+              placeholder={
+                messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
+              }
+              isStreaming={isStreaming}
+              stopButton={stopButtonSetting}
+              onCancel={cancelStreaming}
+              enableMatomoTracking={enableMatomoTracking}
+              persona={persona}
+              onSubmit={handleFormSubmit}
+              toolbarLeft={
+                <>
+                  {enableToolSelection && availableTools?.length > 0 && (
+                    <McpToolSelector
+                      availableTools={availableTools}
+                      selectedToolIds={selectedToolIds}
+                      onToggleTool={toggleTool}
+                      disabled={isStreaming}
+                    />
+                  )}
+
+                  {showDeepResearchToggle && (
+                    <DeepResearchButton
+                      enabled={isDeepResearchEnabled}
+                      onToggle={() => {
+                        setIsDeepResearchEnabled((prev) => !prev);
+                        textareaRef.current?.focus();
+                      }}
+                      disabled={isStreaming}
+                    />
+                  )}
+
+                  {deepResearch === 'always_on' && (
+                    <DeepResearchButton
+                      enabled={true}
+                      disabled={true}
+                      alwaysOn={true}
+                    />
+                  )}
+
+                  {qualityCheck === 'ondemand_toggle' && (
+                    <QualityCheckToggle
+                      isEditMode={isEditMode}
+                      enabled={qualityCheckEnabled}
+                      setEnabled={setQualityCheckEnabled}
+                    />
+                  )}
+                </>
+              }
+              toolbarRight={
+                <>
+                  {messages.length > 0 && (
+                    <button
+                      type="button"
+                      className="chat-composer-action-btn new-chat-btn icon-only"
+                      onClick={handleClearChat}
+                      disabled={isStreaming}
+                      aria-label="New chat"
+                      title="New chat"
+                    >
+                      <SVGIcon name={PenIcon} size={14} />
+                    </button>
+                  )}
+                  {isDownloadEnabled && (
+                    <ChatExportDropdown
+                      messages={messages}
+                      persona={persona}
+                      chatSessionId={chatSessionId}
+                      disabled={isStreaming}
+                    />
+                  )}
+                </>
+              }
+            />
+          </Form>
+        )}
         <div ref={chatWindowEndRef} /> {/* End div to mark the bottom */}
       </div>
 

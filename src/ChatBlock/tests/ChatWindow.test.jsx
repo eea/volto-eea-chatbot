@@ -1,11 +1,24 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the unwrapped ChatWindow (before injectLazyLibs wraps it)
 // We need to import it through the module that injectLazyLibs passes through
 import ChatWindowWrapped from '@eeacms/volto-eea-chatbot/ChatBlock/chat/ChatWindow';
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
+import {
+  getSharedChatSession,
+  deserializeChatSession,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
+
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService',
+  () => ({
+    getSharedChatSession: jest.fn(),
+    deserializeChatSession: jest.fn(),
+    copyShareLink: jest.fn().mockResolvedValue(true),
+  }),
+);
 
 jest.mock('@plone/volto/helpers/Loadable', () => ({
   injectLazyLibs: (libs) => (Component) => (props) => (
@@ -223,7 +236,9 @@ describe('ChatWindow', () => {
     });
 
     render(<ChatWindowWrapped persona={mockPersona} />);
-    expect(screen.getByText('New chat')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /new chat/i }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /export conversation/i }),
     ).toBeInTheDocument();
@@ -673,6 +688,225 @@ describe('ChatWindow', () => {
     });
 
     render(<ChatWindowWrapped persona={mockPersona} enableDownload={false} />);
-    expect(screen.queryByTestId('mock-toolbar-right')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /export/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders New chat button in toolbarRight when messages exist', () => {
+    const mockClearChat = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [
+        {
+          messageId: 1,
+          message: 'Hello',
+          type: 'user',
+          packets: [],
+          files: [],
+          toolCall: null,
+          parentNodeId: null,
+          nodeId: 1,
+        },
+      ],
+      chatSessionId: 'test-session-uuid-1234',
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: mockClearChat,
+      resetChatSessionId: jest.fn(),
+      loadChatSession: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} />);
+    const newChatBtn = screen.getByRole('button', {
+      name: /new chat/i,
+    });
+    expect(newChatBtn).toBeInTheDocument();
+
+    fireEvent.click(newChatBtn);
+    expect(mockClearChat).toHaveBeenCalled();
+  });
+
+  it('loads shared session on mount via initialChatSessionId', async () => {
+    const mockLoadChatSession = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      chatSessionId: null,
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      resetChatSessionId: jest.fn(),
+      loadChatSession: mockLoadChatSession,
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+
+    getSharedChatSession.mockResolvedValueOnce({
+      chat_session_id: 'shared-uuid-5678',
+      messages: [{ message_id: 1, message: 'Shared' }],
+    });
+    deserializeChatSession.mockReturnValueOnce([
+      { messageId: 1, type: 'assistant', message: 'Shared' },
+    ]);
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialChatSessionId="shared-uuid-5678"
+      />,
+    );
+
+    expect(getSharedChatSession).toHaveBeenCalledWith('shared-uuid-5678');
+    await waitFor(() => {
+      expect(mockLoadChatSession).toHaveBeenCalledWith('shared-uuid-5678', [
+        { messageId: 1, type: 'assistant', message: 'Shared' },
+      ]);
+    });
+  });
+
+  it('renders read-only banner instead of input form in shared view', async () => {
+    const mockClearChat = jest.fn();
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      chatSessionId: 'shared-uuid-5678',
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: mockClearChat,
+      resetChatSessionId: jest.fn(),
+      loadChatSession: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+
+    getSharedChatSession.mockResolvedValueOnce({
+      chat_session_id: 'shared-uuid-5678',
+      messages: [{ message_id: 1, message: 'Shared answer' }],
+    });
+    deserializeChatSession.mockReturnValueOnce([
+      { messageId: 1, type: 'assistant', message: 'Shared answer' },
+    ]);
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialChatSessionId="shared-uuid-5678"
+      />,
+    );
+
+    const banner = await screen.findByText(
+      /you are viewing a shared conversation \(read-only\)/i,
+    );
+    expect(banner).toBeInTheDocument();
+
+    // Textarea form is replaced by the read-only banner
+    expect(screen.queryByTestId('mock-textarea')).not.toBeInTheDocument();
+
+    // Clicking "Start a new conversation" calls clearChat
+    const newChatBtn = screen.getByRole('button', {
+      name: /start a new conversation/i,
+    });
+    expect(newChatBtn).toBeInTheDocument();
+    fireEvent.click(newChatBtn);
+    expect(mockClearChat).toHaveBeenCalled();
+  });
+
+  it('renders loading state while shared session is loading and hides the composer', () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      chatSessionId: null,
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      resetChatSessionId: jest.fn(),
+      loadChatSession: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+
+    // Unresolved promise simulates in-flight fetch
+    getSharedChatSession.mockReturnValueOnce(new Promise(() => {}));
+
+    const { container } = render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialChatSessionId="loading-uuid-1234"
+      />,
+    );
+
+    expect(
+      screen.getByText(/loading shared conversation/i),
+    ).toBeInTheDocument();
+    expect(container.querySelector('.shared-chat-spinner')).toBeInTheDocument();
+    // Composer input should be hidden while loading
+    expect(screen.queryByTestId('mock-textarea')).not.toBeInTheDocument();
+  });
+
+  it('renders error state when shared session fails to load', async () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      chatSessionId: null,
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      resetChatSessionId: jest.fn(),
+      loadChatSession: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+
+    getSharedChatSession.mockRejectedValueOnce(new Error('404 Not Found'));
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialChatSessionId="invalid-uuid"
+      />,
+    );
+
+    const errorMsg = await screen.findByText(
+      /this shared conversation could not be found or is private/i,
+    );
+    expect(errorMsg).toBeInTheDocument();
+
+    const newConvBtn = screen.getByRole('button', {
+      name: /start a new conversation/i,
+    });
+    expect(newConvBtn).toBeInTheDocument();
   });
 });

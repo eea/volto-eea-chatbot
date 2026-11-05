@@ -20,6 +20,7 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
     block_id,
     initialQuery,
     initialDeepResearch,
+    initialChatSessionId,
   }) => (
     <div
       data-testid="chat-window"
@@ -28,6 +29,7 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/chat', () => ({
       data-block-id={block_id}
       data-initial-query={initialQuery || ''}
       data-initial-deep-research={initialDeepResearch || ''}
+      data-initial-chat-session-id={initialChatSessionId || ''}
     >
       ChatWindow
     </div>
@@ -138,16 +140,18 @@ describe('ChatBlockView', () => {
     );
   });
 
-  it('passes empty initialQuery when no query param', () => {
+  it('passes initialChatSessionId from URL param to ChatWindow', () => {
     const props = {
       ...defaultProps,
       assistantData: { id: 42, name: 'My Assistant' },
-      location: { search: '' },
+      location: {
+        search: '?chat=46277749-db60-44f2-9de1-c5dca2eb68fa',
+      },
     };
     render(<ChatBlockView {...props} />);
     expect(screen.getByTestId('chat-window')).toHaveAttribute(
-      'data-initial-query',
-      '',
+      'data-initial-chat-session-id',
+      '46277749-db60-44f2-9de1-c5dca2eb68fa',
     );
   });
 

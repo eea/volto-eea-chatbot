@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+import { Button } from 'semantic-ui-react';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import DownloadIcon from '@eeacms/volto-eea-chatbot/icons/download.svg';
 import CopyIcon from '@eeacms/volto-eea-chatbot/icons/copy.svg';
@@ -149,9 +150,10 @@ export function ChatExportDropdown({
       ref={containerRef}
       className={`chat-export-dropdown ${className} ${isOpen ? 'open' : ''}`}
     >
-      <button
+      <Button
+        basic
         type="button"
-        className="chat-export-trigger icon-only"
+        className="chat-export-trigger"
         onClick={toggleDropdown}
         disabled={!canExport}
         aria-haspopup="true"
@@ -168,7 +170,7 @@ export function ChatExportDropdown({
         )}
       >
         <SVGIcon name={DownloadIcon} size={15} className="export-icon" />
-      </button>
+      </Button>
 
       {isOpen && (
         <div className="chat-export-menu" role="menu">

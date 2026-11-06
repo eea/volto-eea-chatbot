@@ -1347,11 +1347,30 @@ mark {
 }
 
 .message-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 0.8em 0;
+  gap: 0.5em;
+
+  .message-actions-left {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.2em;
+  }
+
+  .message-actions-right {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+  }
 
   .ui.basic.button {
     padding: 6px 8px;
-    margin-right: 0.2em;
+    margin: 0 0.2em 0 0;
+    min-height: auto;
+    color: #0a0a0a;
 
     &:active,
     &:focus {
@@ -1371,7 +1390,75 @@ mark {
       background-color: @lightGrey !important;
       box-shadow: none;
     }
+
+    &:disabled {
+      opacity: 0.5;
+    }
   }
+
+  .chat-share-btn svg[fill='currentColor'] {
+    fill: #0a0a0a;
+    stroke: none;
+  }
+
+  .chat-export-dropdown {
+    .chat-export-menu {
+      top: calc(100% + 4px);
+      right: auto;
+      bottom: auto;
+      left: 0;
+    }
+  }
+}
+
+.ui.button.start-new-chat-btn {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: none;
+  border-radius: 9999px;
+  margin: 0;
+  background-color: #004b87;
+  color: #ffffff !important;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 6px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #003661 !important;
+    color: #ffffff !important;
+  }
+
+  &:focus,
+  &:active {
+    background-color: #003661 !important;
+    color: #ffffff !important;
+    box-shadow: none;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    margin: 0 !important;
+    fill: none !important;
+    stroke: #ffffff !important;
+  }
+}
+
+.chat-window-top-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0 1em 0;
+  margin-bottom: 0.5em;
 }
 
 .ui.button.starter-message {
@@ -1469,15 +1556,13 @@ body > textarea {
     }
 
     &.is-readonly {
-      min-height: 52px;
+      min-height: 48px;
       flex-direction: row;
-      flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
-      padding: 8px 14px;
+      justify-content: center;
+      padding: 10px 16px;
       border-radius: 24px;
       background-color: #f8fafc;
-      gap: 12px;
 
       .chat-composer-readonly-badge {
         display: inline-flex;
@@ -1497,41 +1582,6 @@ body > textarea {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-        }
-      }
-
-      .chat-composer-toolbar-right {
-        display: inline-flex;
-        align-items: center;
-        margin-left: auto;
-        gap: 8px;
-
-        .ui.button.start-new-chat-btn {
-          display: inline-flex;
-          height: 34px;
-          align-items: center;
-          justify-content: center;
-          padding: 0 14px;
-          border: none;
-          border-radius: 9999px;
-          margin: 0;
-          background-color: #004b87;
-          color: #ffffff;
-          cursor: pointer;
-          font-size: 13px;
-          font-weight: 600;
-          gap: 6px;
-          transition: background-color 0.15s ease;
-
-          &:hover {
-            background-color: #003661;
-          }
-
-          svg {
-            width: 14px;
-            height: 14px;
-            color: #ffffff;
-          }
         }
       }
     }
@@ -2459,6 +2509,18 @@ body > textarea {
 
       &:hover {
         background: #f9fafb;
+      }
+
+      &.locked {
+        cursor: default;
+
+        input[type='checkbox'] {
+          cursor: not-allowed;
+        }
+
+        .tool-item-name {
+          color: #004b87;
+        }
       }
 
       input[type='checkbox'] {

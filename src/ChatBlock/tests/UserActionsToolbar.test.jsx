@@ -232,4 +232,76 @@ describe('UserActionsToolbar', () => {
     const json = component.toJSON();
     expect(json).toMatchSnapshot();
   });
+
+  it('renders Share button when chatSessionId is provided and copies link on click', async () => {
+    const props = {
+      message: { messageId: 1, message: 'Test message' },
+      chatSessionId: 'session-uuid-1234',
+      enableMatomoTracking: true,
+    };
+
+    renderWithRTL(props);
+
+    const shareButton = screen.getByRole('button', {
+      name: /share conversation/i,
+    });
+    expect(shareButton).toBeInTheDocument();
+
+    fireEvent.click(shareButton);
+
+    await waitFor(() => {
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        expect.stringContaining('?chat=session-uuid-1234'),
+      );
+    });
+
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot',
+      action: 'Conversation shared',
+    });
+  });
+
+  it('does not render Share button when chatSessionId is not provided', () => {
+    const props = {
+      message: { messageId: 1, message: 'Test message' },
+      chatSessionId: null,
+    };
+
+    renderWithRTL(props);
+
+    expect(
+      screen.queryByRole('button', { name: /share conversation/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders Download button when enableDownload is true', () => {
+    const props = {
+      message: { messageId: 1, message: 'Test message' },
+      enableDownload: true,
+    };
+
+    renderWithRTL(props);
+
+    expect(
+      screen.getByRole('button', { name: /export conversation/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders Start a new conversation pill button when onNewChat is provided', () => {
+    const mockNewChat = jest.fn();
+    const props = {
+      message: { messageId: 1, message: 'Test message' },
+      onNewChat: mockNewChat,
+    };
+
+    renderWithRTL(props);
+
+    const newChatBtn = screen.getByRole('button', {
+      name: /start a new conversation/i,
+    });
+    expect(newChatBtn).toBeInTheDocument();
+
+    fireEvent.click(newChatBtn);
+    expect(mockNewChat).toHaveBeenCalled();
+  });
 });

@@ -230,6 +230,10 @@ export function AIMessage({
   extraRehypePlugins,
   stopButton,
   onCancel,
+  chatSessionId,
+  onNewChat,
+  enableDownload,
+  allMessages,
 }: ChatMessageProps) {
   const [allToolsDisplayed, setAllToolsDisplayed] = useState(false);
   const [messageDisplayed, setMessageDisplayed] = useState(false);
@@ -589,14 +593,19 @@ export function AIMessage({
         />
       )}
 
-      {/* User actions toolbar (feedback, copy, etc) */}
+      {/* User actions toolbar (feedback, copy, share, download, new chat) */}
       {!isLoading && (
         <UserActionsToolbar
           message={message}
+          allMessages={allMessages}
+          chatSessionId={chatSessionId}
+          onNewChat={onNewChat}
+          enableDownload={enableDownload}
           enableFeedback={enableFeedback}
           feedbackReasons={feedbackReasons}
           enableMatomoTracking={enableMatomoTracking}
           persona={persona}
+          isLoading={isLoading}
         />
       )}
 

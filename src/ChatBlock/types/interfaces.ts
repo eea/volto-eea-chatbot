@@ -178,6 +178,10 @@ export interface ChatMessageProps {
   extraRehypePlugins?: any[];
   stopButton?: 'disabled' | 'input' | 'floating' | 'message_loader';
   onCancel?: () => void;
+  chatSessionId?: string | null;
+  onNewChat?: () => void;
+  enableDownload?: boolean;
+  allMessages?: Message[];
 }
 
 export interface ToolSnapshot {

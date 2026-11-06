@@ -10,7 +10,7 @@ import type { Persona } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfac
 import { Button, Form } from 'semantic-ui-react';
 import { injectLazyLibs } from '@plone/volto/helpers/Loadable';
 import { trackEvent } from '@eeacms/volto-matomo/utils';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ChatMessage } from '.';
 import AutoResizeTextarea from '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea';
@@ -186,6 +186,7 @@ function ChatWindow({
   const [sharedSessionError, setSharedSessionError] = useState(false);
 
   const history = useHistory();
+  const intl = useIntl();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const chatWindowRef = useRef(null);
   const chatWindowEndRef = useRef(null);
@@ -322,18 +323,41 @@ function ChatWindow({
             )}
           </>
         ) : (
-          <div
-            ref={chatWindowRef}
-            className={`conversation ${height ? 'include-scrollbar' : ''}`}
-            style={{ maxHeight: height }}
-          >
-            {messages.map((message, index) => (
-              <React.Fragment key={message.messageId}>
-                <ChatMessage
-                  prevMessage={messages[index - 1]}
-                  message={message}
-                  isLoading={isStreaming}
-                  isDeepResearchEnabled={isDeepResearchEnabled}
+          <>
+            <div className="chat-window-top-toolbar">
+              <Button
+                onClick={handleClearChat}
+                disabled={isStreaming}
+                className="start-new-chat-btn"
+                aria-label={intl.formatMessage({
+                  id: 'Start a new conversation',
+                  defaultMessage: 'Start a new conversation',
+                })}
+              >
+                <SVGIcon name={PenIcon} size={14} />{' '}
+                <FormattedMessage
+                  id="Start a new conversation"
+                  defaultMessage="Start a new conversation"
+                />
+              </Button>
+            </div>
+
+            <div
+              ref={chatWindowRef}
+              className={`conversation ${height ? 'include-scrollbar' : ''}`}
+              style={{ maxHeight: height }}
+            >
+              {messages.map((message, index) => (
+                <React.Fragment key={message.messageId}>
+                  <ChatMessage
+                    prevMessage={messages[index - 1]}
+                    message={message}
+                    isLoading={isStreaming}
+                    chatSessionId={chatSessionId}
+                    onNewChat={handleClearChat}
+                    enableDownload={isDownloadEnabled}
+                    allMessages={messages}
+                    isDeepResearchEnabled={isDeepResearchEnabled}
                   libs={libs}
                   onChoice={
                     isSharedView
@@ -422,7 +446,8 @@ function ChatWindow({
                   </div>
                 </div>
               )}
-          </div>
+            </div>
+          </>
         )}
       </div>
 
@@ -473,16 +498,8 @@ function ChatWindow({
               </span>
             </div>
             <div className="chat-composer-toolbar-right chat-right-actions">
-              {isDownloadEnabled && (
-                <ChatExportDropdown
-                  messages={messages}
-                  persona={persona}
-                  chatSessionId={chatSessionId}
-                />
-              )}
               <Button
                 onClick={handleClearChat}
-                primary
                 className="start-new-chat-btn"
                 aria-label="Start a new conversation"
               >
@@ -545,30 +562,6 @@ function ChatWindow({
                       isEditMode={isEditMode}
                       enabled={qualityCheckEnabled}
                       setEnabled={setQualityCheckEnabled}
-                    />
-                  )}
-                </>
-              }
-              toolbarRight={
-                <>
-                  {messages.length > 0 && (
-                    <button
-                      type="button"
-                      className="chat-composer-action-btn new-chat-btn icon-only"
-                      onClick={handleClearChat}
-                      disabled={isStreaming}
-                      aria-label="New chat"
-                      title="New chat"
-                    >
-                      <SVGIcon name={PenIcon} size={14} />
-                    </button>
-                  )}
-                  {isDownloadEnabled && (
-                    <ChatExportDropdown
-                      messages={messages}
-                      persona={persona}
-                      chatSessionId={chatSessionId}
-                      disabled={isStreaming}
                     />
                   )}
                 </>

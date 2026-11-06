@@ -237,10 +237,7 @@ describe('ChatWindow', () => {
 
     render(<ChatWindowWrapped persona={mockPersona} />);
     expect(
-      screen.getByRole('button', { name: /new chat/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /export conversation/i }),
+      screen.getByRole('button', { name: /start a new conversation/i }),
     ).toBeInTheDocument();
   });
 
@@ -631,7 +628,7 @@ describe('ChatWindow', () => {
       isDeepResearchEnabled: false,
       selectedToolIds: [1],
       availableTools: [
-        { id: 1, name: 'search', display_name: 'Search' },
+        { id: 1, name: 'internal_search', display_name: 'Internal Search' },
         {
           id: 10,
           name: 'data',
@@ -649,11 +646,12 @@ describe('ChatWindow', () => {
     expect(screen.getByRole('button', { name: /Tools/i })).toBeInTheDocument();
   });
 
-  it('renders ChatExportDropdown in toolbarRight by default', () => {
-    useChatController.mockReturnValueOnce({
+  it('passes enableDownload and chatSessionId to ChatMessage when messages exist', () => {
+    useChatController.mockReturnValue({
       onSubmit: jest.fn(),
       onFetchRelatedQuestions: jest.fn(),
-      messages: [{ role: 'user', message: 'Hi' }],
+      messages: [{ messageId: 1, type: 'assistant', message: 'Hello' }],
+      chatSessionId: 'test-session-123',
       isStreaming: false,
       isFetchingRelatedQuestions: false,
       clearChat: jest.fn(),
@@ -666,8 +664,8 @@ describe('ChatWindow', () => {
       enableTool: jest.fn(),
     });
 
-    render(<ChatWindowWrapped persona={mockPersona} />);
-    expect(screen.getByTestId('mock-toolbar-right')).toBeInTheDocument();
+    render(<ChatWindowWrapped persona={mockPersona} enableDownload={true} />);
+    expect(screen.getByTestId('chat-message')).toBeInTheDocument();
   });
 
   it('does not render ChatExportDropdown in toolbarRight when enableDownload is false', () => {
@@ -693,7 +691,7 @@ describe('ChatWindow', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders New chat button in toolbarRight when messages exist', () => {
+  it('renders Start a new conversation button when messages exist', () => {
     const mockClearChat = jest.fn();
     useChatController.mockReturnValue({
       onSubmit: jest.fn(),
@@ -727,7 +725,7 @@ describe('ChatWindow', () => {
 
     render(<ChatWindowWrapped persona={mockPersona} />);
     const newChatBtn = screen.getByRole('button', {
-      name: /new chat/i,
+      name: /start a new conversation/i,
     });
     expect(newChatBtn).toBeInTheDocument();
 

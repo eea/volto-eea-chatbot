@@ -567,12 +567,24 @@ describe('useChatController', () => {
     act(() => {
       result.current.disableTool(1);
     });
-    expect(result.current.selectedToolIds).toEqual([10]);
+    // Internal search cannot be disabled (untoggleable)
+    expect(result.current.selectedToolIds).toEqual([1, 10]);
+
+    act(() => {
+      result.current.toggleTool(1);
+    });
+    // Internal search is untoggleable
+    expect(result.current.selectedToolIds).toEqual([1, 10]);
+
+    act(() => {
+      result.current.disableTool(10);
+    });
+    expect(result.current.selectedToolIds).toEqual([1]);
 
     act(() => {
       result.current.enableTool(6);
     });
-    expect(result.current.selectedToolIds).toEqual([10, 6]);
+    expect(result.current.selectedToolIds).toEqual([1, 6]);
   });
 
   it('respects allowedToolIds and defaultEnabledToolIds from block config', () => {

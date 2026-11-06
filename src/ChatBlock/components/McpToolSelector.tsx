@@ -98,7 +98,11 @@ export default function McpToolSelector({
           </div>
           <div className="mcp-tool-menu-items">
             {availableTools.map((tool) => {
-              const isChecked = selectedToolIds.includes(tool.id);
+              const isSearch =
+                tool.name === 'internal_search' ||
+                tool.in_code_tool_id === 'SearchTool' ||
+                tool.id === 1;
+              const isChecked = isSearch || selectedToolIds.includes(tool.id);
               const isMcp =
                 tool.mcp_server_id !== null &&
                 tool.mcp_server_id !== undefined;
@@ -106,13 +110,24 @@ export default function McpToolSelector({
               return (
                 <label
                   key={tool.id}
-                  className={`mcp-tool-menu-item ${isChecked ? 'active' : ''}`}
+                  className={`mcp-tool-menu-item ${isChecked ? 'active' : ''}${
+                    isSearch ? ' locked' : ''
+                  }`}
+                  title={
+                    isSearch
+                      ? 'Internal Search is always active'
+                      : undefined
+                  }
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
-                    disabled={disabled}
-                    onChange={() => onToggleTool(tool.id)}
+                    disabled={disabled || isSearch}
+                    onChange={() => {
+                      if (!isSearch) {
+                        onToggleTool(tool.id);
+                      }
+                    }}
                   />
                   <div className="tool-item-info">
                     <div className="tool-item-title-row">

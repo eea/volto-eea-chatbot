@@ -90,6 +90,26 @@ describe('McpToolSelector', () => {
     expect(onToggle).toHaveBeenCalledWith(10);
   });
 
+  it('keeps internal search tool checked and disabled (untoggleable)', () => {
+    const onToggle = jest.fn();
+    renderWithIntl(
+      <McpToolSelector
+        availableTools={tools}
+        selectedToolIds={[1]}
+        onToggleTool={onToggle}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Tools/i }));
+
+    const searchCheckbox = screen.getAllByRole('checkbox')[0];
+    expect(searchCheckbox).toBeChecked();
+    expect(searchCheckbox).toBeDisabled();
+
+    fireEvent.click(searchCheckbox);
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
   it('closes menu when Escape is pressed', () => {
     renderWithIntl(
       <McpToolSelector

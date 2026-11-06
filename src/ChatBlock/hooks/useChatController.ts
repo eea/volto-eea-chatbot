@@ -142,6 +142,14 @@ export function useChatController({
     defaultEnabledToolIds,
   );
 
+  const isSearchTool = useCallback(
+    (t: ToolSnapshot | { name?: string; in_code_tool_id?: string; id?: number }) =>
+      t.in_code_tool_id === 'SearchTool' ||
+      t.name === 'internal_search' ||
+      t.id === 1,
+    [],
+  );
+
   const availableTools: ToolSnapshot[] = useMemo(() => {
     const rawTools = persona?.tools || [];
     return rawTools.filter((t) => {
@@ -154,6 +162,13 @@ export function useChatController({
     });
   }, [persona?.tools, memoizedAllowedToolIds]);
 
+  const searchTool = useMemo(
+    () => availableTools.find(isSearchTool),
+    [availableTools, isSearchTool],
+  );
+
+  const searchToolId = searchTool ? searchTool.id : 1;
+
   const initialToolIds = useMemo(() => {
     if (
       memoizedDefaultEnabledToolIds &&
@@ -164,16 +179,19 @@ export function useChatController({
         availableTools.some((t) => t.id === id),
       );
       if (matched.length > 0) {
-        return matched;
+        return searchTool && !matched.includes(searchTool.id)
+          ? [searchTool.id, ...matched]
+          : matched;
       }
     }
     const defaultEnabled = availableTools
       .filter((t) => t.default_enabled)
       .map((t) => t.id);
     if (defaultEnabled.length > 0) {
-      return defaultEnabled;
+      return searchTool && !defaultEnabled.includes(searchTool.id)
+        ? [searchTool.id, ...defaultEnabled]
+        : defaultEnabled;
     }
-    // Onyx personas return default_enabled: false on all tools.
     // Default to the primary internal search tool so standard queries work out
     // of the box, but keep specialized tools (Code Interpreter, Image Generation,
     // Coding Agent, MCP connectors) disabled by default so they can be enabled
@@ -190,7 +208,7 @@ export function useChatController({
       return searchTools;
     }
     return [];
-  }, [availableTools, memoizedDefaultEnabledToolIds]);
+  }, [availableTools, memoizedDefaultEnabledToolIds, searchTool]);
 
   const [selectedToolIds, setSelectedToolIds] =
     useState<number[]>(initialToolIds);
@@ -215,13 +233,18 @@ export function useChatController({
     });
   }, [initialToolIds, availableTools]);
 
-  const toggleTool = useCallback((toolId: number) => {
-    setSelectedToolIds((prev) =>
-      prev.includes(toolId)
-        ? prev.filter((id) => id !== toolId)
-        : [...prev, toolId],
-    );
-  }, []);
+  const toggleTool = useCallback(
+    (toolId: number) => {
+      // Internal search is untoggleable: always keep it active
+      if (searchTool && toolId === searchTool.id) return;
+      setSelectedToolIds((prev) =>
+        prev.includes(toolId)
+          ? prev.filter((id) => id !== toolId)
+          : [...prev, toolId],
+      );
+    },
+    [searchTool],
+  );
 
   const enableTool = useCallback((toolId: number) => {
     setSelectedToolIds((prev) =>
@@ -229,9 +252,14 @@ export function useChatController({
     );
   }, []);
 
-  const disableTool = useCallback((toolId: number) => {
-    setSelectedToolIds((prev) => prev.filter((id) => id !== toolId));
-  }, []);
+  const disableTool = useCallback(
+    (toolId: number) => {
+      // Internal search is untoggleable: cannot be disabled
+      if (searchTool && toolId === searchTool.id) return;
+      setSelectedToolIds((prev) => prev.filter((id) => id !== toolId));
+    },
+    [searchTool],
+  );
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
@@ -539,5 +567,6 @@ export function useChatController({
     enableTool,
     disableTool,
     availableTools,
+    searchToolId,
   };
 }

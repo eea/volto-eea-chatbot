@@ -7,6 +7,8 @@ import TextareaAutosize from 'react-textarea-autosize';
 import SVGIcon from './Icon';
 import ArrowUpIcon from '@eeacms/volto-eea-chatbot/icons/arrow-up.svg';
 import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
+import McpToolProposal from './McpToolProposal';
+import { findSuggestedMcpTool } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/mcpToolMatching';
 
 const messages = defineMessages({
   send: {
@@ -43,10 +45,95 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
     persona,
     toolbarLeft,
     toolbarRight,
+    availableTools = [],
+    selectedToolIds = [],
+    onEnableTool,
     ...rest
   } = props;
   const intl = useIntl();
   const [input, setInput] = React.useState('');
+  const [dismissedToolIds, setDismissedToolIds] = React.useState(
+    () => new Set(),
+  );
+  const localTextareaRef = React.useRef(null);
+
+  const setTextareaRef = (element) => {
+    localTextareaRef.current = element;
+    if (typeof ref === 'function') {
+      ref(element);
+    } else if (ref) {
+      ref.current = element;
+    }
+  };
+
+  const suggestedTool = React.useMemo(() => {
+    return findSuggestedMcpTool(
+      input,
+      availableTools,
+      selectedToolIds,
+      dismissedToolIds,
+    );
+  }, [input, availableTools, selectedToolIds, dismissedToolIds]);
+
+  const handleAcceptProposal = (proposal) => {
+    const match = proposal || suggestedTool;
+    const tool = match?.tool || match;
+    if (!tool) return;
+    if (onEnableTool) {
+      onEnableTool(tool.id);
+    }
+
+    const toolTag = `@${(tool.display_name || tool.name).trim()}`;
+    const textarea = localTextareaRef.current;
+
+    if (
+      match &&
+      typeof match.matchIndex === 'number' &&
+      match.matchLength > 0
+    ) {
+      const { matchIndex, matchLength } = match;
+      const before = input.slice(0, matchIndex);
+      const after = input.slice(matchIndex + matchLength);
+
+      const needsPreSpace = before.length > 0 && !before.endsWith(' ');
+      const needsPostSpace =
+        after.length === 0 ||
+        (!after.startsWith(' ') && !/^[.,!?;:)]/.test(after));
+
+      const replacement = `${needsPreSpace ? ' ' : ''}${toolTag}${needsPostSpace ? ' ' : ''}`;
+      const newText = `${before}${replacement}${after}`;
+      setInput(newText);
+
+      setTimeout(() => {
+        if (textarea) {
+          textarea.focus();
+          const newPos = before.length + replacement.length;
+          textarea.setSelectionRange(newPos, newPos);
+        }
+      }, 0);
+    } else if (textarea) {
+      const start = textarea.selectionStart ?? input.length;
+      const end = textarea.selectionEnd ?? input.length;
+      const before = input.slice(0, start);
+      const after = input.slice(end);
+      const needsPreSpace = before.length > 0 && !before.endsWith(' ');
+      const newText = `${before}${needsPreSpace ? ' ' : ''}${toolTag} ${after}`;
+      setInput(newText);
+      setTimeout(() => {
+        textarea.focus();
+        const newPos = start + (needsPreSpace ? 1 : 0) + toolTag.length + 1;
+        textarea.setSelectionRange(newPos, newPos);
+      }, 0);
+    } else {
+      const separator = input.length > 0 && !input.endsWith(' ') ? ' ' : '';
+      setInput((prev) => `${prev}${separator}${toolTag} `);
+    }
+  };
+
+  const handleDismissProposal = (tool) => {
+    if (!tool) return;
+    setDismissedToolIds((prev) => new Set([...prev, tool.id]));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -122,6 +209,14 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
     <div
       className={`chat-composer ${hasToolbar ? 'has-toolbar' : 'no-toolbar'}`}
     >
+      {suggestedTool && (
+        <McpToolProposal
+          tool={suggestedTool}
+          onAccept={handleAcceptProposal}
+          onDismiss={handleDismissProposal}
+        />
+      )}
+
       <div className="chat-composer-input">
         <TextareaAutosize
           value={input}
@@ -136,7 +231,7 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
           }}
           disabled={isStreaming}
           {...rest}
-          ref={ref}
+          ref={setTextareaRef}
         />
       </div>
 

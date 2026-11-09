@@ -168,4 +168,112 @@ describe('AutoResizeTextarea', () => {
     );
     expect(getByTestId('custom-action')).toBeInTheDocument();
   });
+
+  it('surfaces floating MCP tool proposal on matching keyword and replaces the trigger text on click', () => {
+    const mockEnableTool = jest.fn();
+    const mockTools = [
+      {
+        id: 1,
+        name: 'internal_search',
+        display_name: 'Internal Search',
+        in_code_tool_id: 'SearchTool',
+      },
+      {
+        id: 10,
+        name: 'data_connector',
+        display_name: 'EEA Data Connector',
+        description: 'Query EEA datasets',
+        mcp_server_id: 1,
+      },
+    ];
+
+    const { getByRole, getByText } = render(
+      <AutoResizeTextarea
+        onSubmit={jest.fn()}
+        availableTools={mockTools}
+        selectedToolIds={[1]}
+        onEnableTool={mockEnableTool}
+      />,
+    );
+
+    const textarea = getByRole('textbox');
+    fireEvent.change(textarea, { target: { value: 'Show me data on water' } });
+
+    // Proposal should appear floating above the textarea
+    expect(getByText('@EEA Data Connector')).toBeInTheDocument();
+    expect(getByText('Use')).toBeInTheDocument();
+
+    // Clicking proposal
+    fireEvent.click(getByRole('button', { name: /Enable @EEA Data Connector/i }));
+
+    expect(mockEnableTool).toHaveBeenCalledWith(10);
+    // The typed word "data" is replaced with "@EEA Data Connector"
+    expect(textarea.value).toBe('Show me @EEA Data Connector on water');
+  });
+
+  it('replaces trigger keyword at the end of the input', () => {
+    const mockEnableTool = jest.fn();
+    const mockTools = [
+      {
+        id: 2,
+        name: 'image_generation',
+        display_name: 'Image Generation',
+      },
+    ];
+
+    const { getByRole, getByText } = render(
+      <AutoResizeTextarea
+        onSubmit={jest.fn()}
+        availableTools={mockTools}
+        selectedToolIds={[]}
+        onEnableTool={mockEnableTool}
+      />,
+    );
+
+    const textarea = getByRole('textbox');
+    fireEvent.change(textarea, {
+      target: {
+        value: 'Which species are most at risk in Europe? image',
+      },
+    });
+
+    expect(getByText('@Image Generation')).toBeInTheDocument();
+
+    fireEvent.click(getByRole('button', { name: /Enable @Image Generation/i }));
+
+    expect(mockEnableTool).toHaveBeenCalledWith(2);
+    // "image" at the end is replaced with "@Image Generation "
+    expect(textarea.value).toBe(
+      'Which species are most at risk in Europe? @Image Generation ',
+    );
+  });
+
+  it('allows dismissing the floating tool proposal', () => {
+    const mockTools = [
+      {
+        id: 10,
+        name: 'data_connector',
+        display_name: 'EEA Data Connector',
+        mcp_server_id: 1,
+      },
+    ];
+
+    const { getByRole, getByText, queryByText } = render(
+      <AutoResizeTextarea
+        onSubmit={jest.fn()}
+        availableTools={mockTools}
+        selectedToolIds={[]}
+      />,
+    );
+
+    const textarea = getByRole('textbox');
+    fireEvent.change(textarea, { target: { value: 'emissions data' } });
+
+    expect(getByText('@EEA Data Connector')).toBeInTheDocument();
+
+    const dismissBtn = getByRole('button', { name: /Dismiss suggestion/i });
+    fireEvent.click(dismissBtn);
+
+    expect(queryByText('@EEA Data Connector')).not.toBeInTheDocument();
+  });
 });

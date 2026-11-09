@@ -167,6 +167,7 @@ function ChatWindow({
     chatSessionId,
     selectedToolIds,
     toggleTool,
+    enableTool,
     availableTools,
   } = useChatController({
     personaId: persona.id,
@@ -528,6 +529,9 @@ function ChatWindow({
                 enableMatomoTracking={enableMatomoTracking}
                 persona={persona}
                 onSubmit={handleFormSubmit}
+                availableTools={availableTools}
+                selectedToolIds={selectedToolIds}
+                onEnableTool={enableTool}
                 toolbarLeft={
                   <>
                     {enableToolSelection && availableTools?.length > 0 && (

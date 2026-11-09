@@ -143,7 +143,11 @@ export function useChatController({
   );
 
   const isSearchTool = useCallback(
-    (t: ToolSnapshot | { name?: string; in_code_tool_id?: string; id?: number }) =>
+    (
+      t:
+        | ToolSnapshot
+        | { name?: string; in_code_tool_id?: string; id?: number },
+    ) =>
       t.in_code_tool_id === 'SearchTool' ||
       t.name === 'internal_search' ||
       t.id === 1,
@@ -263,6 +267,9 @@ export function useChatController({
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
+  const [sharedParentSessionId, setSharedParentSessionId] = useState<
+    string | null
+  >(null);
   const [chatSessionLoading, setChatSessionLoading] = useState(false);
   const [isDeepResearchEnabled, setIsDeepResearchEnabled] = useState(
     deepResearch === 'always_on' || deepResearch === 'user_on',
@@ -274,6 +281,8 @@ export function useChatController({
   const messagesRef = useRef(messages);
   const nodeIdCounter = useRef(1);
   const isCancelledRef = useRef(isCancelled);
+  const inheritedContextRef = useRef<string | null>(null);
+  const forkedSessionMessageIdsRef = useRef<Set<number>>(new Set());
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -282,6 +291,7 @@ export function useChatController({
 
   const { isStreaming, startStreaming, cancelStreaming } = useChatStreaming({
     onMessageUpdate: (message) => {
+      forkedSessionMessageIdsRef.current.add(message.nodeId);
       setMessages((prev) => {
         const existingIndex = prev.findIndex(
           (m) => m.nodeId === message.nodeId,
@@ -360,38 +370,69 @@ export function useChatController({
       enabledToolIds?: number[];
       forcedToolId?: number | null;
     } = {}) => {
-      if (isStreaming) return;
+      const messageText = message?.trim();
+      if (!messageText || isStreaming || chatSessionLoading) return;
 
       try {
-        // Create session if needed
+        // Create session if needed or fork from shared parent session
         let sessionId = chatSessionId;
-
-        if (!sessionId) {
-          setChatSessionLoading(true);
-          sessionId = await createChatSession(personaId, 'Chat session');
-          setChatSessionId(sessionId);
-        }
-
-        let messageText = message;
+        let additionalContext: string | null = null;
         let parentNodeId: number | null = null;
         let parentMessageId: number | null = null;
 
-        // For new messages, set parent to the last assistant message
-        const lastMessage = messages
-          .filter((m) => m.type === 'assistant')
-          .pop();
+        if (sharedParentSessionId) {
+          setChatSessionLoading(true);
+          const parentId = sharedParentSessionId;
+          const preview =
+            messageText.slice(0, 40).trim() || 'Continued conversation';
+          const title = `${preview} [parent:${parentId}]`;
+          sessionId = await createChatSession(personaId, title);
+          setChatSessionId(sessionId);
+          setSharedParentSessionId(null);
 
-        const lastPacket = lastMessage?.packets.pop();
+          const priorTranscript = messages
+            .filter((m) => m.type === 'user' || m.type === 'assistant')
+            .map(
+              (m) =>
+                `${m.type === 'user' ? 'User' : 'Assistant'}: ${m.message}`,
+            )
+            .join('\n\n');
+          inheritedContextRef.current = priorTranscript || null;
+          additionalContext = inheritedContextRef.current;
+          parentMessageId = null;
+        } else if (!sessionId) {
+          setChatSessionLoading(true);
+          sessionId = await createChatSession(personaId, 'Chat session');
+          setChatSessionId(sessionId);
+        } else {
+          // Retain inherited parent context across subsequent turns
+          additionalContext = inheritedContextRef.current;
 
-        if (lastMessage && lastPacket?.obj.type !== PacketType.ERROR) {
-          parentNodeId = lastMessage.nodeId;
-          parentMessageId = lastMessage.messageId || null;
+          // For new messages on active session, set parent to the last assistant message
+          const lastMessage = messages
+            .filter((m) => m.type === 'assistant')
+            .pop();
+
+          const lastPacket =
+            lastMessage?.packets?.[lastMessage.packets.length - 1];
+
+          if (lastMessage && lastPacket?.obj?.type !== PacketType.ERROR) {
+            parentNodeId = lastMessage.nodeId;
+            // Only send parentMessageId if this assistant message belongs to the current session
+            if (
+              !inheritedContextRef.current ||
+              forkedSessionMessageIdsRef.current.has(lastMessage.nodeId)
+            ) {
+              parentMessageId = lastMessage.messageId || null;
+            } else {
+              parentMessageId = null;
+            }
+          }
         }
-
-        if (!messageText?.trim()) return;
 
         // Add user message
         const userNodeId = nodeIdCounter.current++;
+        forkedSessionMessageIdsRef.current.add(userNodeId);
         const userMessage: Message = {
           messageId: Date.now(),
           nodeId: userNodeId,
@@ -429,6 +470,7 @@ export function useChatController({
             enabledToolIds: effectiveToolIds,
             forcedToolIds:
               effectiveForcedId != null ? [effectiveForcedId] : undefined,
+            additionalContext,
           },
           assistantNodeId,
           userNodeId,
@@ -441,6 +483,8 @@ export function useChatController({
     },
     [
       chatSessionId,
+      sharedParentSessionId,
+      chatSessionLoading,
       personaId,
       isStreaming,
       isDeepResearchEnabled,
@@ -518,17 +562,34 @@ export function useChatController({
   const clearChat = useCallback(() => {
     setMessages([]);
     setChatSessionId(null);
+    setSharedParentSessionId(null);
+    inheritedContextRef.current = null;
+    forkedSessionMessageIdsRef.current.clear();
     nodeIdCounter.current = 1;
     setIsCancelled(false);
   }, []);
 
   const resetChatSessionId = useCallback(() => {
     setChatSessionId(null);
+    setSharedParentSessionId(null);
+    inheritedContextRef.current = null;
+    forkedSessionMessageIdsRef.current.clear();
   }, []);
 
   const loadChatSession = useCallback(
-    (sessionId: string, loadedMessages: Message[]) => {
+    (
+      sessionId: string,
+      loadedMessages: Message[],
+      isShared: boolean = true,
+    ) => {
       setChatSessionId(sessionId);
+      if (isShared) {
+        setSharedParentSessionId(sessionId);
+      } else {
+        setSharedParentSessionId(null);
+      }
+      inheritedContextRef.current = null;
+      forkedSessionMessageIdsRef.current.clear();
       setMessages(loadedMessages);
       messagesRef.current = loadedMessages;
       const maxId = loadedMessages.reduce(
@@ -568,5 +629,6 @@ export function useChatController({
     disableTool,
     availableTools,
     searchToolId,
+    sharedParentSessionId,
   };
 }

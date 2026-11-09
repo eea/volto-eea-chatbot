@@ -19,7 +19,6 @@ import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyStat
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 import McpToolSelector from '@eeacms/volto-eea-chatbot/ChatBlock/components/McpToolSelector';
 import DeepResearchButton from '@eeacms/volto-eea-chatbot/ChatBlock/components/DeepResearchButton';
-import ChatExportDropdown from '@eeacms/volto-eea-chatbot/ChatBlock/components/ChatExportDropdown';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
 import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
@@ -221,6 +220,19 @@ function ChatWindow({
     };
   }, [initialChatSessionId, loadChatSession]);
 
+  // Track when a shared session is continued into a new session
+  useEffect(() => {
+    if (
+      isSharedView &&
+      chatSessionId &&
+      initialChatSessionId &&
+      chatSessionId !== initialChatSessionId
+    ) {
+      setIsSharedView(false);
+      history.replace(`${window.location.pathname}?chat=${chatSessionId}`);
+    }
+  }, [chatSessionId, isSharedView, initialChatSessionId, history]);
+
   const handleClearChat = useCallback(() => {
     clearChat();
     setIsSharedView(false);
@@ -358,94 +370,96 @@ function ChatWindow({
                     enableDownload={isDownloadEnabled}
                     allMessages={messages}
                     isDeepResearchEnabled={isDeepResearchEnabled}
-                  libs={libs}
-                  onChoice={
-                    isSharedView
-                      ? undefined
-                      : (message) => handleFormSubmit({ message })
-                  }
-                  onFetchRelatedQuestions={
-                    isSharedView ? undefined : onFetchRelatedQuestions
-                  }
-                  enableFeedback={enableFeedback}
-                  scrollToInput={scrollToInput}
-                  feedbackReasons={feedbackReasons}
-                  qualityCheck={qualityCheck}
-                  qualityCheckStages={qualityCheckStages}
-                  qualityCheckContext={qualityCheckContext}
-                  qualityCheckEnabled={qualityCheckEnabled}
-                  noSupportDocumentsMessage={noSupportDocumentsMessage}
-                  totalFailMessage={totalFailMessage}
-                  isFetchingRelatedQuestions={isFetchingRelatedQuestions}
-                  enableShowTotalFailMessage={enableShowTotalFailMessage}
-                  enableMatomoTracking={enableMatomoTracking}
-                  persona={persona}
-                  maxContextSegments={maxContextSegments}
-                  batchSize={batchSize}
-                  chunkEvidenceWindow={chunkEvidenceWindow}
-                  isLastMessage={index === messages.length - 1}
-                  className={index === messages.length - 1 ? 'most-recent' : ''}
-                  chatWindowRef={chatWindowRef}
-                  chatWindowEndRef={chatWindowEndRef}
-                  hideSourcesTab={hideSourcesTab}
-                  extraRemarkPlugins={extraRemarkPlugins}
-                  extraMarkdownComponents={extraMarkdownComponents}
-                  extraRehypePlugins={extraRehypePlugins}
-                  stopButton={stopButtonSetting}
-                  onCancel={cancelStreaming}
-                />
-              </React.Fragment>
-            ))}
+                    libs={libs}
+                    onChoice={
+                      isSharedView
+                        ? undefined
+                        : (message) => handleFormSubmit({ message })
+                    }
+                    onFetchRelatedQuestions={
+                      isSharedView ? undefined : onFetchRelatedQuestions
+                    }
+                    enableFeedback={enableFeedback}
+                    scrollToInput={scrollToInput}
+                    feedbackReasons={feedbackReasons}
+                    qualityCheck={qualityCheck}
+                    qualityCheckStages={qualityCheckStages}
+                    qualityCheckContext={qualityCheckContext}
+                    qualityCheckEnabled={qualityCheckEnabled}
+                    noSupportDocumentsMessage={noSupportDocumentsMessage}
+                    totalFailMessage={totalFailMessage}
+                    isFetchingRelatedQuestions={isFetchingRelatedQuestions}
+                    enableShowTotalFailMessage={enableShowTotalFailMessage}
+                    enableMatomoTracking={enableMatomoTracking}
+                    persona={persona}
+                    maxContextSegments={maxContextSegments}
+                    batchSize={batchSize}
+                    chunkEvidenceWindow={chunkEvidenceWindow}
+                    isLastMessage={index === messages.length - 1}
+                    className={
+                      index === messages.length - 1 ? 'most-recent' : ''
+                    }
+                    chatWindowRef={chatWindowRef}
+                    chatWindowEndRef={chatWindowEndRef}
+                    hideSourcesTab={hideSourcesTab}
+                    extraRemarkPlugins={extraRemarkPlugins}
+                    extraMarkdownComponents={extraMarkdownComponents}
+                    extraRehypePlugins={extraRehypePlugins}
+                    stopButton={stopButtonSetting}
+                    onCancel={cancelStreaming}
+                  />
+                </React.Fragment>
+              ))}
 
-            {isStreaming &&
-              !isFetchingRelatedQuestions &&
-              messages[messages.length - 1]?.type === 'user' && (
-                <div className="comment">
-                  <div className="circle assistant placeholder"></div>
-                  <div className="comment-content">
-                    <div className="loader-container">
-                      <div className="loader" />
-                      {stopButtonSetting === 'message_loader' && (
-                        <div className="message-loader-stop">
-                          <Button
-                            className="message-loader-stop-btn"
-                            type="button"
-                            aria-label="Stop generating"
-                            onClick={() => {
-                              if (enableMatomoTracking) {
-                                trackEvent({
-                                  category: persona?.name
-                                    ? `Chatbot - ${persona.name}`
-                                    : 'Chatbot',
-                                  action: 'Chatbot: Stop generating',
-                                  name: 'Message generation stopped',
-                                });
-                              }
-                              cancelStreaming();
-                            }}
-                          >
-                            <div className="stop-btn-inner">
-                              <div className="stop-icon-circle">
-                                <SVGIcon
-                                  name={StopIcon}
-                                  size={8}
-                                  color="#fff"
-                                />
+              {isStreaming &&
+                !isFetchingRelatedQuestions &&
+                messages[messages.length - 1]?.type === 'user' && (
+                  <div className="comment">
+                    <div className="circle assistant placeholder"></div>
+                    <div className="comment-content">
+                      <div className="loader-container">
+                        <div className="loader" />
+                        {stopButtonSetting === 'message_loader' && (
+                          <div className="message-loader-stop">
+                            <Button
+                              className="message-loader-stop-btn"
+                              type="button"
+                              aria-label="Stop generating"
+                              onClick={() => {
+                                if (enableMatomoTracking) {
+                                  trackEvent({
+                                    category: persona?.name
+                                      ? `Chatbot - ${persona.name}`
+                                      : 'Chatbot',
+                                    action: 'Chatbot: Stop generating',
+                                    name: 'Message generation stopped',
+                                  });
+                                }
+                                cancelStreaming();
+                              }}
+                            >
+                              <div className="stop-btn-inner">
+                                <div className="stop-icon-circle">
+                                  <SVGIcon
+                                    name={StopIcon}
+                                    size={8}
+                                    color="#fff"
+                                  />
+                                </div>
+                                <span>
+                                  <FormattedMessage
+                                    id="Stop generating"
+                                    defaultMessage="Stop generating"
+                                  />
+                                </span>
                               </div>
-                              <span>
-                                <FormattedMessage
-                                  id="Stop generating"
-                                  defaultMessage="Stop generating"
-                                />
-                              </span>
-                            </div>
-                          </Button>
-                        </div>
-                      )}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </>
         )}
@@ -486,88 +500,76 @@ function ChatWindow({
           </div>
         )}
         {/* @ts-ignore */}
-        {sharedSessionLoading || sharedSessionError ? null : isSharedView ? (
-          <div className="chat-composer is-readonly">
-            <div className="chat-composer-readonly-badge">
-              <SVGIcon name={ExternalLinkIcon} size={15} />
-              <span>
-                <FormattedMessage
-                  id="You are viewing a shared conversation (read-only)."
-                  defaultMessage="You are viewing a shared conversation (read-only)."
-                />
-              </span>
-            </div>
-            <div className="chat-composer-toolbar-right chat-right-actions">
-              <Button
-                onClick={handleClearChat}
-                className="start-new-chat-btn"
-                aria-label="Start a new conversation"
-              >
-                <SVGIcon name={PenIcon} size={14} />{' '}
-                <FormattedMessage
-                  id="Start a new conversation"
-                  defaultMessage="Start a new conversation"
-                />
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Form>
-            <AutoResizeTextarea
-              // @ts-ignore TODO: convert AutoResizeTextarea to TypeScript
-              maxRows={8}
-              minRows={1}
-              ref={textareaRef}
-              placeholder={
-                messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
-              }
-              isStreaming={isStreaming}
-              stopButton={stopButtonSetting}
-              onCancel={cancelStreaming}
-              enableMatomoTracking={enableMatomoTracking}
-              persona={persona}
-              onSubmit={handleFormSubmit}
-              toolbarLeft={
-                <>
-                  {enableToolSelection && availableTools?.length > 0 && (
-                    <McpToolSelector
-                      availableTools={availableTools}
-                      selectedToolIds={selectedToolIds}
-                      onToggleTool={toggleTool}
-                      disabled={isStreaming}
-                    />
-                  )}
+        {sharedSessionLoading || sharedSessionError ? null : (
+          <>
+            {isSharedView && (
+              <div className="shared-chat-notice">
+                <span className="shared-chat-notice-text">
+                  <SVGIcon name={ExternalLinkIcon} size={14} />{' '}
+                  <FormattedMessage
+                    id="You are viewing a shared conversation. Ask a follow-up to continue in your own chat."
+                    defaultMessage="You are viewing a shared conversation. Ask a follow-up to continue in your own chat."
+                  />
+                </span>
+              </div>
+            )}
+            <Form>
+              <AutoResizeTextarea
+                // @ts-ignore TODO: convert AutoResizeTextarea to TypeScript
+                maxRows={8}
+                minRows={1}
+                ref={textareaRef}
+                placeholder={
+                  messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
+                }
+                isStreaming={isStreaming}
+                stopButton={stopButtonSetting}
+                onCancel={cancelStreaming}
+                enableMatomoTracking={enableMatomoTracking}
+                persona={persona}
+                onSubmit={handleFormSubmit}
+                toolbarLeft={
+                  <>
+                    {enableToolSelection && availableTools?.length > 0 && (
+                      <McpToolSelector
+                        availableTools={availableTools}
+                        selectedToolIds={selectedToolIds}
+                        onToggleTool={toggleTool}
+                        disabled={isStreaming}
+                      />
+                    )}
 
-                  {showDeepResearchToggle && (
-                    <DeepResearchButton
-                      enabled={isDeepResearchEnabled}
-                      onToggle={() => {
-                        setIsDeepResearchEnabled((prev) => !prev);
-                        textareaRef.current?.focus();
-                      }}
-                      disabled={isStreaming}
-                    />
-                  )}
+                    {showDeepResearchToggle && (
+                      <DeepResearchButton
+                        enabled={isDeepResearchEnabled}
+                        onToggle={() => {
+                          setIsDeepResearchEnabled((prev) => !prev);
+                          textareaRef.current?.focus();
+                        }}
+                        disabled={isStreaming}
+                      />
+                    )}
 
-                  {deepResearch === 'always_on' && (
-                    <DeepResearchButton
-                      enabled={true}
-                      disabled={true}
-                      alwaysOn={true}
-                    />
-                  )}
+                    {deepResearch === 'always_on' && (
+                      <DeepResearchButton
+                        enabled={true}
+                        disabled={true}
+                        alwaysOn={true}
+                      />
+                    )}
 
-                  {qualityCheck === 'ondemand_toggle' && (
-                    <QualityCheckToggle
-                      isEditMode={isEditMode}
-                      enabled={qualityCheckEnabled}
-                      setEnabled={setQualityCheckEnabled}
-                    />
-                  )}
-                </>
-              }
-            />
-          </Form>
+                    {qualityCheck === 'ondemand_toggle' && (
+                      <QualityCheckToggle
+                        isEditMode={isEditMode}
+                        enabled={qualityCheckEnabled}
+                        setEnabled={setQualityCheckEnabled}
+                      />
+                    )}
+                  </>
+                }
+              />
+            </Form>
+          </>
         )}
         <div ref={chatWindowEndRef} /> {/* End div to mark the bottom */}
       </div>

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { ToolSnapshot } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
-import { FormattedMessage } from 'react-intl';
+import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 import SVGIcon from './Icon';
 import ChevronIcon from '@eeacms/volto-eea-chatbot/icons/chevron.svg';
 import SlidersIcon from '@eeacms/volto-eea-chatbot/icons/sliders.svg';
@@ -12,6 +12,13 @@ interface McpToolSelectorProps {
   disabled?: boolean;
 }
 
+const messages = defineMessages({
+  internalSearchLocked: {
+    id: 'Internal Search is always active',
+    defaultMessage: 'Internal Search is always active',
+  },
+});
+
 export default function McpToolSelector({
   availableTools,
   selectedToolIds,
@@ -20,6 +27,7 @@ export default function McpToolSelector({
 }: McpToolSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const intl = useIntl();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -115,7 +123,7 @@ export default function McpToolSelector({
                   }`}
                   title={
                     isSearch
-                      ? 'Internal Search is always active'
+                      ? intl.formatMessage(messages.internalSearchLocked)
                       : undefined
                   }
                 >

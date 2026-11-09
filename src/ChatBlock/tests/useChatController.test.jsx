@@ -629,4 +629,117 @@ describe('useChatController', () => {
     // Only tool 10 should be enabled by default
     expect(result.current.selectedToolIds).toEqual([10]);
   });
+
+  it('forks shared conversation into new linked session with additionalContext on submit', async () => {
+    createChatSession.mockResolvedValue('new-session-uuid-999');
+
+    const mockPersona = {
+      id: 1,
+      name: 'EEA Assistant',
+      tools: [{ id: 1, name: 'internal_search', display_name: 'Search' }],
+    };
+
+    const { result } = renderHook(() =>
+      useChatController({
+        personaId: 1,
+        persona: mockPersona,
+      }),
+    );
+
+    const initialSharedMessages = [
+      {
+        messageId: 1,
+        nodeId: 1,
+        type: 'user',
+        message: 'What is air quality?',
+      },
+      {
+        messageId: 2,
+        nodeId: 2,
+        type: 'assistant',
+        message: 'Air quality measures pollutants in the atmosphere.',
+        packets: [],
+      },
+    ];
+
+    // Load shared session
+    act(() => {
+      result.current.loadChatSession(
+        'shared-session-uuid-111',
+        initialSharedMessages,
+        true,
+      );
+    });
+
+    expect(result.current.chatSessionId).toBe('shared-session-uuid-111');
+    expect(result.current.sharedParentSessionId).toBe(
+      'shared-session-uuid-111',
+    );
+    expect(result.current.messages).toHaveLength(2);
+
+    // Submit follow-up message
+    await act(async () => {
+      await result.current.onSubmit({ message: 'What about in Denmark?' });
+    });
+
+    // Verifies createChatSession was called with [parent:<sharedSessionId>] tag
+    expect(createChatSession).toHaveBeenCalledWith(
+      1,
+      expect.stringContaining('[parent:shared-session-uuid-111]'),
+    );
+
+    // Chat session id updated to new session and shared parent cleared
+    expect(result.current.chatSessionId).toBe('new-session-uuid-999');
+    expect(result.current.sharedParentSessionId).toBeNull();
+
+    // Verify startStreaming was called with new session and additionalContext containing prior turn
+    expect(mockSendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'What about in Denmark?',
+        chatSessionId: 'new-session-uuid-999',
+        parentMessageId: null,
+        additionalContext: expect.stringContaining(
+          'User: What is air quality?\n\nAssistant: Air quality measures pollutants in the atmosphere.',
+        ),
+      }),
+    );
+
+    // Second follow-up turn in session B retains inheritedContext
+    await act(async () => {
+      await result.current.onSubmit({ message: 'And in Sweden?' });
+    });
+
+    expect(mockSendMessage).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        message: 'And in Sweden?',
+        chatSessionId: 'new-session-uuid-999',
+        additionalContext: expect.stringContaining(
+          'User: What is air quality?\n\nAssistant: Air quality measures pollutants in the atmosphere.',
+        ),
+      }),
+    );
+  });
+
+  it('ignores blank follow-up messages without forking shared session', async () => {
+    createChatSession.mockClear();
+
+    const { result } = renderHook(() =>
+      useChatController({
+        personaId: 1,
+        persona: { id: 1, name: 'EEA Assistant', tools: [] },
+      }),
+    );
+
+    act(() => {
+      result.current.loadChatSession('shared-session-123', [], true);
+    });
+
+    await act(async () => {
+      await result.current.onSubmit({ message: '   ' });
+    });
+
+    expect(createChatSession).not.toHaveBeenCalled();
+    expect(result.current.chatSessionId).toBe('shared-session-123');
+    expect(result.current.sharedParentSessionId).toBe('shared-session-123');
+  });
 });

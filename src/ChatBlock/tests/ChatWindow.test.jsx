@@ -777,7 +777,7 @@ describe('ChatWindow', () => {
     });
   });
 
-  it('renders read-only banner instead of input form in shared view', async () => {
+  it('renders shared conversation notice and input form to allow continuation in shared view', async () => {
     const mockClearChat = jest.fn();
     useChatController.mockReturnValue({
       onSubmit: jest.fn(),
@@ -814,20 +814,12 @@ describe('ChatWindow', () => {
     );
 
     const banner = await screen.findByText(
-      /you are viewing a shared conversation \(read-only\)/i,
+      /you are viewing a shared conversation/i,
     );
     expect(banner).toBeInTheDocument();
 
-    // Textarea form is replaced by the read-only banner
-    expect(screen.queryByTestId('mock-textarea')).not.toBeInTheDocument();
-
-    // Clicking "Start a new conversation" calls clearChat
-    const newChatBtn = screen.getByRole('button', {
-      name: /start a new conversation/i,
-    });
-    expect(newChatBtn).toBeInTheDocument();
-    fireEvent.click(newChatBtn);
-    expect(mockClearChat).toHaveBeenCalled();
+    // Textarea form is accessible to allow continuing the conversation
+    expect(screen.getByTestId('autoresize-textarea')).toBeInTheDocument();
   });
 
   it('renders loading state while shared session is loading and hides the composer', () => {

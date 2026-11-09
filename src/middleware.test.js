@@ -414,6 +414,194 @@ describe('src/middleware', () => {
     );
   });
 
+  it('stitches chained parent session messages and strips parent tag from description', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    const childSessionId = '22222222-2222-4222-8222-222222222222';
+    const parentSessionId = '11111111-1111-4111-8111-111111111111';
+
+    req.url = `/_da/chat/get-chat-session/${childSessionId}`;
+    req.method = 'GET';
+
+    nodeFetch.mockImplementation(async (url) => {
+      if (url.includes(childSessionId)) {
+        return {
+          status: 200,
+          headers: { get: () => 'application/json' },
+          json: () =>
+            Promise.resolve({
+              chat_session_id: childSessionId,
+              description: `Follow-up query [parent:${parentSessionId}]`,
+              persona_id: 1,
+              shared_status: 'public',
+              messages: [
+                {
+                  message_id: 10,
+                  message_type: 'user',
+                  message: 'What about in Germany?',
+                },
+                {
+                  message_id: 11,
+                  message_type: 'assistant',
+                  message: 'In Germany, air quality is monitored closely.',
+                },
+              ],
+            }),
+        };
+      }
+      if (url.includes(parentSessionId)) {
+        return {
+          status: 200,
+          headers: { get: () => 'application/json' },
+          json: () =>
+            Promise.resolve({
+              chat_session_id: parentSessionId,
+              description: 'Initial Air Quality Discussion',
+              persona_id: 1,
+              shared_status: 'public',
+              messages: [
+                {
+                  message_id: 1,
+                  message_type: 'user',
+                  message: 'What is air quality?',
+                },
+                {
+                  message_id: 2,
+                  message_type: 'assistant',
+                  message: 'Air quality measures pollutants in the air.',
+                },
+              ],
+            }),
+        };
+      }
+      return { status: 404, headers: { get: () => 'application/json' } };
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    const sentData = JSON.parse(res.send.mock.calls[0][0]);
+    expect(sentData.chat_session_id).toBe(childSessionId);
+    expect(sentData.description).toBe('Follow-up query');
+    expect(sentData.messages).toHaveLength(4);
+    expect(sentData.messages[0].message).toBe('What is air quality?');
+    expect(sentData.messages[1].message).toBe(
+      'Air quality measures pollutants in the air.',
+    );
+    expect(sentData.messages[2].message).toBe('What about in Germany?');
+    expect(sentData.messages[3].message).toBe(
+      'In Germany, air quality is monitored closely.',
+    );
+  });
+
+  it('stops parent stitching safely when parent session is private', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    const childSessionId = '22222222-2222-4222-8222-222222222222';
+    const privateParentId = '33333333-3333-4333-8333-333333333333';
+
+    req.url = `/_da/chat/get-chat-session/${childSessionId}`;
+    req.method = 'GET';
+
+    nodeFetch.mockImplementation(async (url) => {
+      if (url.includes(childSessionId)) {
+        return {
+          status: 200,
+          headers: { get: () => 'application/json' },
+          json: () =>
+            Promise.resolve({
+              chat_session_id: childSessionId,
+              description: `Child [parent:${privateParentId}]`,
+              persona_id: 1,
+              shared_status: 'public',
+              messages: [
+                {
+                  message_id: 10,
+                  message_type: 'user',
+                  message: 'Child question',
+                },
+              ],
+            }),
+        };
+      }
+      if (url.includes(privateParentId)) {
+        return {
+          status: 200,
+          headers: { get: () => 'application/json' },
+          json: () =>
+            Promise.resolve({
+              chat_session_id: privateParentId,
+              shared_status: 'private',
+              messages: [{ message_id: 1, message: 'Private secret' }],
+            }),
+        };
+      }
+      return { status: 404, headers: { get: () => 'application/json' } };
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    const sentData = JSON.parse(res.send.mock.calls[0][0]);
+    expect(sentData.messages).toHaveLength(1);
+    expect(sentData.messages[0].message).toBe('Child question');
+  });
+
+  it('prevents infinite loops on cyclic parent session references', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    const sessionA = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const sessionB = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+
+    req.url = `/_da/chat/get-chat-session/${sessionA}`;
+    req.method = 'GET';
+
+    nodeFetch.mockImplementation(async (url) => {
+      if (url.includes(sessionA)) {
+        return {
+          status: 200,
+          headers: { get: () => 'application/json' },
+          json: () =>
+            Promise.resolve({
+              chat_session_id: sessionA,
+              description: `Session A [parent:${sessionB}]`,
+              persona_id: 1,
+              shared_status: 'public',
+              messages: [{ message_id: 1, message: 'Msg from A' }],
+            }),
+        };
+      }
+      if (url.includes(sessionB)) {
+        return {
+          status: 200,
+          headers: { get: () => 'application/json' },
+          json: () =>
+            Promise.resolve({
+              chat_session_id: sessionB,
+              description: `Session B [parent:${sessionA}]`,
+              persona_id: 1,
+              shared_status: 'public',
+              messages: [{ message_id: 2, message: 'Msg from B' }],
+            }),
+        };
+      }
+      return { status: 404, headers: { get: () => 'application/json' } };
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    const sentData = JSON.parse(res.send.mock.calls[0][0]);
+    // Should terminate gracefully and include both A and B without an infinite loop
+    expect(sentData.messages).toHaveLength(2);
+  });
+
   it('rejects disallowed paths with 404', async () => {
     process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
     process.env.ONYX_URL = 'http://localhost:3000';

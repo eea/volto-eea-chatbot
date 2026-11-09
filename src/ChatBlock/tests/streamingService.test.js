@@ -486,6 +486,31 @@ describe('sendMessage', () => {
     const body = JSON.parse(global.fetch.mock.calls[0][1].body);
     expect(body.allowed_tool_ids).toEqual([]);
   });
+
+  it('includes additional_context in payload when provided', async () => {
+    const chunk = JSON.stringify({
+      ind: 1,
+      obj: { type: 'stop' },
+    });
+    global.fetch.mockResolvedValue(makeStreamResponse([chunk]));
+
+    // eslint-disable-next-line no-unused-vars
+    for await (const _ of sendMessage({
+      message: 'follow up',
+      chatSessionId: 'session-1',
+      parentMessageId: null,
+      regenerate: false,
+      filters: null,
+      selectedDocumentIds: [],
+      onyxVersion: '3',
+      additionalContext: 'Previous turn summary',
+    })) {
+      // consume
+    }
+
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    expect(body.additional_context).toBe('Previous turn summary');
+  });
 });
 
 // ── regenerateMessage ──────────────────────────────────────────────────

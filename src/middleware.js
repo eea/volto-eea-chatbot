@@ -298,7 +298,7 @@ async function send_onyx_request(
     }
   }
 
-  // Intercept get-chat-session to enforce public shared_status and sanitize data
+  // Intercept get-chat-session to enforce public shared_status, stitch chained parents, and sanitize data
   if (url.includes('/chat/get-chat-session/')) {
     try {
       log(`Fetching ${url}`);
@@ -317,12 +317,11 @@ async function send_onyx_request(
           return;
         }
 
-        const sanitized = {
-          chat_session_id: sessionData.chat_session_id,
-          description: sessionData.description,
-          persona_id: sessionData.persona_id,
-          persona_name: sessionData.persona_name,
-          messages: (sessionData.messages || []).map((msg) => ({
+        const PARENT_SESSION_TAG_REGEX =
+          /\[parent:([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\]\s*$/;
+
+        const mapMessages = (msgs) =>
+          (msgs || []).map((msg) => ({
             message_id: msg.message_id,
             parent_message: msg.parent_message,
             latest_child_message: msg.latest_child_message,
@@ -332,7 +331,58 @@ async function send_onyx_request(
             citations: msg.citations,
             time_sent: msg.time_sent,
             files: msg.files,
-          })),
+          }));
+
+        let compositeMessages = mapMessages(sessionData.messages);
+        let currentDesc = sessionData.description || '';
+        let match = currentDesc.match(PARENT_SESSION_TAG_REGEX);
+        const visitedSessionIds = new Set([
+          String(sessionData.chat_session_id).toLowerCase(),
+        ]);
+        const MAX_ANCESTOR_DEPTH = 10;
+        let depth = 0;
+
+        while (match && depth < MAX_ANCESTOR_DEPTH) {
+          depth++;
+          const parentId = match[1].toLowerCase();
+          if (visitedSessionIds.has(parentId)) {
+            break;
+          }
+          visitedSessionIds.add(parentId);
+
+          const parentUrl = `${process.env.ONYX_URL || ''}/api/chat/get-chat-session/${parentId}?is_shared=true`;
+          try {
+            log(`Fetching parent session ${parentId}`);
+            const parentRes = await fetch(parentUrl, options);
+            if (parentRes.status === 200) {
+              const parentData = await parentRes.json();
+              if (parentData?.shared_status === 'public') {
+                const parentMessages = mapMessages(parentData.messages);
+                compositeMessages = [...parentMessages, ...compositeMessages];
+                currentDesc = parentData.description || '';
+                match = currentDesc.match(PARENT_SESSION_TAG_REGEX);
+              } else {
+                break;
+              }
+            } else {
+              break;
+            }
+          } catch (ancestorErr) {
+            log(`Error fetching parent session ${parentId}:`, ancestorErr);
+            break;
+          }
+        }
+
+        const cleanDescription = (sessionData.description || '')
+          .replace(PARENT_SESSION_TAG_REGEX, '')
+          .trim();
+
+        const sanitized = {
+          chat_session_id: sessionData.chat_session_id,
+          description: cleanDescription,
+          persona_id: sessionData.persona_id,
+          persona_name: sessionData.persona_name,
+          messages: compositeMessages,
         };
 
         res.set('Content-Type', 'application/json');

@@ -31,6 +31,7 @@ export interface SendMessageParams {
   forcedToolIds?: number[];
   retrieval_options?: any;
   onyxVersion?: '2' | '3';
+  additionalContext?: string | null;
 }
 
 export interface StreamResponse {
@@ -141,6 +142,7 @@ function buildPayloadV2(params: SendMessageParams): Record<string, unknown> {
     use_agentic_search: params.useAgentSearch ?? false,
     allowed_tool_ids: params.enabledToolIds,
     forced_tool_ids: params.forcedToolIds,
+    additional_context: params.additionalContext ?? null,
   };
 }
 
@@ -173,7 +175,7 @@ function buildPayloadV3(params: SendMessageParams): Record<string, unknown> {
     },
     llm_overrides: null,
     origin: 'webapp',
-    additional_context: null,
+    additional_context: params.additionalContext ?? null,
     alternate_assistant_id: params.alternateAssistantId ?? null,
     stream: true,
   };

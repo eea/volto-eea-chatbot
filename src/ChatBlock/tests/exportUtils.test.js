@@ -4,6 +4,8 @@ import {
   generateMarkdownContent,
   exportConversationAsMarkdown,
   exportConversationAsPdf,
+  generateHtmlContent,
+  exportConversationAsHtml,
   parseMarkdownToDocxParagraphs,
   exportConversationAsDocx,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/exportUtils';
@@ -202,6 +204,45 @@ describe('exportUtils', () => {
       exportConversationAsPdf();
       expect(printSpy).toHaveBeenCalled();
       printSpy.mockRestore();
+    });
+  });
+
+  describe('generateHtmlContent', () => {
+    it('generates an EEA-branded self-contained HTML white paper document', () => {
+      const html = generateHtmlContent(mockMessages, mockPersona);
+
+      expect(html).toContain('<!DOCTYPE html>');
+      expect(html).toContain('European Environment Agency');
+      expect(html).toContain('EEA Green Guru');
+      expect(html).toContain('What is PM2.5?');
+      expect(html).toContain('PM2.5 refers to fine particulate matter');
+      expect(html).toContain('Sources &amp; References');
+      expect(html).toContain('Air Quality in Europe 2024');
+      expect(html).toContain('www.eea.europa.eu');
+    });
+  });
+
+  describe('exportConversationAsHtml', () => {
+    it('creates Blob and triggers download in browser for HTML', () => {
+      const originalCreateObjectURL = window.URL.createObjectURL;
+      const originalRevokeObjectURL = window.URL.revokeObjectURL;
+
+      window.URL.createObjectURL = jest.fn(() => 'blob:mock-html-url');
+      window.URL.revokeObjectURL = jest.fn();
+
+      const clickSpy = jest.spyOn(HTMLAnchorElement.prototype, 'click');
+
+      exportConversationAsHtml(mockMessages, mockPersona);
+
+      expect(window.URL.createObjectURL).toHaveBeenCalled();
+      expect(clickSpy).toHaveBeenCalled();
+      expect(window.URL.revokeObjectURL).toHaveBeenCalledWith(
+        'blob:mock-html-url',
+      );
+
+      window.URL.createObjectURL = originalCreateObjectURL;
+      window.URL.revokeObjectURL = originalRevokeObjectURL;
+      clickSpy.mockRestore();
     });
   });
 

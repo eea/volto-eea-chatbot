@@ -9,6 +9,7 @@ import {
   exportConversationAsMarkdown,
   exportConversationAsPdf,
   exportConversationAsDocx,
+  exportConversationAsHtml,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/exportUtils';
 import { copyShareLink } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
 import type {
@@ -126,6 +127,11 @@ export function ChatExportDropdown({
     exportConversationAsPdf();
   };
 
+  const handleExportHtml = () => {
+    closeDropdown();
+    exportConversationAsHtml(messages, persona);
+  };
+
   const handleCopyLink = async () => {
     if (!chatSessionId) return;
     const ok = await copyShareLink(chatSessionId);
@@ -202,6 +208,16 @@ export function ChatExportDropdown({
                 'Word (.docx)'
               )}
             </span>
+          </button>
+
+          <button
+            type="button"
+            className="chat-export-item"
+            role="menuitem"
+            onClick={handleExportHtml}
+          >
+            <span className="export-format-badge">HTML</span>
+            <span className="export-format-name">Web Page (.html)</span>
           </button>
 
           <button

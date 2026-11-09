@@ -4,6 +4,10 @@ import type {
 } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { addCitations } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/citations';
 import { marked } from 'marked';
+import {
+  renderHtmlWhitePaper,
+  escapeHtml,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/utils/exportHtmlTemplate';
 
 export interface ExportSource {
   citationIndex?: number | string;
@@ -225,6 +229,104 @@ export function generateMarkdownContent(
   });
 
   return lines.join('\n');
+}
+
+/**
+ * Generates an EEA-branded, self-contained HTML white paper document.
+ */
+export function generateHtmlContent(
+  messages: Message[],
+  persona?: Persona,
+): string {
+  const title = persona?.name || 'EEA Assistant';
+  const now = new Date();
+  const dateFormatted = now.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  const visibleMessages = (messages || []).filter(
+    (m) =>
+      (m.type === 'user' || m.type === 'assistant') &&
+      Boolean(m.message && m.message.trim()),
+  );
+
+  let turnsHtml = '';
+  let turnCounter = 0;
+
+  visibleMessages.forEach((msg) => {
+    if (msg.type === 'user') {
+      turnCounter++;
+      turnsHtml += `
+      <div class="turn-wrapper turn-user" id="turn-${turnCounter}">
+        <div class="turn-header">
+          <span class="role-badge role-user">Question</span>
+          <span class="turn-number">#${turnCounter}</span>
+        </div>
+        <div class="turn-content user-text">${escapeHtml(msg.message || '')}</div>
+      </div>`;
+    } else if (msg.type === 'assistant') {
+      const parsedMarkdown = marked.parse(msg.message || '');
+      const sources = extractMessageSources(msg);
+
+      let sourcesHtml = '';
+      if (sources.length > 0) {
+        sourcesHtml = `
+        <div class="sources-section">
+          <h4 class="sources-heading">Sources &amp; References</h4>
+          <ol class="sources-list">
+            ${sources
+              .map((source, sIdx) => {
+                const badge =
+                  source.citationIndex !== undefined
+                    ? `[${escapeHtml(String(source.citationIndex))}]`
+                    : `[${sIdx + 1}]`;
+                const titleHtml = source.url
+                  ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a>`
+                  : `<span>${escapeHtml(source.title)}</span>`;
+                return `<li class="source-item"><span class="source-index">${badge}</span> ${titleHtml}</li>`;
+              })
+              .join('\n            ')}
+          </ol>
+        </div>`;
+      }
+
+      turnsHtml += `
+      <div class="turn-wrapper turn-assistant">
+        <div class="turn-header">
+          <span class="role-badge role-assistant">Response</span>
+        </div>
+        <div class="turn-content assistant-text markdown-body">
+          ${parsedMarkdown}
+        </div>
+        ${sourcesHtml}
+      </div>`;
+    }
+  });
+
+  return renderHtmlWhitePaper({
+    title,
+    dateFormatted,
+    turnCounter,
+    turnsHtml,
+  });
+}
+
+/**
+ * Exports conversation as a self-contained HTML (.html) white paper download.
+ */
+export function exportConversationAsHtml(
+  messages: Message[],
+  persona?: Persona,
+  customFilename?: string,
+): void {
+  const content = generateHtmlContent(messages, persona);
+  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+  const filename = customFilename || getExportFilename(persona, 'html');
+  downloadBlob(blob, filename);
 }
 
 /**

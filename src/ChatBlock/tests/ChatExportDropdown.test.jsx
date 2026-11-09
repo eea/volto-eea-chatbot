@@ -106,6 +106,23 @@ describe('ChatExportDropdown', () => {
     exportMdSpy.mockRestore();
   });
 
+  it('calls exportConversationAsHtml when clicking HTML option', () => {
+    const exportHtmlSpy = jest
+      .spyOn(exportUtils, 'exportConversationAsHtml')
+      .mockImplementation(() => {});
+
+    renderComponent();
+    fireEvent.click(screen.getByRole('button', { name: /export/i }));
+
+    const htmlBtn = screen.getByText('Web Page (.html)');
+    fireEvent.click(htmlBtn);
+
+    expect(exportHtmlSpy).toHaveBeenCalledWith(mockMessages, mockPersona);
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+
+    exportHtmlSpy.mockRestore();
+  });
+
   it('calls exportConversationAsPdf when clicking PDF option', () => {
     const exportPdfSpy = jest
       .spyOn(exportUtils, 'exportConversationAsPdf')

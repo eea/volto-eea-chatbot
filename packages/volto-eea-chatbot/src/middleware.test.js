@@ -1,0 +1,413 @@
+// Mock superagent
+import middleware, { isPathAllowed, ALLOWED_PROXY_PATHS } from './middleware';
+
+vi.mock('superagent', () => ({
+  post: vi.fn().mockReturnValue({
+    type: vi.fn().mockReturnValue({
+      send: vi.fn().mockResolvedValue({
+        headers: { 'set-cookie': ['session=abc; Max-Age=3600'] },
+      }),
+    }),
+  }),
+}));
+
+// Mock node-fetch - use require() to get the mock reference in tests
+vi.mock('node-fetch', () => {
+  const mockPipe = vi.fn();
+  const fn = vi.fn().mockResolvedValue({
+    status: 200,
+    headers: {
+      get: vi.fn().mockReturnValue('application/json'),
+      raw: vi.fn().mockReturnValue({}),
+    },
+    body: { pipe: mockPipe },
+  });
+  fn.__mockPipe = mockPipe;
+  return { default: fn };
+});
+
+// Mock fs with stream callbacks
+const _mockOnCallbacks = {};
+vi.mock('fs', () => {
+  const mockReadStream = {
+    on: vi.fn((event, cb) => {
+      _mockOnCallbacks[event] = cb;
+      return mockReadStream;
+    }),
+  };
+  const mockFs = {
+    createReadStream: vi.fn(() => mockReadStream),
+    createWriteStream: vi.fn(() => ({ write: vi.fn(), end: vi.fn() })),
+    readFileSync: vi.fn(),
+  };
+  return {
+    ...mockFs,
+    default: mockFs,
+  };
+});
+
+describe('src/middleware', () => {
+  let req, res, next, nodeFetch;
+  const originalEnv = process.env;
+
+  beforeEach(async () => {
+    vi.useFakeTimers();
+    process.env = { ...originalEnv };
+    nodeFetch = (await import('node-fetch')).default;
+    nodeFetch.mockReset();
+    nodeFetch.mockResolvedValue({
+      status: 200,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json'),
+        raw: vi.fn().mockReturnValue({}),
+      },
+      body: { pipe: nodeFetch.__mockPipe },
+    });
+    nodeFetch.__mockPipe.mockClear();
+
+    // Reset stream callbacks
+    Object.keys(_mockOnCallbacks).forEach((k) => delete _mockOnCallbacks[k]);
+
+    req = {
+      url: '/_da/chat/send-message',
+      method: 'POST',
+      body: { message: 'hello' },
+      ip: '127.0.0.1',
+      headers: {},
+    };
+    res = {
+      send: vi.fn(),
+      set: vi.fn(),
+      setHeader: vi.fn(),
+      write: vi.fn(),
+      end: vi.fn(),
+      status: vi.fn().mockReturnThis(),
+    };
+    next = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    process.env = originalEnv;
+    vi.restoreAllMocks();
+  });
+
+  it('returns error when ONYX_API_KEY is missing', async () => {
+    delete process.env.ONYX_API_KEY;
+    await middleware(req, res, next);
+    expect(res.send).toHaveBeenCalledWith({
+      error: 'Invalid configuration: missing ONYX api key',
+    });
+  });
+
+  it('proxies POST request with api_key and pipes response', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+
+    await middleware(req, res, next);
+
+    expect(nodeFetch).toHaveBeenCalledWith(
+      'http://localhost:3000/api/chat/send-message',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-key',
+        }),
+        body: JSON.stringify({ message: 'hello' }),
+      }),
+      { message: 'hello' },
+    );
+    expect(res.set).toHaveBeenCalledWith('Content-Type', 'application/json');
+    expect(nodeFetch.__mockPipe).toHaveBeenCalledWith(res);
+  });
+
+  it('handles related question paths', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.url = '/_rq/chat/send-message';
+
+    await middleware(req, res, next);
+
+    expect(nodeFetch).toHaveBeenCalledWith(
+      'http://localhost:3000/api/chat/send-message',
+      expect.any(Object),
+      expect.anything(),
+    );
+  });
+
+  it('sends error response when fetch throws', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+
+    nodeFetch.mockRejectedValueOnce(
+      Object.assign(new Error('Network error'), {
+        response: { text: 'Connection refused' },
+      }),
+    );
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await middleware(req, res, next);
+
+    expect(res.send).toHaveBeenCalledWith({
+      error: 'Onyx error: Connection refused',
+    });
+    consoleSpy.mockRestore();
+  });
+
+  it('handles error without response text', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+
+    nodeFetch.mockRejectedValueOnce(new Error('No response'));
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await middleware(req, res, next);
+
+    expect(res.send).toHaveBeenCalledWith({
+      error: 'Onyx error: error',
+    });
+    consoleSpy.mockRestore();
+  });
+
+  it('handles GET requests without body', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.method = 'GET';
+    req.url = '/_da/persona/1';
+    req.body = null;
+
+    await middleware(req, res, next);
+
+    const lastCall = nodeFetch.mock.calls[nodeFetch.mock.calls.length - 1];
+    expect(lastCall[1].body).toBeUndefined();
+  });
+
+  // Express defaults to 200 when the proxy never sets a status, so every Onyx
+  // error reached the browser as a success. The evidence client cannot tell a
+  // missing chunk from a found one (or a gateway throttle from a response) unless
+  // the upstream status survives the proxy.
+  it('propagates an upstream 404 instead of flattening it to 200', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.method = 'GET';
+    req.url = '/_da/document/chunk-info?document_id=doc-1&chunk_id=9';
+    req.body = null;
+    nodeFetch.mockResolvedValueOnce({
+      status: 404,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json'),
+        raw: vi.fn().mockReturnValue({}),
+      },
+      body: { pipe: vi.fn() },
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+  });
+
+  it('propagates an upstream 429 so the client can retry it', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.method = 'GET';
+    req.url = '/_da/document/chunk-info?document_id=doc-1&chunk_id=0';
+    req.body = null;
+    nodeFetch.mockResolvedValueOnce({
+      status: 429,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json'),
+        raw: vi.fn().mockReturnValue({}),
+      },
+      body: { pipe: vi.fn() },
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(429);
+  });
+
+  it('answers 200 for a successful proxied chunk', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.method = 'GET';
+    req.url = '/_da/document/chunk-info?document_id=doc-1&chunk_id=0';
+    req.body = null;
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it('uses mock create-chat-session when MOCK_LLM_FILE_PATH is set', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    process.env.MOCK_LLM_FILE_PATH = '/tmp/mock.jsonl';
+    req.url = '/_da/chat/create-chat-session';
+
+    const middlewarePromise = middleware(req, res, next);
+    vi.advanceTimersByTime(1000);
+    await middlewarePromise.catch(() => {});
+
+    expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'text/plain');
+    expect(res.setHeader).toHaveBeenCalledWith('Transfer-Encoding', 'chunked');
+  });
+
+  it('uses mock send-message with stream when MOCK_LLM_FILE_PATH is set', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    process.env.MOCK_LLM_FILE_PATH = '/tmp/mock.jsonl';
+    req.url = '/_da/chat/send-message';
+
+    const middlewarePromise = middleware(req, res, next);
+
+    // Advance past the 2000ms mock delay
+    vi.advanceTimersByTime(2000);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const fs = await import('fs');
+    expect(fs.createReadStream).toHaveBeenCalledWith('/tmp/mock.jsonl', {
+      encoding: 'utf8',
+    });
+
+    // Simulate data event
+    if (_mockOnCallbacks.data) {
+      _mockOnCallbacks.data('{"ind":1}\n{"ind":2}\n');
+    }
+
+    // Simulate end event
+    if (_mockOnCallbacks.end) {
+      _mockOnCallbacks.end();
+    }
+
+    vi.advanceTimersByTime(5000);
+    await middlewarePromise.catch(() => {});
+
+    expect(res.write).toHaveBeenCalled();
+  });
+
+  it('dumps LLM response when DUMP_LLM_FILE_PATH is set', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    process.env.DUMP_LLM_FILE_PATH = '/tmp/dumped_response.jsonl';
+
+    await middleware(req, res, next);
+
+    const fs = await import('fs');
+    expect(fs.createWriteStream).toHaveBeenCalledWith(
+      '/tmp/dumped_response.jsonl',
+    );
+  });
+
+  it('rejects disallowed paths with 404', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.url = '/_da/admin/users/delete';
+    req.method = 'POST';
+
+    await middleware(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.send).toHaveBeenCalledWith({ error: 'Not Found' });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects allowed path with wrong HTTP method', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.url = '/_da/persona';
+    req.method = 'DELETE';
+
+    await middleware(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.send).toHaveBeenCalledWith({ error: 'Not Found' });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects path traversal attempts', async () => {
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+    req.url = '/_da/../../etc/passwd';
+    req.method = 'GET';
+
+    await middleware(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.send).toHaveBeenCalledWith({ error: 'Not Found' });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('isPathAllowed', () => {
+  it('allows all defined _da proxy paths with correct methods', () => {
+    expect(isPathAllowed('/persona', 'GET', ALLOWED_PROXY_PATHS)).toBe(true);
+    expect(isPathAllowed('/persona/25', 'GET', ALLOWED_PROXY_PATHS)).toBe(true);
+    expect(
+      isPathAllowed('/chat/create-chat-session', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/chat/send-message', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/chat/send-chat-message', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed(
+        '/chat/create-chat-message-feedback',
+        'POST',
+        ALLOWED_PROXY_PATHS,
+      ),
+    ).toBe(true);
+  });
+
+  it('rejects allowed paths with wrong methods', () => {
+    expect(isPathAllowed('/persona', 'POST', ALLOWED_PROXY_PATHS)).toBe(false);
+    expect(
+      isPathAllowed('/chat/send-message', 'GET', ALLOWED_PROXY_PATHS),
+    ).toBe(false);
+  });
+
+  it('rejects disallowed paths', () => {
+    expect(
+      isPathAllowed('/admin/users/delete', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(false);
+    expect(isPathAllowed('/../../etc/passwd', 'GET', ALLOWED_PROXY_PATHS)).toBe(
+      false,
+    );
+    expect(isPathAllowed('/api/debug', 'GET', ALLOWED_PROXY_PATHS)).toBe(false);
+  });
+
+  it('strips query strings before comparison', () => {
+    expect(
+      isPathAllowed(
+        '/persona?include_deleted=false',
+        'GET',
+        ALLOWED_PROXY_PATHS,
+      ),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/persona/25?fields=name', 'GET', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+  });
+
+  it('rejects non-numeric persona IDs', () => {
+    expect(isPathAllowed('/persona/abc', 'GET', ALLOWED_PROXY_PATHS)).toBe(
+      false,
+    );
+  });
+});
+
+describe('isPathAllowed with _rq paths', () => {
+  it('allows related question paths via shared allowlist', () => {
+    expect(
+      isPathAllowed('/chat/create-chat-session', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/chat/send-message', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+    expect(
+      isPathAllowed('/chat/send-chat-message', 'POST', ALLOWED_PROXY_PATHS),
+    ).toBe(true);
+  });
+});

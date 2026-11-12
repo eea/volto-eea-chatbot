@@ -220,6 +220,16 @@ describe('ChatBlockSchema', () => {
     expect(schema.properties.enableDownload.type).toBe('boolean');
   });
 
+  it('includes enableShare in default fields with default true', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: {},
+    });
+    expect(schema.fieldsets[0].fields).toContain('enableShare');
+    expect(schema.properties.enableShare.default).toBe(true);
+    expect(schema.properties.enableShare.type).toBe('boolean');
+  });
+
   it('includes enableToolSelection in default fields', () => {
     const schema = ChatBlockSchema({
       assistants: mockAssistants,

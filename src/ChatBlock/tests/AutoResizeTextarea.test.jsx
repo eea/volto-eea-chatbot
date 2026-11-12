@@ -210,8 +210,8 @@ describe('AutoResizeTextarea', () => {
     );
 
     expect(mockEnableTool).toHaveBeenCalledWith(10);
-    // The typed word "data" is replaced with "@EEA Data Connector"
-    expect(textarea.value).toBe('Show me @EEA Data Connector on water');
+    // The input text is preserved without replacement
+    expect(textarea.value).toBe('Show me data on water');
     expect(trackEvent).toHaveBeenCalledWith({
       category: 'Chatbot',
       action: 'MCP tool selected',
@@ -219,7 +219,7 @@ describe('AutoResizeTextarea', () => {
     });
   });
 
-  it('replaces trigger keyword at the end of the input', () => {
+  it('enables tool on proposal click without modifying input text', () => {
     const mockEnableTool = jest.fn();
     const mockTools = [
       {
@@ -250,9 +250,9 @@ describe('AutoResizeTextarea', () => {
     fireEvent.click(getByRole('button', { name: /Enable @Image Generation/i }));
 
     expect(mockEnableTool).toHaveBeenCalledWith(2);
-    // "image" at the end is replaced with "@Image Generation "
+    // Input text remains completely unchanged
     expect(textarea.value).toBe(
-      'Which species are most at risk in Europe? @Image Generation ',
+      'Which species are most at risk in Europe? image',
     );
   });
 

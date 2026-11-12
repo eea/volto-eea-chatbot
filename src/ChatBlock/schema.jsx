@@ -147,6 +147,7 @@ export function ChatBlockSchema({ assistants, data = {} }) {
           'enableFeedback',
           ...(data.enableFeedback ? ['feedbackReasons'] : []),
           'enableDownload',
+          'enableShare',
           'enableToolSelection',
           ...(data.enableToolSelection
             ? ['allowedTools', 'defaultEnabledTools']
@@ -480,7 +481,14 @@ range is from 0 to 100`,
         type: 'boolean',
         default: true,
         description:
-          'Allow users to export and download conversations as Markdown, Word (DOCX), or PDF.',
+          'Allow users to export and download conversations as Markdown, Word (DOCX), HTML, or PDF.',
+      },
+      enableShare: {
+        title: 'Enable share conversation',
+        type: 'boolean',
+        default: true,
+        description:
+          'Allow users to share conversations via a public shareable link.',
       },
       enableToolSelection: {
         title: 'Enable tool selection',

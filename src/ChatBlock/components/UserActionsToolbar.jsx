@@ -52,6 +52,7 @@ const UserActionsToolbar = ({
   matomoCategory,
   persona,
   enableDownload = true,
+  enableShare = true,
   isLoading = false,
 }) => {
   const [copied, handleCopy] = useCopyToClipboard(message?.message || '');
@@ -142,7 +143,7 @@ const UserActionsToolbar = ({
           {copied ? <SVGIcon name={CheckIcon} /> : <SVGIcon name={CopyIcon} />}
         </Button>
 
-        {chatSessionId && (
+        {enableShare && chatSessionId && (
           <Button
             basic
             className="chat-action-btn chat-share-btn"

@@ -63,6 +63,7 @@ interface ChatWindowProps {
   onyxVersion?: '2' | '3';
   enableDownload?: boolean;
   enableExport?: boolean;
+  enableShare?: boolean;
   enableToolSelection?: boolean;
   allowedTools?: (number | string)[];
   defaultEnabledTools?: (number | string)[];
@@ -126,6 +127,11 @@ function ChatWindow({
       : typeof data.enableExport !== 'undefined'
         ? Boolean(data.enableExport)
         : true;
+
+  const isShareEnabled =
+    typeof data.enableShare !== 'undefined'
+      ? Boolean(data.enableShare)
+      : true;
 
   const stopButtonSetting:
     | 'disabled'
@@ -403,6 +409,7 @@ function ChatWindow({
                     chatSessionId={chatSessionId}
                     onNewChat={handleClearChat}
                     enableDownload={isDownloadEnabled}
+                    enableShare={isShareEnabled}
                     allMessages={messages}
                     isDeepResearchEnabled={isDeepResearchEnabled}
                     libs={libs}

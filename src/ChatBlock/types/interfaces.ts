@@ -181,6 +181,7 @@ export interface ChatMessageProps {
   chatSessionId?: string | null;
   onNewChat?: () => void;
   enableDownload?: boolean;
+  enableShare?: boolean;
   allMessages?: Message[];
 }
 

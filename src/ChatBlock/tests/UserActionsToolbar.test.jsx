@@ -312,6 +312,20 @@ describe('UserActionsToolbar', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('does not render Share button when enableShare is false', () => {
+    const props = {
+      message: { messageId: 1, message: 'Test message' },
+      chatSessionId: 'session-uuid-1234',
+      enableShare: false,
+    };
+
+    renderWithRTL(props);
+
+    expect(
+      screen.queryByRole('button', { name: /share conversation/i }),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders Download button when enableDownload is true', () => {
     const props = {
       message: { messageId: 1, message: 'Test message' },

@@ -91,50 +91,8 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
       });
     }
 
-    const toolTag = `@${(tool.display_name || tool.name).trim()}`;
-    const textarea = localTextareaRef.current;
-
-    if (
-      match &&
-      typeof match.matchIndex === 'number' &&
-      match.matchLength > 0
-    ) {
-      const { matchIndex, matchLength } = match;
-      const before = input.slice(0, matchIndex);
-      const after = input.slice(matchIndex + matchLength);
-
-      const needsPreSpace = before.length > 0 && !before.endsWith(' ');
-      const needsPostSpace =
-        after.length === 0 ||
-        (!after.startsWith(' ') && !/^[.,!?;:)]/.test(after));
-
-      const replacement = `${needsPreSpace ? ' ' : ''}${toolTag}${needsPostSpace ? ' ' : ''}`;
-      const newText = `${before}${replacement}${after}`;
-      setInput(newText);
-
-      setTimeout(() => {
-        if (textarea) {
-          textarea.focus();
-          const newPos = before.length + replacement.length;
-          textarea.setSelectionRange(newPos, newPos);
-        }
-      }, 0);
-    } else if (textarea) {
-      const start = textarea.selectionStart ?? input.length;
-      const end = textarea.selectionEnd ?? input.length;
-      const before = input.slice(0, start);
-      const after = input.slice(end);
-      const needsPreSpace = before.length > 0 && !before.endsWith(' ');
-      const newText = `${before}${needsPreSpace ? ' ' : ''}${toolTag} ${after}`;
-      setInput(newText);
-      setTimeout(() => {
-        textarea.focus();
-        const newPos = start + (needsPreSpace ? 1 : 0) + toolTag.length + 1;
-        textarea.setSelectionRange(newPos, newPos);
-      }, 0);
-    } else {
-      const separator = input.length > 0 && !input.endsWith(' ') ? ' ' : '';
-      setInput((prev) => `${prev}${separator}${toolTag} `);
+    if (localTextareaRef.current) {
+      localTextareaRef.current.focus();
     }
   };
 

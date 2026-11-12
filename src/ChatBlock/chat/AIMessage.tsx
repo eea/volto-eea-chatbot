@@ -233,6 +233,7 @@ export function AIMessage({
   chatSessionId,
   onNewChat,
   enableDownload,
+  enableShare,
   allMessages,
 }: ChatMessageProps) {
   const [allToolsDisplayed, setAllToolsDisplayed] = useState(false);
@@ -601,6 +602,7 @@ export function AIMessage({
           chatSessionId={chatSessionId}
           onNewChat={onNewChat}
           enableDownload={enableDownload}
+          enableShare={enableShare}
           enableFeedback={enableFeedback}
           feedbackReasons={feedbackReasons}
           enableMatomoTracking={enableMatomoTracking}

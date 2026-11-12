@@ -4,25 +4,17 @@ import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { ChatExportDropdown } from '@eeacms/volto-eea-chatbot/ChatBlock/components/ChatExportDropdown';
 import * as exportUtils from '@eeacms/volto-eea-chatbot/ChatBlock/utils/exportUtils';
+import { trackEvent } from '@eeacms/volto-matomo/utils';
+
+jest.mock('@eeacms/volto-matomo/utils', () => ({
+  trackEvent: jest.fn(),
+}));
 
 jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => {
   return function MockIcon() {
     return <span data-testid="mock-icon" />;
   };
 });
-
-jest.mock(
-  '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService',
-  () => {
-    const actual = jest.requireActual(
-      '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService',
-    );
-    return {
-      ...actual,
-      shareChatSession: jest.fn().mockResolvedValue(true),
-    };
-  },
-);
 
 describe('ChatExportDropdown', () => {
   const mockPersona = { id: 1, name: 'Green Guru' };
@@ -114,6 +106,11 @@ describe('ChatExportDropdown', () => {
     fireEvent.click(mdBtn);
 
     expect(exportMdSpy).toHaveBeenCalledWith(mockMessages, mockPersona);
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot - Green Guru',
+      action: 'Conversation exported',
+      name: 'Markdown',
+    });
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
     exportMdSpy.mockRestore();
@@ -131,6 +128,11 @@ describe('ChatExportDropdown', () => {
     fireEvent.click(htmlBtn);
 
     expect(exportHtmlSpy).toHaveBeenCalledWith(mockMessages, mockPersona);
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot - Green Guru',
+      action: 'Conversation exported',
+      name: 'HTML',
+    });
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
     exportHtmlSpy.mockRestore();
@@ -148,6 +150,11 @@ describe('ChatExportDropdown', () => {
     fireEvent.click(pdfBtn);
 
     expect(exportPdfSpy).toHaveBeenCalled();
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot - Green Guru',
+      action: 'Conversation exported',
+      name: 'PDF',
+    });
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
     exportPdfSpy.mockRestore();
@@ -170,6 +177,11 @@ describe('ChatExportDropdown', () => {
         mockPersona,
         expect.anything(),
       );
+      expect(trackEvent).toHaveBeenCalledWith({
+        category: 'Chatbot - Green Guru',
+        action: 'Conversation exported',
+        name: 'DOCX',
+      });
     });
 
     exportDocxSpy.mockRestore();
@@ -182,42 +194,6 @@ describe('ChatExportDropdown', () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-  });
-
-  it('renders Shareable link option when chatSessionId is provided and copies link on click', async () => {
-    const originalClipboard = navigator.clipboard;
-    const writeTextMock = jest.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, 'clipboard', {
-      value: { writeText: writeTextMock },
-      writable: true,
-      configurable: true,
-    });
-
-    try {
-      renderComponent({
-        chatSessionId: 'test-session-uuid-1234',
-      });
-
-      fireEvent.click(screen.getByRole('button', { name: /export/i }));
-      const shareButton = screen.getByRole('menuitem', {
-        name: /shareable link/i,
-      });
-      expect(shareButton).toBeInTheDocument();
-
-      fireEvent.click(shareButton);
-
-      await waitFor(() => {
-        expect(writeTextMock).toHaveBeenCalledWith(
-          expect.stringContaining('?chat=test-session-uuid-1234'),
-        );
-      });
-    } finally {
-      Object.defineProperty(navigator, 'clipboard', {
-        value: originalClipboard,
-        writable: true,
-        configurable: true,
-      });
-    }
   });
 
   it('closes dropdown when clicking outside', () => {

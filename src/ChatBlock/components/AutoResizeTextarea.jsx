@@ -83,6 +83,14 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
       onEnableTool(tool.id);
     }
 
+    if (enableMatomoTracking) {
+      trackEvent({
+        category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+        action: 'MCP tool selected',
+        name: (tool.display_name || tool.name || '').trim(),
+      });
+    }
+
     const toolTag = `@${(tool.display_name || tool.name).trim()}`;
     const textarea = localTextareaRef.current;
 

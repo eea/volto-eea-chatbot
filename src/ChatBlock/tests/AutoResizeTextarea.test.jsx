@@ -193,6 +193,7 @@ describe('AutoResizeTextarea', () => {
         availableTools={mockTools}
         selectedToolIds={[1]}
         onEnableTool={mockEnableTool}
+        enableMatomoTracking={true}
       />,
     );
 
@@ -211,6 +212,11 @@ describe('AutoResizeTextarea', () => {
     expect(mockEnableTool).toHaveBeenCalledWith(10);
     // The typed word "data" is replaced with "@EEA Data Connector"
     expect(textarea.value).toBe('Show me @EEA Data Connector on water');
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot',
+      action: 'MCP tool selected',
+      name: 'EEA Data Connector',
+    });
   });
 
   it('replaces trigger keyword at the end of the input', () => {

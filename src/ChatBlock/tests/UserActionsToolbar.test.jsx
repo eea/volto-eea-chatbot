@@ -330,6 +330,7 @@ describe('UserActionsToolbar', () => {
     const props = {
       message: { messageId: 1, message: 'Test message' },
       onNewChat: mockNewChat,
+      enableMatomoTracking: true,
     };
 
     renderWithRTL(props);
@@ -341,5 +342,10 @@ describe('UserActionsToolbar', () => {
 
     fireEvent.click(newChatBtn);
     expect(mockNewChat).toHaveBeenCalled();
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot',
+      action: 'Start new conversation',
+      name: 'Message actions',
+    });
   });
 });

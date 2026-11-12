@@ -1,20 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 import { Button } from 'semantic-ui-react';
+import { trackEvent } from '@eeacms/volto-matomo/utils';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import DownloadIcon from '@eeacms/volto-eea-chatbot/icons/download.svg';
-import CopyIcon from '@eeacms/volto-eea-chatbot/icons/copy.svg';
-import CheckIcon from '@eeacms/volto-eea-chatbot/icons/check.svg';
 import {
   exportConversationAsMarkdown,
   exportConversationAsPdf,
   exportConversationAsDocx,
   exportConversationAsHtml,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/exportUtils';
-import {
-  copyShareLink,
-  shareChatSession,
-} from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
 import type {
   Message,
   Persona,
@@ -23,10 +18,10 @@ import type {
 export interface ChatExportDropdownProps {
   messages: Message[];
   persona?: Persona;
-  chatSessionId?: string | null;
   disabled?: boolean;
   className?: string;
   hideWhenEmpty?: boolean;
+  enableMatomoTracking?: boolean;
 }
 
 const messagesI18n = defineMessages({
@@ -34,36 +29,20 @@ const messagesI18n = defineMessages({
     id: 'Export conversation',
     defaultMessage: 'Export conversation',
   },
-  exportOrShareConversation: {
-    id: 'Export or share conversation',
-    defaultMessage: 'Export or share conversation',
-  },
 });
 
 export function ChatExportDropdown({
   messages,
   persona,
-  chatSessionId,
   disabled = false,
   className = '',
   hideWhenEmpty = true,
+  enableMatomoTracking = true,
 }: ChatExportDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
-  const [isConversationPublic, setIsConversationPublic] = useState(false);
-  const [isSharingLink, setIsSharingLink] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intl = useIntl();
-
-  useEffect(() => {
-    return () => {
-      if (copyTimeoutRef.current) {
-        clearTimeout(copyTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const hasMessages = Array.isArray(messages) && messages.length > 0;
   const canExport = !disabled && hasMessages;
@@ -109,8 +88,15 @@ export function ChatExportDropdown({
   }, [isOpen, closeDropdown]);
 
   const handleExportMarkdown = () => {
-    exportConversationAsMarkdown(messages, persona);
     closeDropdown();
+    exportConversationAsMarkdown(messages, persona);
+    if (enableMatomoTracking) {
+      trackEvent({
+        category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+        action: 'Conversation exported',
+        name: 'Markdown',
+      });
+    }
   };
 
   const handleExportDocx = async () => {
@@ -118,6 +104,13 @@ export function ChatExportDropdown({
     try {
       const docxLib = await import('docx');
       await exportConversationAsDocx(messages, persona, docxLib);
+      if (enableMatomoTracking) {
+        trackEvent({
+          category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+          action: 'Conversation exported',
+          name: 'DOCX',
+        });
+      }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Failed to export conversation as DOCX:', err);
@@ -130,43 +123,24 @@ export function ChatExportDropdown({
   const handleExportPdf = () => {
     closeDropdown();
     exportConversationAsPdf();
+    if (enableMatomoTracking) {
+      trackEvent({
+        category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+        action: 'Conversation exported',
+        name: 'PDF',
+      });
+    }
   };
 
   const handleExportHtml = () => {
     closeDropdown();
     exportConversationAsHtml(messages, persona);
-  };
-
-  const handleCopyLink = async () => {
-    if (!chatSessionId || isSharingLink) return;
-
-    if (!isConversationPublic) {
-      setIsSharingLink(true);
-      try {
-        const ok = await shareChatSession(chatSessionId);
-        if (!ok) {
-          setIsSharingLink(false);
-          return;
-        }
-        setIsConversationPublic(true);
-      } catch {
-        setIsSharingLink(false);
-        return;
-      } finally {
-        setIsSharingLink(false);
-      }
-    }
-
-    const ok = await copyShareLink(chatSessionId);
-    if (ok) {
-      setIsCopied(true);
-      if (copyTimeoutRef.current) {
-        clearTimeout(copyTimeoutRef.current);
-      }
-      copyTimeoutRef.current = setTimeout(() => {
-        setIsCopied(false);
-        closeDropdown();
-      }, 1500);
+    if (enableMatomoTracking) {
+      trackEvent({
+        category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+        action: 'Conversation exported',
+        name: 'HTML',
+      });
     }
   };
 
@@ -187,16 +161,8 @@ export function ChatExportDropdown({
         disabled={!canExport}
         aria-haspopup="true"
         aria-expanded={isOpen}
-        aria-label={intl.formatMessage(
-          chatSessionId
-            ? messagesI18n.exportOrShareConversation
-            : messagesI18n.exportConversation,
-        )}
-        title={intl.formatMessage(
-          chatSessionId
-            ? messagesI18n.exportOrShareConversation
-            : messagesI18n.exportConversation,
-        )}
+        aria-label={intl.formatMessage(messagesI18n.exportConversation)}
+        title={intl.formatMessage(messagesI18n.exportConversation)}
       >
         <SVGIcon name={DownloadIcon} size={15} className="export-icon" />
       </Button>
@@ -205,7 +171,7 @@ export function ChatExportDropdown({
         <div className="chat-export-menu" role="menu">
           <button
             type="button"
-            className="chat-export-item"
+            className="chat-export-item format-md"
             role="menuitem"
             onClick={handleExportMarkdown}
           >
@@ -215,7 +181,7 @@ export function ChatExportDropdown({
 
           <button
             type="button"
-            className="chat-export-item"
+            className="chat-export-item format-docx"
             role="menuitem"
             onClick={handleExportDocx}
             disabled={isExportingDocx}
@@ -235,7 +201,7 @@ export function ChatExportDropdown({
 
           <button
             type="button"
-            className="chat-export-item"
+            className="chat-export-item format-html"
             role="menuitem"
             onClick={handleExportHtml}
           >
@@ -245,45 +211,13 @@ export function ChatExportDropdown({
 
           <button
             type="button"
-            className="chat-export-item"
+            className="chat-export-item format-pdf"
             role="menuitem"
             onClick={handleExportPdf}
           >
             <span className="export-format-badge">PDF</span>
             <span className="export-format-name">PDF (.pdf)</span>
           </button>
-
-          {chatSessionId && (
-            <button
-              type="button"
-              className="chat-export-item chat-share-link-item"
-              role="menuitem"
-              onClick={handleCopyLink}
-              disabled={isSharingLink}
-            >
-              <span className="export-format-badge">
-                <SVGIcon name={isCopied ? CheckIcon : CopyIcon} size={13} />
-              </span>
-              <span className="export-format-name">
-                {isSharingLink ? (
-                  <FormattedMessage
-                    id="Sharing..."
-                    defaultMessage="Sharing..."
-                  />
-                ) : isCopied ? (
-                  <FormattedMessage
-                    id="Link copied!"
-                    defaultMessage="Link copied!"
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="Shareable link"
-                    defaultMessage="Shareable link"
-                  />
-                )}
-              </span>
-            </button>
-          )}
         </div>
       )}
     </div>

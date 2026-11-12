@@ -32,6 +32,8 @@ jest.mock('react-intl', () => ({
   FormattedMessage: ({ defaultMessage }) => <span>{defaultMessage}</span>,
 }));
 
+import { trackEvent } from '@eeacms/volto-matomo/utils';
+
 jest.mock('@eeacms/volto-matomo/utils', () => ({
   trackEvent: jest.fn(),
 }));
@@ -70,6 +72,7 @@ jest.mock(
       onCancel,
       toolbarLeft,
       toolbarRight,
+      onSubmit,
     }) => (
       <div>
         <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
@@ -84,6 +87,12 @@ jest.mock(
             Stop
           </button>
         )}
+        <button
+          data-testid="mock-submit-button"
+          onClick={() => onSubmit && onSubmit({ message: 'follow-up' })}
+        >
+          Submit
+        </button>
       </div>
     ),
   }),
@@ -646,6 +655,53 @@ describe('ChatWindow', () => {
     expect(screen.getByRole('button', { name: /Tools/i })).toBeInTheDocument();
   });
 
+  it('tracks MCP tool enabling and disabling when toggled', () => {
+    const mockTools = [
+      { id: 10, name: 'data_connector', display_name: 'EEA Data Connector' },
+    ];
+    const mockToggle = jest.fn();
+
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      chatSessionId: null,
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      resetChatSessionId: jest.fn(),
+      loadChatSession: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: mockTools,
+      toggleTool: mockToggle,
+      enableTool: jest.fn(),
+    });
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        enableToolSelection={true}
+        enableMatomoTracking={true}
+      />,
+    );
+
+    const trigger = screen.getByRole('button', { name: /tools/i });
+    fireEvent.click(trigger);
+
+    const checkbox = screen.getByRole('checkbox');
+    fireEvent.click(checkbox);
+
+    expect(mockToggle).toHaveBeenCalledWith(10);
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot - Test Assistant',
+      action: 'MCP tool enabled',
+      name: 'EEA Data Connector',
+    });
+  });
+
   it('passes enableDownload and chatSessionId to ChatMessage when messages exist', () => {
     useChatController.mockReturnValue({
       onSubmit: jest.fn(),
@@ -723,7 +779,12 @@ describe('ChatWindow', () => {
       enableTool: jest.fn(),
     });
 
-    render(<ChatWindowWrapped persona={mockPersona} />);
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        enableMatomoTracking={true}
+      />,
+    );
     const newChatBtn = screen.getByRole('button', {
       name: /start a new conversation/i,
     });
@@ -731,6 +792,11 @@ describe('ChatWindow', () => {
 
     fireEvent.click(newChatBtn);
     expect(mockClearChat).toHaveBeenCalled();
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot - Test Assistant',
+      action: 'Start new conversation',
+      name: 'Top toolbar',
+    });
   });
 
   it('loads shared session on mount via initialChatSessionId', async () => {
@@ -810,6 +876,7 @@ describe('ChatWindow', () => {
       <ChatWindowWrapped
         persona={mockPersona}
         initialChatSessionId="shared-uuid-5678"
+        enableMatomoTracking={true}
       />,
     );
 
@@ -820,6 +887,28 @@ describe('ChatWindow', () => {
 
     // Textarea form is accessible to allow continuing the conversation
     expect(screen.getByTestId('autoresize-textarea')).toBeInTheDocument();
+
+    // Submitting follow-up triggers continuation tracking strictly on the first message
+    const submitBtn = screen.getByTestId('mock-submit-button');
+    fireEvent.click(submitBtn);
+
+    expect(trackEvent).toHaveBeenCalledWith({
+      category: 'Chatbot - Test Assistant',
+      action: 'Shared conversation continued',
+      name: 'shared-uuid-5678',
+    });
+
+    const continuationCalls = trackEvent.mock.calls.filter(
+      (c) => c[0]?.action === 'Shared conversation continued',
+    );
+    expect(continuationCalls).toHaveLength(1);
+
+    // Second message sent must NOT trigger continuation tracking again
+    fireEvent.click(submitBtn);
+    const continuationCallsAfterSecond = trackEvent.mock.calls.filter(
+      (c) => c[0]?.action === 'Shared conversation continued',
+    );
+    expect(continuationCallsAfterSecond).toHaveLength(1);
   });
 
   it('renders loading state while shared session is loading and hides the composer', () => {

@@ -190,6 +190,7 @@ function ChatWindow({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const chatWindowRef = useRef(null);
   const chatWindowEndRef = useRef(null);
+  const hasTrackedContinuationRef = useRef(false);
 
   // Load shared session from URL parameter on mount
   useEffect(() => {
@@ -241,6 +242,14 @@ function ChatWindow({
   }, [chatSessionId, isSharedView, initialChatSessionId, history]);
 
   const handleClearChat = useCallback(() => {
+    hasTrackedContinuationRef.current = false;
+    if (enableMatomoTracking) {
+      trackEvent({
+        category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+        action: 'Start new conversation',
+        name: 'Top toolbar',
+      });
+    }
     clearChat();
     setIsSharedView(false);
     setSharedSessionError(false);
@@ -256,10 +265,28 @@ function ChatWindow({
 
   const handleFormSubmit = useCallback(
     ({ message }: { message: string }) => {
+      if (
+        isSharedView &&
+        !hasTrackedContinuationRef.current &&
+        enableMatomoTracking
+      ) {
+        hasTrackedContinuationRef.current = true;
+        trackEvent({
+          category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+          action: 'Shared conversation continued',
+          name: initialChatSessionId || 'Continuation',
+        });
+      }
       onSubmit({ message });
       setShowLandingPage(false);
     },
-    [onSubmit],
+    [
+      onSubmit,
+      isSharedView,
+      enableMatomoTracking,
+      persona,
+      initialChatSessionId,
+    ],
   );
 
   useEffect(() => {
@@ -545,7 +572,31 @@ function ChatWindow({
                       <McpToolSelector
                         availableTools={availableTools}
                         selectedToolIds={selectedToolIds}
-                        onToggleTool={toggleTool}
+                        onToggleTool={(toolId: number) => {
+                          if (enableMatomoTracking) {
+                            const tool = availableTools.find(
+                              (t) => t.id === toolId,
+                            );
+                            const isCurrentlySelected =
+                              selectedToolIds.includes(toolId);
+                            if (tool) {
+                              trackEvent({
+                                category: persona?.name
+                                  ? `Chatbot - ${persona.name}`
+                                  : 'Chatbot',
+                                action: isCurrentlySelected
+                                  ? 'MCP tool disabled'
+                                  : 'MCP tool enabled',
+                                name: (
+                                  tool.display_name ||
+                                  tool.name ||
+                                  ''
+                                ).trim(),
+                              });
+                            }
+                          }
+                          toggleTool(toolId);
+                        }}
                         disabled={isStreaming}
                       />
                     )}

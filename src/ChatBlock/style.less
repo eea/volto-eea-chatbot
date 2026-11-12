@@ -1403,7 +1403,7 @@ mark {
 
   .chat-export-dropdown {
     .chat-export-menu {
-      top: calc(100% + 4px);
+      top: calc(100% + 6px);
       right: auto;
       bottom: auto;
       left: 0;
@@ -2947,36 +2947,38 @@ body > textarea {
     z-index: 1000;
     right: 0;
     bottom: calc(100% + 8px);
-    min-width: 170px;
-    padding: 4px;
+    width: max-content;
+    min-width: 210px;
+    padding: 6px;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    background: #fff;
+    border-radius: 12px;
+    background: #ffffff;
     box-shadow:
-      0 10px 15px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      0 10px 25px -5px rgba(15, 23, 42, 0.12),
+      0 8px 10px -6px rgba(15, 23, 42, 0.06);
 
     .chat-export-item {
       display: flex;
       width: 100%;
       align-items: center;
-      padding: 8px 10px;
+      padding: 7px 10px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       background: transparent;
       color: #1e293b;
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      gap: 8px;
+      gap: 10px;
       text-align: left;
       transition:
         background-color 0.15s ease,
         color 0.15s ease;
+      white-space: nowrap;
 
       &:hover:not(:disabled) {
         background: #f1f5f9;
-        color: #0f172a;
+        color: #004b87;
       }
 
       &:disabled {
@@ -2985,17 +2987,49 @@ body > textarea {
       }
 
       .export-format-badge {
-        padding: 2px 5px;
-        border-radius: 4px;
-        background: #e2e8f0;
-        color: #475569;
-        font-size: 10px;
+        display: inline-flex;
+        width: 44px;
+        height: 22px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #e2e8f0;
+        border-radius: 5px;
+        background: #f1f5f9;
+        color: #334155;
+        font-size: 11px;
         font-weight: 700;
+        letter-spacing: 0.03em;
         line-height: 1;
+      }
+
+      &.format-md .export-format-badge {
+        border-color: #e2e8f0;
+        background: #f8fafc;
+        color: #475569;
+      }
+
+      &.format-docx .export-format-badge {
+        border-color: #dbeafe;
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+
+      &.format-html .export-format-badge {
+        border-color: #dcfce7;
+        background: #f0fdf4;
+        color: #15803d;
+      }
+
+      &.format-pdf .export-format-badge {
+        border-color: #fee2e2;
+        background: #fef2f2;
+        color: #b91c1c;
       }
 
       .export-format-name {
         flex: 1;
+        white-space: nowrap;
       }
     }
   }

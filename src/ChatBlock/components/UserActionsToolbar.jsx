@@ -174,6 +174,7 @@ const UserActionsToolbar = ({
             persona={persona}
             disabled={isLoading}
             hideWhenEmpty={false}
+            enableMatomoTracking={enableMatomoTracking}
           />
         )}
 
@@ -191,7 +192,18 @@ const UserActionsToolbar = ({
       {onNewChat && (
         <div className="message-actions-right">
           <Button
-            onClick={onNewChat}
+            onClick={() => {
+              if (trackingEnabled.current) {
+                trackEvent({
+                  category:
+                    matomoCategory ||
+                    (persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot'),
+                  action: 'Start new conversation',
+                  name: 'Message actions',
+                });
+              }
+              onNewChat();
+            }}
             disabled={isLoading}
             className="start-new-chat-btn"
             aria-label={intl.formatMessage(messagesI18n.startNewConversation)}

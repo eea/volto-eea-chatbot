@@ -32,9 +32,13 @@ describe('McpToolProposal', () => {
     expect(screen.getByText('@EEA Data Connector')).toBeInTheDocument();
     expect(screen.getByText('Use')).toBeInTheDocument();
     // Plus icon svg inside badge
-    expect(container.querySelector('.proposal-plus-badge svg')).toBeInTheDocument();
+    expect(
+      container.querySelector('.proposal-plus-badge svg'),
+    ).toBeInTheDocument();
     // Dismiss icon svg inside button
-    expect(container.querySelector('.mcp-tool-proposal-dismiss svg')).toBeInTheDocument();
+    expect(
+      container.querySelector('.mcp-tool-proposal-dismiss svg'),
+    ).toBeInTheDocument();
   });
 
   it('calls onAccept with tool when proposal button is clicked', () => {
@@ -47,7 +51,9 @@ describe('McpToolProposal', () => {
       />,
     );
 
-    const btn = screen.getByRole('button', { name: /Enable @EEA Data Connector/i });
+    const btn = screen.getByRole('button', {
+      name: /Enable @EEA Data Connector/i,
+    });
     fireEvent.click(btn);
     expect(onAccept).toHaveBeenCalledWith(mockTool);
   });

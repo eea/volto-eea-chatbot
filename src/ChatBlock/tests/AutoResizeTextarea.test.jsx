@@ -204,7 +204,9 @@ describe('AutoResizeTextarea', () => {
     expect(getByText('Use')).toBeInTheDocument();
 
     // Clicking proposal
-    fireEvent.click(getByRole('button', { name: /Enable @EEA Data Connector/i }));
+    fireEvent.click(
+      getByRole('button', { name: /Enable @EEA Data Connector/i }),
+    );
 
     expect(mockEnableTool).toHaveBeenCalledWith(10);
     // The typed word "data" is replaced with "@EEA Data Connector"

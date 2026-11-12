@@ -1,3 +1,8 @@
+import {
+  DEFAULT_SEED_QUESTIONS_COUNT,
+  DEFAULT_SEED_QUESTIONS_CACHE_MINUTES,
+} from './utils/seedQuestions';
+
 // Schema for ChatBlock
 const ScoreRangeSchema = {
   title: 'Score Range',
@@ -107,11 +112,20 @@ export function ChatBlockSchema({ assistants, data = {} }) {
           'qgenAsistantId',
           'placeholderPrompt',
           'height',
-          'enableStarterPrompts',
-          ...(data.enableStarterPrompts ? ['starterPrompts'] : []),
+          'enableGeneratedSeedQuestions',
+          ...(data.enableGeneratedSeedQuestions
+            ? [
+                'seedQuestionsTopics',
+                'seedQuestionsCount',
+                'seedQuestionsCacheMinutes',
+              ]
+            : [
+                'enableStarterPrompts',
+                ...(data.enableStarterPrompts ? ['starterPrompts'] : []),
+                'showAssistantPrompts',
+              ]),
           'starterPromptsHeading',
           'starterPromptsPosition',
-          'showAssistantPrompts',
           'enableQgen',
           'deepResearch',
           'enableShowTotalFailMessage',
@@ -356,6 +370,48 @@ range is from 0 to 100`,
           'Outdated sources',
           'Too many follow-up questions needed',
         ],
+      },
+      enableGeneratedSeedQuestions: {
+        title: 'Generate seed questions',
+        type: 'boolean',
+        default: false,
+        description:
+          'Randomly generate seed questions from the related questions generator for the active knowledge base.',
+      },
+      seedQuestionsTopics: {
+        title: 'Seed questions topics',
+        description: 'Add topics to evenly distribute questions across.',
+        widget: 'object_list',
+        schema: {
+          title: 'Topic',
+          fieldsets: [
+            {
+              id: 'default',
+              title: 'Default',
+              fields: ['topic'],
+            },
+          ],
+          properties: {
+            topic: {
+              title: 'Topic',
+              type: 'string',
+            },
+          },
+          required: ['topic'],
+        },
+      },
+      seedQuestionsCount: {
+        title: 'Number of seed questions',
+        description: 'Total number of seed questions to generate (e.g. 4).',
+        type: 'number',
+        default: DEFAULT_SEED_QUESTIONS_COUNT,
+      },
+      seedQuestionsCacheMinutes: {
+        title: 'Cache duration (minutes)',
+        description:
+          'How long to cache generated seed questions in minutes (e.g. 10 for 10 minutes, 1440 for 24 hours).',
+        type: 'number',
+        default: DEFAULT_SEED_QUESTIONS_CACHE_MINUTES,
       },
       enableStarterPrompts: {
         title: 'Enable custom starter prompts',

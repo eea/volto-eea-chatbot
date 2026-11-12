@@ -330,6 +330,7 @@ function ChatWindow({
             {starterPromptsPosition === 'top' && (
               <EmptyState
                 {...data}
+                block_id={block_id}
                 persona={persona}
                 onChoice={handleStarterPromptChoice}
               />
@@ -581,6 +582,7 @@ function ChatWindow({
       {showLandingPage && starterPromptsPosition === 'bottom' && (
         <EmptyState
           {...data}
+          block_id={block_id}
           persona={persona}
           onChoice={handleStarterPromptChoice}
         />

@@ -42,12 +42,35 @@ describe('ChatBlockSchema', () => {
     expect(schema.properties.assistant.choices).toEqual([]);
   });
 
-  it('includes starterPrompts field when enableStarterPrompts is true', () => {
+  it('includes starterPrompts field when enableStarterPrompts is true and enableGeneratedSeedQuestions is false', () => {
     const schema = ChatBlockSchema({
       assistants: mockAssistants,
-      data: { enableStarterPrompts: true },
+      data: { enableStarterPrompts: true, enableGeneratedSeedQuestions: false },
     });
     expect(schema.fieldsets[0].fields).toContain('starterPrompts');
+    expect(schema.fieldsets[0].fields).toContain('enableStarterPrompts');
+    expect(schema.fieldsets[0].fields).toContain('showAssistantPrompts');
+  });
+
+  it('excludes starter prompt fields when enableGeneratedSeedQuestions is true', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: {
+        enableGeneratedSeedQuestions: true,
+        enableStarterPrompts: true,
+      },
+    });
+    expect(schema.fieldsets[0].fields).toContain(
+      'enableGeneratedSeedQuestions',
+    );
+    expect(schema.fieldsets[0].fields).toContain('seedQuestionsTopics');
+    expect(schema.fieldsets[0].fields).toContain('seedQuestionsCount');
+    expect(schema.fieldsets[0].fields).toContain('seedQuestionsCacheMinutes');
+    expect(schema.fieldsets[0].fields).not.toContain('enableStarterPrompts');
+    expect(schema.fieldsets[0].fields).not.toContain('starterPrompts');
+    expect(schema.fieldsets[0].fields).not.toContain('showAssistantPrompts');
+    expect(schema.fieldsets[0].fields).toContain('starterPromptsHeading');
+    expect(schema.fieldsets[0].fields).toContain('starterPromptsPosition');
   });
 
   it('excludes starterPrompts field when enableStarterPrompts is false', () => {

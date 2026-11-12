@@ -339,35 +339,28 @@ describe('useChatController', () => {
   it('successfully fetches related questions when enableQgen is true', async () => {
     createChatSession.mockResolvedValue('session-123');
 
-    let callCount = 0;
     mockSendMessage.mockImplementation(async function* () {
-      callCount++;
-      if (callCount === 1) {
-        yield [
-          {
-            ind: 0,
-            obj: {
-              type: PacketType.MESSAGE_START,
-              id: 'msg1',
-              content: 'This is the answer',
-              final_documents: null,
-            },
+      yield [
+        {
+          ind: 0,
+          obj: {
+            type: PacketType.MESSAGE_START,
+            id: 'msg1',
+            content: 'This is the answer',
+            final_documents: null,
           },
-          { ind: 1, obj: { type: PacketType.STOP } },
-        ];
-      } else {
-        yield [
-          {
-            ind: 0,
-            obj: {
-              type: PacketType.MESSAGE_DELTA,
-              content:
-                '1. What is the weather like?\n2. What is climate change?\n',
-            },
-          },
-          { ind: 1, obj: { type: PacketType.STOP } },
-        ];
-      }
+        },
+        { ind: 1, obj: { type: PacketType.STOP } },
+      ];
+    });
+
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          questions: ['What is the weather like?', 'What is climate change?'],
+        }),
     });
 
     const { result } = renderHook(() =>
@@ -389,6 +382,19 @@ describe('useChatController', () => {
       await result.current.onFetchRelatedQuestions();
     });
 
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/_rq/questions',
+      expect.objectContaining({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          assistantId: 2,
+          query: 'Hello',
+          answer: 'This is the answer',
+        }),
+      }),
+    );
+
     const assistantMsg = result.current.messages.find(
       (m) => m.type === 'assistant',
     );
@@ -396,31 +402,30 @@ describe('useChatController', () => {
       { question: 'What is the weather like?' },
       { question: 'What is climate change?' },
     ]);
+
+    global.fetch = originalFetch;
   });
 
   it('handles related questions fetch error gracefully', async () => {
     createChatSession.mockResolvedValue('session-123');
 
-    let callCount = 0;
     mockSendMessage.mockImplementation(async function* () {
-      callCount++;
-      if (callCount === 1) {
-        yield [
-          {
-            ind: 0,
-            obj: {
-              type: PacketType.MESSAGE_START,
-              id: 'msg1',
-              content: 'This is the answer',
-              final_documents: null,
-            },
+      yield [
+        {
+          ind: 0,
+          obj: {
+            type: PacketType.MESSAGE_START,
+            id: 'msg1',
+            content: 'This is the answer',
+            final_documents: null,
           },
-          { ind: 1, obj: { type: PacketType.STOP } },
-        ];
-      } else {
-        throw new Error('Failed to fetch related questions');
-      }
+        },
+        { ind: 1, obj: { type: PacketType.STOP } },
+      ];
     });
+
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockRejectedValue(new Error('Failed to fetch'));
 
     const { result } = renderHook(() =>
       useChatController({
@@ -449,38 +454,27 @@ describe('useChatController', () => {
     expect(assistantMsg.relatedQuestions).toEqual([]);
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
+    global.fetch = originalFetch;
   });
 
-  it('extracts related questions from JSON formats', async () => {
+  it('handles related questions non-ok response gracefully', async () => {
     createChatSession.mockResolvedValue('session-123');
 
-    let callCount = 0;
     mockSendMessage.mockImplementation(async function* () {
-      callCount++;
-      if (callCount === 1) {
-        yield [
-          {
-            ind: 0,
-            obj: {
-              type: PacketType.MESSAGE_START,
-              content: 'Answer',
-            },
+      yield [
+        {
+          ind: 0,
+          obj: {
+            type: PacketType.MESSAGE_START,
+            content: 'Answer',
           },
-          { ind: 1, obj: { type: PacketType.STOP } },
-        ];
-      } else {
-        yield [
-          {
-            ind: 0,
-            obj: {
-              type: PacketType.MESSAGE_DELTA,
-              content: JSON.stringify(['Question A', 'Question B']),
-            },
-          },
-          { ind: 1, obj: { type: PacketType.STOP } },
-        ];
-      }
+        },
+        { ind: 1, obj: { type: PacketType.STOP } },
+      ];
     });
+
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue({ ok: false });
 
     const { result } = renderHook(() =>
       useChatController({
@@ -501,10 +495,8 @@ describe('useChatController', () => {
     const assistantMsg = result.current.messages.find(
       (m) => m.type === 'assistant',
     );
-    expect(assistantMsg.relatedQuestions).toEqual([
-      { question: 'Question A' },
-      { question: 'Question B' },
-    ]);
+    expect(assistantMsg.relatedQuestions).toEqual([]);
+    global.fetch = originalFetch;
   });
 
   it('manages tool selection and passes enabledToolIds to streaming', async () => {

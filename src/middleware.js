@@ -3,6 +3,10 @@ import fetch from 'node-fetch';
 import debug from 'debug';
 
 import fs from 'fs';
+import {
+  extractQuestions,
+  buildQuestionsPrompt,
+} from './ChatBlock/utils/seedQuestions';
 
 const log = debug('volto-eea-chatbot');
 // import readline from 'readline';
@@ -440,10 +444,242 @@ async function send_onyx_request(
   }
 }
 
-export { isPathAllowed, ALLOWED_PROXY_PATHS };
+async function handleQuestions(req, res) {
+  const body = req.body || {};
+  const queryParams = { ...(req.query || {}) };
+
+  if (typeof req.url === 'string' && req.url.includes('?')) {
+    try {
+      const qs = req.url.split('?')[1];
+      const searchParams = new URLSearchParams(qs);
+      for (const [key, val] of searchParams.entries()) {
+        if (!queryParams[key]) queryParams[key] = val;
+      }
+    } catch {
+      // ignore parsing error
+    }
+  }
+
+  const rawAssistantId = body.assistantId || queryParams.assistantId;
+  const targetAssistantId =
+    rawAssistantId || process.env.ONYX_SEED_QUESTIONS_ASSISTANT_ID;
+
+  if (!targetAssistantId || !/^\d+$/.test(String(targetAssistantId).trim())) {
+    res.status(200);
+    res.set('Content-Type', 'application/json');
+    res.send({ questions: [] });
+    return;
+  }
+
+  const numericAssistantId = Number(String(targetAssistantId).trim());
+
+  const onyxUrl = process.env.ONYX_URL;
+  const apiKey = process.env.ONYX_API_KEY; //betterleaks:allow
+
+  if (!onyxUrl || !apiKey) {
+    res.status(200);
+    res.set('Content-Type', 'application/json');
+    res.send({ questions: [] });
+    return;
+  }
+
+  try {
+    const checkRes = await fetch(
+      `${onyxUrl}/api/persona/${numericAssistantId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!checkRes.ok) {
+      log(
+        `Questions assistant ${numericAssistantId} not found on Onyx (${checkRes.status})`,
+      );
+      res.status(200);
+      res.set('Content-Type', 'application/json');
+      res.send({ questions: [] });
+      return;
+    }
+
+    const query = body.query || queryParams.query;
+    const answer = body.answer || queryParams.answer;
+    let topics = body.topics;
+    if (!topics && queryParams.topics) {
+      topics = queryParams.topics
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+    }
+    const count = body.count || queryParams.count;
+    let persona = body.persona;
+    if (
+      !persona &&
+      (queryParams.personaName || queryParams.personaDescription)
+    ) {
+      persona = {
+        name: queryParams.personaName,
+        description: queryParams.personaDescription,
+      };
+    }
+
+    const sessionRes = await fetch(`${onyxUrl}/api/chat/create-chat-session`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        persona_id: numericAssistantId,
+        description: query ? `Q: ${query}` : 'Seed questions',
+      }),
+    });
+
+    if (!sessionRes.ok) {
+      log(
+        `Failed to create session for assistant ${numericAssistantId} (${sessionRes.status})`,
+      );
+      res.status(200);
+      res.set('Content-Type', 'application/json');
+      res.send({ questions: [] });
+      return;
+    }
+
+    const sessionData = await sessionRes.json();
+    const chatSessionId = sessionData?.chat_session_id;
+
+    const prompt = buildQuestionsPrompt({
+      query,
+      answer,
+      topics,
+      count,
+      persona,
+    });
+
+    let sendUrl = `${onyxUrl}/api/chat/send-chat-message`;
+    let sendRes = await fetch(sendUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: prompt,
+        alternate_assistant_id: numericAssistantId,
+        chat_session_id: chatSessionId,
+        parent_message_id: null,
+        file_descriptors: [],
+        internal_search_filters: null,
+        deep_research: false,
+        stream: true,
+      }),
+    });
+
+    if (sendRes.status === 404) {
+      sendUrl = `${onyxUrl}/api/chat/send-message`;
+      sendRes = await fetch(sendUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: prompt,
+          alternate_assistant_id: numericAssistantId,
+          chat_session_id: chatSessionId,
+          parent_message_id: null,
+          search_doc_ids: null,
+          file_descriptors: [],
+          regenerate: false,
+          retrieval_options: {
+            run_search: 'auto',
+            real_time: true,
+            filters: null,
+          },
+          prompt_override: {},
+          llm_override: null,
+          use_agentic_search: false,
+        }),
+      });
+    }
+
+    if (!sendRes.ok) {
+      log(
+        `Failed to send message to questions assistant ${numericAssistantId} (${sendRes.status})`,
+      );
+      res.status(200);
+      res.set('Content-Type', 'application/json');
+      res.send({ questions: [] });
+      return;
+    }
+
+    const rawText = await sendRes.text();
+    let accumulatedText = '';
+    let sawJsonPacket = false;
+    const lines = (rawText || '').split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      try {
+        const packet = JSON.parse(trimmed);
+        if (Array.isArray(packet) || packet?.questions) {
+          const directQuestions = extractQuestions(trimmed, persona?.name);
+          res.status(200);
+          res.set('Content-Type', 'application/json');
+          res.send({ questions: directQuestions });
+          return;
+        }
+        sawJsonPacket = true;
+        if (packet.obj?.content) {
+          accumulatedText += packet.obj.content;
+        } else if (packet.content) {
+          accumulatedText += packet.content;
+        } else if (packet.answer_piece) {
+          accumulatedText += packet.answer_piece;
+        }
+      } catch {
+        accumulatedText += line + '\n';
+      }
+    }
+
+    const textToParse =
+      accumulatedText.trim() || !sawJsonPacket
+        ? accumulatedText.trim()
+          ? accumulatedText
+          : rawText
+        : '';
+    const questions = extractQuestions(textToParse, persona?.name);
+
+    res.status(200);
+    res.set('Content-Type', 'application/json');
+    res.send({ questions });
+  } catch (error) {
+    console.error('Error in handleQuestions:', error);
+    res.status(200);
+    res.set('Content-Type', 'application/json');
+    res.send({ questions: [] });
+  }
+}
+
+export { isPathAllowed, ALLOWED_PROXY_PATHS, handleQuestions };
 export default async function middleware(req, res, next) {
   const is_related_question = req.url.includes('/_rq/');
   const path = req.url.replace('/_da/', '/').replace('/_rq/', '/');
+  const cleanPath = path.split('?')[0];
+
+  if (cleanPath === '/questions' || cleanPath === '/seed-questions') {
+    if (req.method !== 'GET' && req.method !== 'POST') {
+      res.statusCode = 405;
+      res.statusMessage = 'Method Not Allowed';
+      res.send({ error: 'Method Not Allowed' });
+      return;
+    }
+    await handleQuestions(req, res);
+    return;
+  }
 
   // Reject paths not on the allowlist — prevents Confused Deputy attacks
   if (!isPathAllowed(path, req.method, ALLOWED_PROXY_PATHS)) {
@@ -453,7 +689,6 @@ export default async function middleware(req, res, next) {
     return;
   }
 
-  const cleanPath = path.split('?')[0];
   let reqUrl = `${process.env.ONYX_URL || ''}/api${cleanPath}`;
 
   // For shared sessions, always enforce is_shared=true upstream so Onyx only returns public sessions

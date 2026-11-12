@@ -738,3 +738,332 @@ describe('isPathAllowed with _rq paths', () => {
     ).toBe(true);
   });
 });
+
+describe('POST /_rq/questions', () => {
+  let req, res, next, nodeFetch;
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    process.env = { ...originalEnv };
+    process.env.ONYX_API_KEY = 'test-api-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://localhost:3000';
+
+    nodeFetch = require('node-fetch');
+    nodeFetch.mockClear();
+
+    req = {
+      url: '/_rq/questions',
+      method: 'POST',
+      headers: {},
+      body: {},
+      query: {},
+    };
+    res = {
+      send: jest.fn(),
+      set: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+    next = jest.fn();
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+    jest.restoreAllMocks();
+  });
+
+  it('returns empty questions when neither assistantId nor ONYX_SEED_QUESTIONS_ASSISTANT_ID is configured', async () => {
+    delete process.env.ONYX_SEED_QUESTIONS_ASSISTANT_ID;
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({ questions: [] });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+
+  it('uses ONYX_SEED_QUESTIONS_ASSISTANT_ID when no assistantId is in body', async () => {
+    process.env.ONYX_SEED_QUESTIONS_ASSISTANT_ID = '42';
+    req.body = { topics: ['Biodiversity'] };
+
+    nodeFetch.mockImplementation((url, opts) => {
+      if (url.includes('/api/persona/42')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ id: 42, name: 'Default Assistant' }),
+        });
+      }
+      if (url.includes('/api/chat/create-chat-session')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ chat_session_id: 'session-42' }),
+        });
+      }
+      if (url.includes('/api/chat/send-chat-message')) {
+        const bodyObj = JSON.parse(opts.body);
+        expect(bodyObj.message).toContain('Biodiversity');
+        expect(bodyObj.message).toContain('even distribution');
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: () =>
+            Promise.resolve(
+              '1. Question from Default?\n2. Second question from Default?',
+            ),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      questions: ['Question from Default?', 'Second question from Default?'],
+    });
+  });
+
+  it('body assistantId overrides ONYX_SEED_QUESTIONS_ASSISTANT_ID', async () => {
+    process.env.ONYX_SEED_QUESTIONS_ASSISTANT_ID = '42';
+    req.body = {
+      assistantId: 10,
+      persona: { name: 'Freshwater', description: 'Water data' },
+      topics: ['wetlands'],
+    };
+
+    nodeFetch.mockImplementation((url, opts) => {
+      if (url.includes('/api/persona/10')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ id: 10, name: 'Freshwater' }),
+        });
+      }
+      if (url.includes('/api/chat/create-chat-session')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ chat_session_id: 'session-10' }),
+        });
+      }
+      if (url.includes('/api/chat/send-chat-message')) {
+        const bodyObj = JSON.parse(opts.body);
+        expect(bodyObj.message).toContain(
+          'Do not mention or reference "Freshwater"',
+        );
+        expect(bodyObj.message).toContain('wetlands');
+        expect(bodyObj.message).toContain('even distribution');
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: () =>
+            Promise.resolve(
+              JSON.stringify(['Custom Question A', 'Custom Question B']),
+            ),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      questions: ['Custom Question A', 'Custom Question B'],
+    });
+  });
+
+  it('handles follow-up questions when query and answer are provided', async () => {
+    req.body = {
+      assistantId: 24,
+      query: 'What is climate change?',
+      answer: 'It refers to long-term shifts in temperatures.',
+    };
+
+    nodeFetch.mockImplementation((url, opts) => {
+      if (url.includes('/api/persona/24')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ id: 24 }),
+        });
+      }
+      if (url.includes('/api/chat/create-chat-session')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ chat_session_id: 's24' }),
+        });
+      }
+      if (url.includes('/api/chat/send-chat-message')) {
+        const bodyObj = JSON.parse(opts.body);
+        expect(bodyObj.message).toBe(
+          'Question: What is climate change?\nAnswer:\nIt refers to long-term shifts in temperatures.',
+        );
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: () =>
+            Promise.resolve(
+              '1. What are greenhouse gases?\n2. How is Europe affected?',
+            ),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      questions: ['What are greenhouse gases?', 'How is Europe affected?'],
+    });
+  });
+
+  it('returns empty questions when assistant does not exist on Onyx', async () => {
+    req.body = { assistantId: 99 };
+
+    nodeFetch.mockImplementation((url) => {
+      if (url.includes('/api/persona/99')) {
+        return Promise.resolve({ ok: false, status: 404 });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({ questions: [] });
+  });
+
+  it('returns empty questions when chat session creation fails', async () => {
+    req.body = { assistantId: 5 };
+
+    nodeFetch.mockImplementation((url) => {
+      if (url.includes('/api/persona/5')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({}),
+        });
+      }
+      if (url.includes('/api/chat/create-chat-session')) {
+        return Promise.resolve({ ok: false, status: 500 });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({ questions: [] });
+  });
+
+  it('rejects unsupported HTTP methods with 405 Method Not Allowed', async () => {
+    req.method = 'DELETE';
+    await middleware(req, res, next);
+
+    expect(res.statusCode).toBe(405);
+    expect(res.send).toHaveBeenCalledWith({ error: 'Method Not Allowed' });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects non-numeric assistantId with empty questions without making upstream fetch', async () => {
+    req.body = { assistantId: '../../admin/users' };
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({ questions: [] });
+    expect(nodeFetch).not.toHaveBeenCalled();
+  });
+
+  it('handles GET /_rq/questions with query parameters', async () => {
+    req.method = 'GET';
+    req.url = '/_rq/questions?assistantId=12&topics=Climate,Freshwater&count=2';
+    req.body = {};
+
+    nodeFetch.mockImplementation((url, opts) => {
+      if (url.includes('/api/persona/12')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ id: 12 }),
+        });
+      }
+      if (url.includes('/api/chat/create-chat-session')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ chat_session_id: 's12' }),
+        });
+      }
+      if (url.includes('/api/chat/send-chat-message')) {
+        const bodyObj = JSON.parse(opts.body);
+        expect(bodyObj.message).toContain('Climate');
+        expect(bodyObj.message).toContain('Freshwater');
+        expect(bodyObj.message).toContain(
+          'Generate exactly 2 starter questions',
+        );
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: () =>
+            Promise.resolve('1. Climate Question?\n2. Freshwater Question?'),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      questions: ['Climate Question?', 'Freshwater Question?'],
+    });
+  });
+
+  it('does not leak raw JSON lines when upstream stream emits empty content or error packet', async () => {
+    req.body = { assistantId: 7 };
+
+    // Stream contains metadata/error packets but no message content
+    const streamText = [
+      JSON.stringify({
+        ind: 0,
+        obj: { type: 'error', error: 'Internal onyx error' },
+      }),
+      JSON.stringify({ ind: 1, obj: { type: 'stop' } }),
+    ].join('\n');
+
+    nodeFetch.mockImplementation((url) => {
+      if (url.includes('/api/persona/7')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({}),
+        });
+      }
+      if (url.includes('/api/chat/create-chat-session')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ chat_session_id: 's7' }),
+        });
+      }
+      if (url.includes('/api/chat/send-chat-message')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: () => Promise.resolve(streamText),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      questions: [],
+    });
+  });
+});

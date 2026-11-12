@@ -6,10 +6,7 @@ import type {
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useDeepCompareMemoize } from './useDeepCompareMemoize';
 import { useChatStreaming } from './useChatStreaming';
-import {
-  createChatSession,
-  sendMessage,
-} from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
+import { createChatSession } from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
 import { ResearchType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 
@@ -28,99 +25,34 @@ interface RelatedQuestion {
   question: string;
 }
 
-// Extract JSON array from related questions response
-function extractRelatedQuestions(str: string): RelatedQuestion[] {
-  if (!str || str.toLowerCase().includes('no_response')) {
-    return [];
-  }
-
-  // Try to parse as JSON first if it looks like JSON
-  const trimmed = str.trim();
-  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
-    try {
-      const parsed = JSON.parse(trimmed);
-      const items = Array.isArray(parsed) ? parsed : parsed.questions || [];
-      if (Array.isArray(items)) {
-        return items
-          .map((item) => {
-            if (typeof item === 'string') return { question: item };
-            if (item && typeof item === 'object' && item.question)
-              return { question: item.question };
-            return null;
-          })
-          .filter((i): i is RelatedQuestion => i !== null);
-      }
-    } catch (e) {
-      // Fallback to line parsing
-    }
-  }
-
-  // Fallback: split by lines and clean up common list formats
-  return str
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .map((line) => {
-      // Remove leading numbers or bullets like "1. ", "- ", "* ", etc.
-      const cleaned = line.replace(/^[\d\.\-\*\s]+/, '').trim();
-      return cleaned ? { question: cleaned } : null;
-    })
-    .filter((i): i is RelatedQuestion => i !== null);
-}
-
 // Fetch related questions using the qgen assistant
 async function fetchRelatedQuestions(
   query: string,
   answer: string,
   qgenAsistantId: number,
-  onyxVersion: '2' | '3' = '3',
 ): Promise<RelatedQuestion[]> {
   try {
-    console.log(
-      `[RQ] Creating session for assistant ${qgenAsistantId} (Onyx v${onyxVersion})`,
-    );
-    const chatSessionId = await createChatSession(
-      qgenAsistantId,
-      `Q: ${query}`,
-      true,
-    );
-    console.log(`[RQ] Session created: ${chatSessionId}`);
+    const res = await fetch('/_rq/questions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        assistantId: qgenAsistantId,
+        query,
+        answer,
+      }),
+    });
 
-    const params = {
-      message: `Question: ${query}\nAnswer:\n${answer}`,
-      alternateAssistantId: qgenAsistantId,
-      fileDescriptors: [],
-      parentMessageId: null,
-      chatSessionId,
-      filters: null,
-      selectedDocumentIds: [],
-      use_agentic_search: false,
-      regenerate: false,
-      onyxVersion,
-    };
-
-    if (onyxVersion === '3') {
-      console.log('[Onyx v3] Sending RQ prompt:', params.message);
+    if (!res.ok) {
+      return [];
     }
 
-    let result = '';
-    for await (const packets of sendMessage(params, true)) {
-      for (const packet of packets) {
-        if (onyxVersion === '3') {
-          // console.log('[Onyx v3] RQ Packet:', packet);
-        }
-        if (
-          packet.obj.type === PacketType.MESSAGE_DELTA ||
-          packet.obj.type === PacketType.MESSAGE_START
-        ) {
-          result += (packet.obj as any).content || '';
-        }
-      }
+    const data = await res.json();
+    if (Array.isArray(data?.questions)) {
+      return data.questions.map((q: string) => ({ question: q }));
     }
-    console.log(`[RQ] Final response string: "${result}"`);
-    const extracted = extractRelatedQuestions(result);
-    console.log(`[RQ] Extracted ${extracted.length} questions`);
-    return extracted;
+    return [];
   } catch (error) {
     console.error('Error fetching related questions:', error);
     return [];
@@ -535,7 +467,6 @@ export function useChatController({
             userMessage.message,
             latestAssistantMessage.message,
             qgenAsistantId,
-            onyxVersion,
           );
         }
       } catch (error) {
@@ -551,13 +482,7 @@ export function useChatController({
         setIsFetchingRelatedQuestions(false);
       }
     }
-  }, [
-    messages,
-    enableQgen,
-    qgenAsistantId,
-    isDeepResearchEnabled,
-    onyxVersion,
-  ]);
+  }, [messages, enableQgen, qgenAsistantId, isDeepResearchEnabled]);
 
   const clearChat = useCallback(() => {
     setMessages([]);

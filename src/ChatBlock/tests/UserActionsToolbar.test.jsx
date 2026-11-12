@@ -14,8 +14,22 @@ import { Provider } from 'react-intl-redux';
 import UserActionsToolbar from '@eeacms/volto-eea-chatbot/ChatBlock/components/UserActionsToolbar';
 
 import { trackEvent } from '@eeacms/volto-matomo/utils';
+import { shareChatSession } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
 
 jest.mock('@eeacms/volto-matomo/utils', () => ({ trackEvent: jest.fn() }));
+
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService',
+  () => {
+    const actual = jest.requireActual(
+      '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService',
+    );
+    return {
+      ...actual,
+      shareChatSession: jest.fn().mockResolvedValue(true),
+    };
+  },
+);
 
 const mockStore = configureStore();
 
@@ -250,6 +264,7 @@ describe('UserActionsToolbar', () => {
     fireEvent.click(shareButton);
 
     await waitFor(() => {
+      expect(shareChatSession).toHaveBeenCalledWith('session-uuid-1234');
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
         expect.stringContaining('?chat=session-uuid-1234'),
       );
@@ -259,6 +274,29 @@ describe('UserActionsToolbar', () => {
       category: 'Chatbot',
       action: 'Conversation shared',
     });
+  });
+
+  it('triggers shareChatSession only once when clicking share multiple times', async () => {
+    const props = {
+      message: { messageId: 1, message: 'Test message' },
+      chatSessionId: 'session-uuid-1234',
+    };
+
+    renderWithRTL(props);
+
+    const shareButton = screen.getByRole('button', {
+      name: /share conversation/i,
+    });
+
+    // First click
+    fireEvent.click(shareButton);
+    await waitFor(() => {
+      expect(shareChatSession).toHaveBeenCalledTimes(1);
+    });
+
+    // Second click on the same toolbar should not call shareChatSession again
+    fireEvent.click(shareButton);
+    expect(shareChatSession).toHaveBeenCalledTimes(1);
   });
 
   it('does not render Share button when chatSessionId is not provided', () => {

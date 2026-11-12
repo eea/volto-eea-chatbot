@@ -294,7 +294,7 @@ describe('src/middleware', () => {
     );
   });
 
-  it('automatically sets sharing_status to public when create-chat-session succeeds', async () => {
+  it('does not auto-patch sharing_status to public when create-chat-session succeeds', async () => {
     delete process.env.MOCK_LLM_FILE_PATH;
     process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
     process.env.ONYX_URL = 'http://onyx.test';
@@ -303,28 +303,67 @@ describe('src/middleware', () => {
     req.method = 'POST';
     req.body = { persona_id: 1 };
 
+    let patchCalled = false;
     nodeFetch.mockImplementation(async (url, opts) => {
       if (url.includes('/chat/create-chat-session')) {
         return {
           status: 200,
           headers: { get: () => 'application/json' },
-          json: () =>
-            Promise.resolve({ chat_session_id: 'test-session-uuid-1234' }),
+          body: {
+            pipe: (destination) => {
+              destination.status(200);
+              destination.send(
+                JSON.stringify({ chat_session_id: 'test-session-uuid-1234' }),
+              );
+            },
+          },
         };
       }
-      if (url.includes('/chat/chat-session/test-session-uuid-1234')) {
-        expect(opts.method).toBe('PATCH');
-        expect(JSON.parse(opts.body)).toEqual({ sharing_status: 'public' });
-        return { ok: true, status: 200 };
+      if (opts?.method === 'PATCH') {
+        patchCalled = true;
       }
       return { status: 200, headers: { get: () => 'application/json' } };
     });
 
     await middleware(req, res, next);
 
+    expect(patchCalled).toBe(false);
+  });
+
+  it('promotes session to public via share-chat-session endpoint', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    req.url =
+      '/_da/chat/share-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa';
+    req.method = 'POST';
+    req.body = undefined;
+
+    let patchMethod = null;
+    let patchBody = null;
+
+    nodeFetch.mockImplementation(async (url, opts) => {
+      if (
+        url.includes('/chat/chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa')
+      ) {
+        patchMethod = opts.method;
+        patchBody = JSON.parse(opts.body);
+        return { ok: true, status: 200 };
+      }
+      return { ok: false, status: 404 };
+    });
+
+    await middleware(req, res, next);
+
+    expect(patchMethod).toBe('PATCH');
+    expect(patchBody).toEqual({ sharing_status: 'public' });
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(
-      JSON.stringify({ chat_session_id: 'test-session-uuid-1234' }),
+      JSON.stringify({
+        success: true,
+        chat_session_id: '46277749-db60-44f2-9de1-c5dca2eb68fa',
+      }),
     );
   });
 
@@ -666,6 +705,13 @@ describe('isPathAllowed', () => {
       isPathAllowed(
         '/chat/get-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa',
         'GET',
+        ALLOWED_PROXY_PATHS,
+      ),
+    ).toBe(true);
+    expect(
+      isPathAllowed(
+        '/chat/share-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa',
+        'POST',
         ALLOWED_PROXY_PATHS,
       ),
     ).toBe(true);

@@ -11,6 +11,19 @@ jest.mock('@eeacms/volto-eea-chatbot/ChatBlock/components/Icon', () => {
   };
 });
 
+jest.mock(
+  '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService',
+  () => {
+    const actual = jest.requireActual(
+      '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService',
+    );
+    return {
+      ...actual,
+      shareChatSession: jest.fn().mockResolvedValue(true),
+    };
+  },
+);
+
 describe('ChatExportDropdown', () => {
   const mockPersona = { id: 1, name: 'Green Guru' };
   const mockMessages = [

@@ -11,7 +11,10 @@ import {
   exportConversationAsDocx,
   exportConversationAsHtml,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/exportUtils';
-import { copyShareLink } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
+import {
+  copyShareLink,
+  shareChatSession,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
 import type {
   Message,
   Persona,
@@ -48,6 +51,8 @@ export function ChatExportDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isConversationPublic, setIsConversationPublic] = useState(false);
+  const [isSharingLink, setIsSharingLink] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intl = useIntl();
@@ -133,7 +138,25 @@ export function ChatExportDropdown({
   };
 
   const handleCopyLink = async () => {
-    if (!chatSessionId) return;
+    if (!chatSessionId || isSharingLink) return;
+
+    if (!isConversationPublic) {
+      setIsSharingLink(true);
+      try {
+        const ok = await shareChatSession(chatSessionId);
+        if (!ok) {
+          setIsSharingLink(false);
+          return;
+        }
+        setIsConversationPublic(true);
+      } catch {
+        setIsSharingLink(false);
+        return;
+      } finally {
+        setIsSharingLink(false);
+      }
+    }
+
     const ok = await copyShareLink(chatSessionId);
     if (ok) {
       setIsCopied(true);
@@ -236,12 +259,18 @@ export function ChatExportDropdown({
               className="chat-export-item chat-share-link-item"
               role="menuitem"
               onClick={handleCopyLink}
+              disabled={isSharingLink}
             >
               <span className="export-format-badge">
                 <SVGIcon name={isCopied ? CheckIcon : CopyIcon} size={13} />
               </span>
               <span className="export-format-name">
-                {isCopied ? (
+                {isSharingLink ? (
+                  <FormattedMessage
+                    id="Sharing..."
+                    defaultMessage="Sharing..."
+                  />
+                ) : isCopied ? (
                   <FormattedMessage
                     id="Link copied!"
                     defaultMessage="Link copied!"

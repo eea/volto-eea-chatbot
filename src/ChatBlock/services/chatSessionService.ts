@@ -184,10 +184,46 @@ export function getShareableLink(
 }
 
 /**
- * Copy shareable link to the user's clipboard with fallback support.
+ * Promotes a chat session to 'public' in Onyx via the backend middleware share endpoint.
+ */
+export async function shareChatSession(
+  chatSessionId: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<boolean> {
+  if (!chatSessionId) return false;
+  try {
+    const url = `/_da/chat/share-chat-session/${encodeURIComponent(chatSessionId)}`;
+    const response = await fetchImpl(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.ok;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to share chat session:', err);
+    return false;
+  }
+}
+
+/**
+ * Copy shareable link to the user's clipboard with fallback support,
+ * and updates the browser address bar to reflect the shared session URL.
  */
 export async function copyShareLink(chatSessionId: string): Promise<boolean> {
   const shareUrl = getShareableLink(chatSessionId);
+
+  // Update browser address bar to reflect the shared session URL
+  if (typeof window !== 'undefined' && window.history?.replaceState) {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('chat', chatSessionId);
+      window.history.replaceState(null, '', url.toString());
+    } catch {
+      // Ignore URL update errors in non-browser/restricted environments
+    }
+  }
 
   if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
     try {

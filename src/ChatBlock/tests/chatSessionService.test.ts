@@ -3,6 +3,7 @@ import {
   deserializeChatSession,
   getShareableLink,
   copyShareLink,
+  shareChatSession,
   type SharedChatSessionResponse,
 } from '../services/chatSessionService';
 import { isFinalAnswerComplete } from '../services/packetUtils';
@@ -194,6 +195,48 @@ describe('chatSessionService', () => {
     });
   });
 
+  describe('shareChatSession', () => {
+    it('calls /_da/chat/share-chat-session/:id with POST and returns true on success', async () => {
+      const mockFetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+      });
+
+      const success = await shareChatSession(
+        '46277749-db60-44f2-9de1-c5dca2eb68fa',
+        mockFetch as any,
+      );
+
+      expect(success).toBe(true);
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/_da/chat/share-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
+    });
+
+    it('returns false when response is not ok', async () => {
+      const mockFetch = jest.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+      });
+
+      const success = await shareChatSession(
+        'uuid-not-found',
+        mockFetch as any,
+      );
+      expect(success).toBe(false);
+    });
+
+    it('returns false on network error', async () => {
+      const mockFetch = jest.fn().mockRejectedValue(new Error('Network error'));
+      const success = await shareChatSession('uuid-err', mockFetch as any);
+      expect(success).toBe(false);
+    });
+  });
+
   describe('copyShareLink', () => {
     const originalClipboard = navigator.clipboard;
 
@@ -204,18 +247,27 @@ describe('chatSessionService', () => {
       });
     });
 
-    it('writes link to clipboard via navigator.clipboard when available', async () => {
+    it('writes link to clipboard via navigator.clipboard and updates address bar', async () => {
       const writeText = jest.fn().mockResolvedValue(undefined);
       Object.defineProperty(navigator, 'clipboard', {
         value: { writeText },
         writable: true,
       });
 
+      const replaceStateSpy = jest.spyOn(window.history, 'replaceState');
+
       const success = await copyShareLink('uuid-1234');
       expect(success).toBe(true);
       expect(writeText).toHaveBeenCalledWith(
         expect.stringContaining('?chat=uuid-1234'),
       );
+      expect(replaceStateSpy).toHaveBeenCalledWith(
+        null,
+        '',
+        expect.stringContaining('?chat=uuid-1234'),
+      );
+
+      replaceStateSpy.mockRestore();
     });
 
     it('falls back to execCommand when clipboard API is unavailable', async () => {

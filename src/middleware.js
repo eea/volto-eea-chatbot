@@ -27,6 +27,11 @@ const ALLOWED_PROXY_PATHS = [
       /^\/chat\/get-chat-session\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
     methods: ['GET'],
   },
+  {
+    pathPattern:
+      /^\/chat\/share-chat-session\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    methods: ['POST'],
+  },
   // Real document text behind an answer, used to give the fact-checker the same
   // text the answer generator read (see ChatBlock/services/chunkEvidence.ts).
   { pathPattern: /^\/document\/chunk-info$/, methods: ['GET'] },
@@ -253,52 +258,59 @@ async function send_onyx_request(
     return;
   }
 
-  // Intercept create-chat-session to auto-set sharing_status to public server-side
-  if (url.endsWith('/chat/create-chat-session')) {
+  // Intercept share-chat-session to promote an existing session to public in Onyx
+  if (url.includes('/chat/share-chat-session/')) {
+    const sessionMatch = url.match(
+      /\/chat\/share-chat-session\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/,
+    );
+    const chatSessionId = sessionMatch ? sessionMatch[1] : null;
+
+    if (!chatSessionId) {
+      res.status(400);
+      res.set('Content-Type', 'application/json');
+      res.send(JSON.stringify({ error: 'Invalid or missing chat_session_id' }));
+      return;
+    }
+
     try {
-      log(`Fetching ${url}`);
-      const response = await fetch(url, options, req.body);
-      res.status(response.status);
+      const patchUrl = `${process.env.ONYX_URL || ''}/api/chat/chat-session/${chatSessionId}`;
+      const patchOptions = {
+        method: 'PATCH',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sharing_status: 'public' }),
+      };
+      const patchRes = await fetch(patchUrl, patchOptions);
 
-      if (response.status >= 200 && response.status < 300) {
-        const data = await response.json();
-        const chatSessionId = data?.chat_session_id;
-
-        if (chatSessionId) {
-          try {
-            const patchUrl = `${process.env.ONYX_URL || ''}/api/chat/chat-session/${chatSessionId}`;
-            const patchOptions = {
-              method: 'PATCH',
-              headers: {
-                ...headers,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ sharing_status: 'public' }),
-            };
-            const patchRes = await fetch(patchUrl, patchOptions);
-            if (!patchRes.ok) {
-              log(
-                `Failed to patch session ${chatSessionId} to public: ${patchRes.status}`,
-              );
-            }
-          } catch (patchErr) {
-            log(`Error patching session ${chatSessionId} to public:`, patchErr);
-          }
-        }
-
+      if (patchRes.ok) {
+        res.status(200);
         res.set('Content-Type', 'application/json');
-        res.send(JSON.stringify(data));
+        res.send(
+          JSON.stringify({ success: true, chat_session_id: chatSessionId }),
+        );
         return;
       }
 
-      res.set(
-        'Content-Type',
-        response.headers.get('Content-Type') || 'application/json',
+      res.status(patchRes.status);
+      res.set('Content-Type', 'application/json');
+      res.send(
+        JSON.stringify({
+          error: `Failed to share conversation: ${patchRes.statusText || patchRes.status}`,
+        }),
       );
-      response.body.pipe(res);
       return;
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      log(`Error sharing session ${chatSessionId}:`, err);
+      res.status(500);
+      res.set('Content-Type', 'application/json');
+      res.send(
+        JSON.stringify({
+          error: 'Internal server error while sharing session',
+        }),
+      );
+      return;
     }
   }
 

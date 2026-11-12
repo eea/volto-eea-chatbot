@@ -230,7 +230,13 @@ function ChatWindow({
       chatSessionId !== initialChatSessionId
     ) {
       setIsSharedView(false);
-      history.replace(`${window.location.pathname}?chat=${chatSessionId}`);
+      if (
+        typeof window !== 'undefined' &&
+        (window.location?.search?.includes('chat=') ||
+          window.location?.search?.includes('session='))
+      ) {
+        history.replace(window.location.pathname);
+      }
     }
   }, [chatSessionId, isSharedView, initialChatSessionId, history]);
 

@@ -4,7 +4,10 @@ import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { trackEvent } from '@eeacms/volto-matomo/utils';
 import { Button } from 'semantic-ui-react';
 import { useCopyToClipboard } from '@eeacms/volto-eea-chatbot/ChatBlock/utils';
-import { copyShareLink } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
+import {
+  copyShareLink,
+  shareChatSession,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
 import SVGIcon from './Icon';
 import ChatMessageFeedback from './ChatMessageFeedback';
 import { ChatExportDropdown } from './ChatExportDropdown';
@@ -53,6 +56,8 @@ const UserActionsToolbar = ({
 }) => {
   const [copied, handleCopy] = useCopyToClipboard(message?.message || '');
   const [isCopiedShareLink, setIsCopiedShareLink] = useState(false);
+  const [isShared, setIsShared] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const shareTimeoutRef = useRef(null);
   const trackingEnabled = useRef(enableMatomoTracking);
   trackingEnabled.current = enableMatomoTracking;
@@ -67,7 +72,25 @@ const UserActionsToolbar = ({
   }, []);
 
   const handleShare = async () => {
-    if (!chatSessionId) return;
+    if (!chatSessionId || isSharing) return;
+
+    if (!isShared) {
+      setIsSharing(true);
+      try {
+        const sharedOk = await shareChatSession(chatSessionId);
+        if (!sharedOk) {
+          setIsSharing(false);
+          return;
+        }
+        setIsShared(true);
+      } catch {
+        setIsSharing(false);
+        return;
+      } finally {
+        setIsSharing(false);
+      }
+    }
+
     const ok = await copyShareLink(chatSessionId);
     if (ok) {
       setIsCopiedShareLink(true);
@@ -124,7 +147,8 @@ const UserActionsToolbar = ({
             basic
             className="chat-action-btn chat-share-btn"
             onClick={handleShare}
-            disabled={isCopiedShareLink}
+            loading={isSharing}
+            disabled={isCopiedShareLink || isSharing}
             title={
               isCopiedShareLink
                 ? intl.formatMessage(messagesI18n.linkCopied)

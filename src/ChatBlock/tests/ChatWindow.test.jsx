@@ -11,6 +11,8 @@ import {
   deserializeChatSession,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
 
+import { trackEvent } from '@eeacms/volto-matomo/utils';
+
 jest.mock(
   '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService',
   () => ({
@@ -31,8 +33,6 @@ jest.mock('react-intl', () => ({
   defineMessages: (msgs) => msgs,
   FormattedMessage: ({ defaultMessage }) => <span>{defaultMessage}</span>,
 }));
-
-import { trackEvent } from '@eeacms/volto-matomo/utils';
 
 jest.mock('@eeacms/volto-matomo/utils', () => ({
   trackEvent: jest.fn(),
@@ -780,10 +780,7 @@ describe('ChatWindow', () => {
     });
 
     render(
-      <ChatWindowWrapped
-        persona={mockPersona}
-        enableMatomoTracking={true}
-      />,
+      <ChatWindowWrapped persona={mockPersona} enableMatomoTracking={true} />,
     );
     const newChatBtn = screen.getByRole('button', {
       name: /start a new conversation/i,

@@ -43,7 +43,7 @@
     "@eeacms/volto-design-tokens": "*",
     "@eeacms/volto-matomo": "*",
     "@microsoft/fetch-event-source": "2.0.1",
-    "@plone-collective/volto-sentry": "*",
+    "@sentry/browser": "7.15.0",
     "compromise": "14.14.5",
     "fast-json-patch": "3.1.1",
     "highlight.js": "11.10.0",

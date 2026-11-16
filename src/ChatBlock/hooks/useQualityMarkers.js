@@ -348,11 +348,21 @@ export function useQualityMarkers(
     setRunId((r) => r + 1);
   }, [abortInFlight, failures, setPhase]);
 
-  /** Start a check the user asked for. Not bounded by earlier failures. */
+  /**
+   * Start a check the user asked for. Not bounded by earlier failures, and it
+   * clears the retry budget.
+   *
+   * The cap exists to stop a failing check from being re-run over and over - it
+   * is not meant to lock a person out of a message. Without the reset both
+   * affordances go dead after three failures: Retry is hidden by the cap, and
+   * the Fact-check button restarts a check whose budget is already spent, so
+   * every click looks like it did nothing.
+   */
   const startHalloumi = React.useCallback(() => {
     abortInFlight();
     setMarkers(null);
     setError(null);
+    setFailures(0);
     setPhase('idle');
     setRunId((r) => r + 1);
   }, [abortInFlight, setPhase]);

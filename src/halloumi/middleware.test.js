@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import fetch from 'node-fetch';
 import { isPathAllowed } from '../middleware';
 
@@ -14,7 +15,8 @@ describe('halloumi middleware', () => {
     // Re-mock after reset
     jest.mock('node-fetch', () => jest.fn());
 
-    req = {
+    req = new EventEmitter();
+    Object.assign(req, {
       url: '/_ha/generate',
       method: 'POST',
       body: {
@@ -23,7 +25,7 @@ describe('halloumi middleware', () => {
       },
       headers: {},
       ip: '127.0.0.1',
-    };
+    });
     res = {
       send: jest.fn(),
       set: jest.fn(),
@@ -273,6 +275,43 @@ describe('halloumi middleware', () => {
       }),
     );
     await Promise.all([pA, pB]);
+  });
+
+  // Skipped where the environment has no AbortController at all - the proxy
+  // degrades to uncancellable upstream there, by design.
+  const itAbort = typeof AbortController === 'undefined' ? it.skip : it;
+
+  itAbort('aborts the upstream check when the client disconnects', async () => {
+    // The bug this guards: a browser-side Cancel says nothing to the checker,
+    // which is already several LLM calls deep. The abandoned request kept
+    // holding one of the two concurrency slots until it finished, so two
+    // cancels wedged the service and every later check came back busy.
+    process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
+    middleware = require('./middleware').default;
+    const mockedFetch = require('node-fetch');
+
+    mockedFetch.mockImplementation(
+      (url, opts) =>
+        new Promise((resolve, reject) => {
+          opts.signal.addEventListener('abort', () => {
+            const err = new Error('The user aborted a request.');
+            err.name = 'AbortError';
+            reject(err);
+          });
+        }),
+    );
+
+    const running = middleware(req, res, next);
+    await Promise.resolve();
+
+    req.emit('close');
+    await running;
+
+    const opts = mockedFetch.mock.calls[0][1];
+    expect(opts.signal).toBeDefined();
+    expect(opts.signal.aborted).toBe(true);
+    // Nothing to answer, and a cancel must not be logged as an outage.
+    expect(res.status).not.toHaveBeenCalled();
   });
 
   it('proxies /health so the UI can know the checker is down up front', async () => {

@@ -274,6 +274,39 @@ describe('useQualityMarkers', () => {
     expect(result.current.canRetry).toBe(false);
   });
 
+  it('an explicit restart clears the retry budget, so the button is a way back', async () => {
+    // The bug this guards: three failures hid Retry and left the Fact-check
+    // button restarting a check whose budget was already spent, so every click
+    // after that looked dead.
+    global.fetch.mockRejectedValue(new Error('ECONNREFUSED'));
+
+    const result = renderMarkers([true, MESSAGE, SOURCES]);
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+
+    for (let i = 0; i < MAX_QUALITY_CHECK_ATTEMPTS; i++) {
+      act(() => {
+        result.current.retryHalloumi();
+      });
+      await act(async () => {
+        await tick();
+        await tick();
+      });
+    }
+    expect(result.current.canRetry).toBe(false);
+
+    const before = global.fetch.mock.calls.length;
+    act(() => {
+      result.current.startHalloumi();
+    });
+    await act(async () => {
+      await tick();
+      await tick();
+    });
+
+    expect(global.fetch.mock.calls.length).toBe(before + 1);
+    expect(result.current.canRetry).toBe(true);
+  });
+
   it('filters out claims with special characters and low score', async () => {
     global.fetch.mockResolvedValue(
       jsonResponse({
@@ -297,5 +330,52 @@ describe('useQualityMarkers', () => {
     expect(typeof result.current.retryHalloumi).toBe('function');
     expect(typeof result.current.startHalloumi).toBe('function');
     expect(typeof result.current.cancelHalloumi).toBe('function');
+  });
+});
+
+describe('useQualityMarkers cancel/restart cycles', () => {
+  const abortableFetch = () =>
+    jest.fn((url, opts) => {
+      return new Promise((resolve, reject) => {
+        if (opts?.signal) {
+          opts.signal.addEventListener('abort', () => {
+            const err = new Error('The user aborted a request.');
+            err.name = 'AbortError';
+            reject(err);
+          });
+        }
+        setTimeout(() => resolve(jsonResponse(okBody)), 5);
+      });
+    });
+
+  beforeEach(() => {
+    global.fetch = abortableFetch();
+  });
+
+  it('keeps working across repeated cancel then restart cycles', async () => {
+    const result = renderMarkers([true, MESSAGE, SOURCES]);
+
+    await act(async () => {
+      await tick();
+    });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    for (let cycle = 1; cycle <= 4; cycle++) {
+      act(() => result.current.cancelHalloumi());
+      await act(async () => {
+        await tick();
+      });
+
+      expect(result.current.status).toBe('cancelled');
+      expect(result.current.error).toBeNull();
+
+      act(() => result.current.startHalloumi());
+      await act(async () => {
+        await tick();
+      });
+
+      expect(global.fetch).toHaveBeenCalledTimes(cycle + 1);
+      expect(result.current.status).toBe('loading');
+    }
   });
 });

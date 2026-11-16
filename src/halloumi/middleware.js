@@ -50,6 +50,19 @@ function isTimeoutError(error) {
 }
 
 /**
+ * Every Node this proxy runs on has AbortController globally, but not every
+ * test environment the add-on is checked against does - same guard as
+ * createController() in ChatBlock/hooks/useQualityMarkers. A missing controller
+ * degrades to "we cannot cancel upstream", not to a crash.
+ */
+function createController() {
+  if (typeof AbortController === 'undefined') {
+    return { signal: undefined, abort() {} };
+  }
+  return new AbortController();
+}
+
+/**
  * Health is a cheap GET and must not be gated by the fact-check concurrency
  * cap - a busy checker is still a live checker.
  */
@@ -81,6 +94,16 @@ async function proxyGenerate(req, res) {
     sources: sources?.length,
   });
 
+  // A cancelled check has to stop costing money. The browser aborting its fetch
+  // says nothing to the checker, which by then is several LLM calls deep, and
+  // the abandoned request keeps holding one of the concurrency slots until it
+  // finishes. Without this, a user who cancels twice wedges the service for
+  // everyone: every later check is rejected as busy, and the retry cap then
+  // locks the message out.
+  const upstream = createController();
+  const onClientClose = () => upstream.abort('client disconnected');
+  req.on('close', onClientClose);
+
   try {
     const response = await fetch(`${RAG_FACT_CHECKER_URL}/halloumi/generate`, {
       method: 'POST',
@@ -94,6 +117,7 @@ async function proxyGenerate(req, res) {
         ...(batch_size != null && { batch_size }),
       }),
       timeout: UPSTREAM_TIMEOUT_MS,
+      signal: upstream.signal,
     });
 
     const result = await response.json();
@@ -114,6 +138,13 @@ async function proxyGenerate(req, res) {
       ...(isBusy && { retry_after: result.retry_after ?? 30 }),
     });
   } catch (error) {
+    // Nothing to answer, and nothing to report: the user walked away. Saying so
+    // out loud keeps a cancel from looking like an outage in the logs.
+    if (upstream.signal?.aborted) {
+      log('Halloumi request abandoned by the client');
+      return;
+    }
+
     log('Halloumi fetch error', error);
 
     if (isTimeoutError(error)) {
@@ -131,6 +162,8 @@ async function proxyGenerate(req, res) {
       error: `Fact-checker unavailable: ${error.message || 'connection failed'}`,
       code: 'unreachable',
     });
+  } finally {
+    req.removeListener('close', onClientClose);
   }
 }
 

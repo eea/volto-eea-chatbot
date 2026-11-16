@@ -209,6 +209,15 @@ calls, so queueing turns one chatty user into a multi-minute wait for everyone.
 `/health` is deliberately exempt from the cap — a busy checker is still a live
 checker.
 
+**The cap only holds if a cancel reaches upstream.** The browser aborting its
+fetch says nothing to the checker, which by then is several LLM calls deep, and
+the abandoned request keeps holding one of the two slots until it finishes. Two
+cancels are then enough to wedge the service: every later check is rejected as
+`busy`, and the client-side retry cap turns that into a message with no working
+affordance at all. So `proxyGenerate` wires `req.on('close')` to an
+`AbortController` on the upstream fetch, and a request the client walked away
+from is logged as abandoned rather than answered or reported as an outage.
+
 ## Original Halloumi
 
 The original implementation was based on Apache2 licensed https://github.com/oumi-ai/halloumi-demo/tree/d088e1f25e7785326a53bc120113e226ee2f54b7

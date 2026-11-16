@@ -160,10 +160,176 @@ describe('halloumi middleware', () => {
       expect.any(Object),
     );
   });
+
+  it('bounds the upstream request with a timeout', async () => {
+    // Without this, a hung checker pins an Express request - and a Varnish
+    // worker - until Varnish gives up at 300s and answers with HTML.
+    process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
+    middleware = require('./middleware').default;
+    const mockedFetch = require('node-fetch');
+
+    mockedFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ claims: [], segments: {} }),
+    });
+
+    await middleware(req, res, next);
+
+    const [, options] = mockedFetch.mock.calls[0];
+    expect(options.timeout).toBeGreaterThan(0);
+    expect(options.timeout).toBeLessThan(300000);
+  });
+
+  it('returns a 504 timeout envelope when the upstream is too slow', async () => {
+    process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
+    middleware = require('./middleware').default;
+    const mockedFetch = require('node-fetch');
+
+    const timeoutError = new Error('network timeout at: ...');
+    timeoutError.name = 'FetchError';
+    timeoutError.type = 'request-timeout';
+    mockedFetch.mockRejectedValue(timeoutError);
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(504);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'timeout' }),
+    );
+  });
+
+  it('passes a rate limit through as a retryable busy response', async () => {
+    process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
+    middleware = require('./middleware').default;
+    const mockedFetch = require('node-fetch');
+
+    mockedFetch.mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: () => Promise.resolve({ detail: 'Too many requests' }),
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(429);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        code: 'busy',
+        retry_after: expect.any(Number),
+      }),
+    );
+  });
+
+  it('rejects excess checks instead of queueing them', async () => {
+    // One replica, no HPA, and each check is a chain of LLM calls. Queuing is
+    // how one chatty user makes everyone else wait minutes; rejecting fast lets
+    // the UI say "busy".
+    process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
+    middleware = require('./middleware').default;
+    const mockedFetch = require('node-fetch');
+
+    const pending = [];
+    mockedFetch.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          pending.push(resolve);
+        }),
+    );
+
+    const resA = {
+      ...res,
+      send: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+    const resB = {
+      ...res,
+      send: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+    const resC = {
+      ...res,
+      send: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+
+    const pA = middleware(req, resA, next);
+    const pB = middleware(req, resB, next);
+    await middleware(req, resC, next);
+
+    expect(resC.status).toHaveBeenCalledWith(503);
+    expect(resC.send).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'busy' }),
+    );
+    // the rejected request never reached the checker at all
+    expect(mockedFetch).toHaveBeenCalledTimes(2);
+
+    expect(pending).toHaveLength(2);
+    pending.forEach((resolve) =>
+      resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ claims: [], segments: {} }),
+      }),
+    );
+    await Promise.all([pA, pB]);
+  });
+
+  it('proxies /health so the UI can know the checker is down up front', async () => {
+    process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
+    middleware = require('./middleware').default;
+    const mockedFetch = require('node-fetch');
+
+    req.url = '/_ha/health';
+    req.method = 'GET';
+    mockedFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ status: 'ok' }),
+    });
+
+    await middleware(req, res, next);
+
+    expect(mockedFetch).toHaveBeenCalledWith(
+      'http://localhost:8000/health',
+      expect.objectContaining({ method: 'GET' }),
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it('reports /health as unavailable when the checker is unreachable', async () => {
+    process.env.RAG_FACT_CHECKER_URL = 'http://localhost:8000';
+    middleware = require('./middleware').default;
+    const mockedFetch = require('node-fetch');
+
+    req.url = '/_ha/health';
+    req.method = 'GET';
+    mockedFetch.mockRejectedValue(new Error('ECONNREFUSED'));
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(503);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'unreachable' }),
+    );
+  });
 });
 
 describe('halloumi path allowlist', () => {
-  const ALLOWED_HALLOUMI_PATHS = [{ path: '/generate', methods: ['POST'] }];
+  const ALLOWED_HALLOUMI_PATHS = [
+    { path: '/generate', methods: ['POST'] },
+    { path: '/health', methods: ['GET'] },
+  ];
+
+  it('allows /health with GET', () => {
+    expect(isPathAllowed('/health', 'GET', ALLOWED_HALLOUMI_PATHS)).toBe(true);
+  });
+
+  it('rejects /health with POST', () => {
+    expect(isPathAllowed('/health', 'POST', ALLOWED_HALLOUMI_PATHS)).toBe(
+      false,
+    );
+  });
 
   it('allows /generate with POST', () => {
     expect(isPathAllowed('/generate', 'POST', ALLOWED_HALLOUMI_PATHS)).toBe(

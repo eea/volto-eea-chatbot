@@ -22,10 +22,6 @@ const messages = defineMessages({
     id: 'Fact-check AI answer',
     defaultMessage: 'Fact-check AI answer',
   },
-  factCheckChecking: {
-    id: 'Fact-checking',
-    defaultMessage: 'Fact-checking…',
-  },
   factCheckHint: {
     id: 'Please allow a few minutes for claim verification when many references are involved.',
     defaultMessage:
@@ -228,28 +224,12 @@ const HalloumiFeedback = ({
           <Button
             onClick={onManualVerify}
             className="icon claims-btn"
-            disabled={isChecking}
-            aria-busy={isChecking}
-            aria-label={
-              isChecking
-                ? intl.formatMessage(messages.factCheckChecking)
-                : intl.formatMessage(messages.factCheck)
-            }
+            aria-label={intl.formatMessage(messages.factCheck)}
           >
-            <span
-              className="claims-btn-label"
-              aria-hidden={isChecking ? 'true' : undefined}
-            >
-              <SVGIcon name={GlassesIcon} />{' '}
-              {intl.formatMessage(messages.factCheck)}
-            </span>
-            {isChecking && (
-              <span className="claims-btn-progress">
-                <SpinnerRing /> {intl.formatMessage(messages.factCheckChecking)}
-              </span>
-            )}
+            <SVGIcon name={GlassesIcon} />{' '}
+            {intl.formatMessage(messages.factCheck)}
           </Button>
-          {!isChecking && phase !== 'failed' && (
+          {phase !== 'failed' && (
             <div>
               <span>{intl.formatMessage(messages.factCheckHint)}</span>{' '}
             </div>

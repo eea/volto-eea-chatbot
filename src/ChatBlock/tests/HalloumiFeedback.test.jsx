@@ -76,29 +76,30 @@ describe('HalloumiFeedback', () => {
       name: /Fact-check AI answer/i,
     });
     expect(button).toBeEnabled();
-    expect(button).toHaveAttribute('aria-busy', 'false');
     fireEvent.click(button);
     expect(defaultProps.onManualVerify).toHaveBeenCalled();
     expect(screen.getByText(/Please allow a few minutes/i)).toBeInTheDocument();
   });
 
-  it('keeps the button on screen and marks it busy while checking', () => {
+  it('steps the button aside while a check runs', () => {
+    // AIMessage stops asking for the button once a check starts: the strip
+    // below already says "Checking this answer against 3 sources", and a second
+    // "Fact-checking…" in the button said the same thing twice.
     render(
       <HalloumiFeedback
         {...defaultProps}
-        showVerifyClaimsButton
+        showVerifyClaimsButton={false}
         phase="checking"
         sourceCount={3}
       />,
     );
-    const button = screen.getByRole('button', { name: /Fact-checking/i });
-    expect(button).toBeDisabled();
-    expect(button).toHaveAttribute('aria-busy', 'true');
-    // the label is hidden, not removed, so the button never resizes
-    expect(screen.getByText('Fact-check AI answer')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
+    expect(
+      screen.queryByRole('button', { name: /Fact-check AI answer/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Checking this answer against 3 sources…'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Cancel/i })).toBeInTheDocument();
   });
 
   it('shows the progress strip while documents are being resolved', () => {
@@ -112,8 +113,8 @@ describe('HalloumiFeedback', () => {
         sourceCount={4}
       />,
     );
-    // one spinner in the button, one in the strip
-    expect(document.querySelectorAll('.fact-check-spinner').length).toBe(2);
+    // the strip is the only thing spinning now
+    expect(document.querySelectorAll('.fact-check-spinner').length).toBe(1);
     expect(
       screen.getByText('Gathering the cited documents…'),
     ).toBeInTheDocument();

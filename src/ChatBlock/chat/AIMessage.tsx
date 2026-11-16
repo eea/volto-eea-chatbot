@@ -241,6 +241,39 @@ export function getFactCheckPhase({
   return 'idle';
 }
 
+/**
+ * Whether the Fact-check button is on screen.
+ *
+ * It steps aside while a check runs - the progress strip already says the same
+ * thing - and after a failure, where the error block owns the retry. The one
+ * exception is a spent retry budget: the capped Retry in the error block is
+ * gone by then, and hiding the button would leave the message with no way to
+ * try again.
+ */
+export function shouldShowVerifyClaimsButton({
+  messageDisplayed,
+  sourceCount,
+  markers,
+  phase,
+  canRetry,
+  qualityCheck,
+  qualityCheckEnabled,
+}) {
+  const onDemand =
+    qualityCheck === 'ondemand' ||
+    (qualityCheck === 'ondemand_toggle' && !qualityCheckEnabled);
+
+  return (
+    messageDisplayed &&
+    sourceCount > 0 &&
+    !markers &&
+    onDemand &&
+    phase !== 'resolving_evidence' &&
+    phase !== 'checking' &&
+    (phase !== 'failed' || !canRetry)
+  );
+}
+
 export function AIMessage({
   message,
   prevMessage,
@@ -472,17 +505,15 @@ export function AIMessage({
   const halloumiMessage =
     isMessageVerified || doQualityControl ? scoreStage?.label : '';
 
-  // The button stays on screen while a check runs and changes state instead of
-  // disappearing: removing it made the click look like it did nothing, and it
-  // moved the rest of the answer around. It does step aside once a check has
-  // failed - the error block owns the retry affordance there.
-  const showVerifyClaimsButton =
-    messageDisplayed &&
-    sources.length > 0 &&
-    !markers &&
-    factCheckPhase !== 'failed' &&
-    (qualityCheck === 'ondemand' ||
-      (qualityCheck === 'ondemand_toggle' && !qualityCheckEnabled));
+  const showVerifyClaimsButton = shouldShowVerifyClaimsButton({
+    messageDisplayed,
+    sourceCount: sources.length,
+    markers,
+    phase: factCheckPhase,
+    canRetry,
+    qualityCheck,
+    qualityCheckEnabled,
+  });
 
   const showTotalFailMessage =
     messageDisplayed &&

@@ -7,6 +7,8 @@ import { Provider } from 'react-intl-redux';
 import {
   AIMessage,
   getContextSources,
+  getFactCheckPhase,
+  shouldShowVerifyClaimsButton,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/chat/AIMessage';
 import { Tab, Sidebar } from 'semantic-ui-react';
 import { RendererComponent } from '@eeacms/volto-eea-chatbot/ChatBlock/packets';
@@ -319,6 +321,125 @@ describe('AIMessage', () => {
     it('flags sources built from blurbs as snippets', () => {
       const result = getContextSources(mockMessage, mockCitedSources);
       expect(result[0].halloumiSource.kind).toBe('snippet');
+    });
+  });
+
+  describe('getFactCheckPhase', () => {
+    const base = {
+      markers: null,
+      qualityStatus: 'idle',
+      requested: false,
+      evidenceSettled: false,
+      loading: false,
+      qualityError: null,
+    };
+
+    it('names the evidence stage before the checker is even called', () => {
+      expect(
+        getFactCheckPhase({ ...base, requested: true, evidenceSettled: false }),
+      ).toBe('resolving_evidence');
+    });
+
+    it('names the checking stage once the request is in flight', () => {
+      expect(getFactCheckPhase({ ...base, loading: true })).toBe('checking');
+    });
+
+    it('treats a cancel as its own state, not as a failure', () => {
+      expect(getFactCheckPhase({ ...base, qualityStatus: 'cancelled' })).toBe(
+        'cancelled',
+      );
+    });
+
+    it('prefers the verdict over everything once markers arrive', () => {
+      expect(
+        getFactCheckPhase({
+          ...base,
+          markers: { claims: [] },
+          qualityError: { outcome: 'timeout' },
+        }),
+      ).toBe('verdict');
+    });
+
+    it('reports a failure only when nothing else explains the state', () => {
+      expect(
+        getFactCheckPhase({ ...base, qualityError: { outcome: 'busy' } }),
+      ).toBe('failed');
+    });
+
+    it('is idle when nothing has been asked for', () => {
+      expect(getFactCheckPhase(base)).toBe('idle');
+    });
+  });
+
+  describe('shouldShowVerifyClaimsButton', () => {
+    const base = {
+      messageDisplayed: true,
+      sourceCount: 3,
+      markers: null,
+      phase: 'idle',
+      canRetry: true,
+      qualityCheck: 'ondemand',
+      qualityCheckEnabled: false,
+    };
+
+    it('shows the button for an on-demand answer', () => {
+      expect(shouldShowVerifyClaimsButton(base)).toBe(true);
+    });
+
+    it('hides it while a check runs, because the strip says it instead', () => {
+      expect(
+        shouldShowVerifyClaimsButton({ ...base, phase: 'resolving_evidence' }),
+      ).toBe(false);
+      expect(shouldShowVerifyClaimsButton({ ...base, phase: 'checking' })).toBe(
+        false,
+      );
+    });
+
+    it('shows it again after a cancel', () => {
+      expect(
+        shouldShowVerifyClaimsButton({ ...base, phase: 'cancelled' }),
+      ).toBe(true);
+    });
+
+    it('hides it once there is a verdict', () => {
+      expect(
+        shouldShowVerifyClaimsButton({ ...base, markers: { claims: [] } }),
+      ).toBe(false);
+    });
+
+    it('hides it after a failure, where the error block owns the retry', () => {
+      expect(shouldShowVerifyClaimsButton({ ...base, phase: 'failed' })).toBe(
+        false,
+      );
+    });
+
+    it('brings it back once the retry budget is spent', () => {
+      expect(
+        shouldShowVerifyClaimsButton({
+          ...base,
+          phase: 'failed',
+          canRetry: false,
+        }),
+      ).toBe(true);
+    });
+
+    it('stays hidden when the automatic check is on', () => {
+      expect(
+        shouldShowVerifyClaimsButton({
+          ...base,
+          qualityCheck: 'ondemand_toggle',
+          qualityCheckEnabled: true,
+        }),
+      ).toBe(false);
+    });
+
+    it('needs an answer with sources to check', () => {
+      expect(
+        shouldShowVerifyClaimsButton({ ...base, messageDisplayed: false }),
+      ).toBe(false);
+      expect(shouldShowVerifyClaimsButton({ ...base, sourceCount: 0 })).toBe(
+        false,
+      );
     });
   });
 });

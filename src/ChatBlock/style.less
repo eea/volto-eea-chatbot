@@ -1629,35 +1629,6 @@ mark {
 .halloumi-feedback-button {
   margin-top: 1.5em;
   font-size: 15px;
-
-  // The Fact-check button keeps its footprint while a check runs. The label and
-  // the "Fact-checking…" label share one grid cell, so the button never resizes
-  // and the answer below it never jumps when the state changes.
-  .ui.button.claims-btn {
-    display: inline-grid;
-    grid-template-areas: 'label';
-  }
-
-  .claims-btn-label,
-  .claims-btn-progress {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5em;
-    grid-area: label;
-  }
-
-  .claims-btn-progress {
-    // The global .spinner is a 22px two-tone disc - far too heavy inside a
-    // button. Same treatment as .feedback-submit-spinner.
-    .fact-check-spinner {
-      animation-delay: 0s;
-    }
-  }
-
-  .claims-btn-label[aria-hidden='true'] {
-    visibility: hidden;
-  }
 }
 
 // --- Fact-check status blocks ---------------------------------------------

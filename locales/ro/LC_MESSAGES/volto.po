@@ -55,11 +55,6 @@ msgstr ""
 msgid "Fact-check AI answer"
 msgstr ""
 
-#. Default: "Fact-checking…"
-#: ChatBlock/components/HalloumiFeedback
-msgid "Fact-checking"
-msgstr ""
-
 #. Default: "Fact-checking is busy right now."
 #: ChatBlock/components/HalloumiFeedback
 msgid "Fact-checking is busy right now."

@@ -123,7 +123,7 @@ export default function EmptyState(props) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
-    }, 15000);
+    }, 30000);
 
     fetch('/_rq/questions', {
       method: 'POST',

@@ -445,7 +445,7 @@ describe('EmptyState', () => {
       });
 
       await renderer.act(async () => {
-        jest.advanceTimersByTime(15000);
+        jest.advanceTimersByTime(30000);
       });
 
       const buttons = component.root.findAllByProps({

@@ -38,6 +38,18 @@ export const QUALITY_CHECK_OUTCOME = {
   cancelled: 'cancelled',
 };
 
+/**
+ * `AbortController` is everywhere in browsers, but the add-on is also tested
+ * against Volto 17 (jest 26 / jsdom 16), where it is not guaranteed to exist.
+ * A missing controller must degrade to "we cannot cancel", not to a crash.
+ */
+function createController() {
+  if (typeof AbortController === 'undefined') {
+    return { signal: undefined, abort() {} };
+  }
+  return new AbortController();
+}
+
 async function fetchHalloumi(
   answer,
   sources,
@@ -56,7 +68,7 @@ async function fetchHalloumi(
       maxContextSegments,
       ...(batchSize != null && { batch_size: batchSize }),
     }),
-    signal,
+    ...(signal ? { signal } : {}),
   });
 }
 
@@ -201,7 +213,7 @@ export function useQualityMarkers(
       }
 
       const seq = ++requestSeq.current;
-      const controller = new AbortController();
+      const controller = createController();
       abortRef.current = controller;
 
       // Why this request ended up in the catch block. Only the timer sets it:

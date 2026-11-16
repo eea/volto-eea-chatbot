@@ -1667,6 +1667,11 @@ mark {
 // read as an alert, which is wrong for a check that is merely taking its time,
 // and the stacked MessageContent left Cancel sitting on its own line under the
 // text. One quiet strip instead; the accent edge carries the meaning.
+//
+// Deliberately square. The design system's shape language is 0px for
+// containers and interactive elements (DESIGN.md "Shapes", and the callout's
+// own @calloutBorderRadius is 0). Chat bubbles are rounded because they are a
+// component variant; a status strip is not.
 
 .fact-check-spinner {
   display: inline-block;
@@ -1682,14 +1687,16 @@ mark {
   animation: spin-rotate 0.75s linear infinite;
 }
 
-.fact-check-progress {
+// @space-6 matches the 1.5em the Fact-check button already keeps from the
+// answer above. Without it the strip reads as a second paragraph of the answer.
+.fact-check-progress,
+.fact-check-error {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   padding: @space-3 @space-4;
   border: @border-size-1 solid @grey-2;
-  border-radius: @radius-2;
-  border-left: @border-size-4 solid @blue-4;
+  margin-top: @space-6;
   background-color: @grey-1;
   color: @grey-5;
   font-size: @font-size-0;
@@ -1697,58 +1704,13 @@ mark {
   line-height: @font-lineheight-2;
 }
 
-.fact-check-progress-elapsed {
-  color: @grey-4;
-  font-variant-numeric: tabular-nums;
-}
-
-// Cancel sits at the far end of the strip so it reads as an action on the
-// status, not as more status text.
-.fact-check-progress-cancel {
-  margin-left: auto;
-}
-
-// Wraps to its own row inside the same strip rather than opening a second box.
-.fact-check-progress-note {
-  flex: 1 0 100%;
-  color: @grey-4;
-}
-
-// A text action, not a Semantic button: Cancel is the lightest thing the user
-// can do here and should not out-shout the status line it belongs to.
-.fact-check-progress-cancel,
-.fact-check-error-retry {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: @blue-4;
-  cursor: pointer;
-  font-size: @font-size-0;
-  text-decoration: underline;
-
-  &:hover {
-    color: @blue-5;
-  }
-
-  &:focus-visible {
-    outline: @border-size-2 solid @blue-4;
-    outline-offset: @space-1;
-  }
+.fact-check-progress {
+  border-left: @border-size-4 solid @blue-4;
 }
 
 .fact-check-error {
-  display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
-  padding: @space-3 @space-4;
-  border: @border-size-1 solid @grey-2;
-  border-radius: @radius-2;
   border-left: @border-size-4 solid @red-5;
-  background-color: @grey-1;
-  color: @grey-5;
-  font-size: @font-size-0;
-  gap: @space-2 @space-3;
-  line-height: @font-lineheight-2;
 
   // The accent edge carries the severity: a hard failure is red; a check that
   // was busy or ran out of budget is the design system's warning orange, since
@@ -1764,6 +1726,17 @@ mark {
   }
 }
 
+.fact-check-progress-elapsed {
+  color: @grey-4;
+  font-variant-numeric: tabular-nums;
+}
+
+// Wraps to its own row inside the same strip rather than opening a second box.
+.fact-check-progress-note {
+  flex: 1 0 100%;
+  color: @grey-4;
+}
+
 .fact-check-error-text {
   flex: 1 1 auto;
 }
@@ -1776,15 +1749,23 @@ mark {
   color: @grey-4;
 }
 
+// Cancel and Retry are the design system's Text Button - `className="text"`,
+// defined in the EEA theme at elements/button.overrides: transparent fill,
+// @primaryColor, underlined, its own inset focus ring. Only placement is ours:
+// pinned to the end of the line, so it reads as an action on the status rather
+// than as more status text.
+.fact-check-progress-cancel,
+.fact-check-error-retry {
+  margin-left: auto;
+}
+
 .fact-check-error-retry {
   display: inline-flex;
   align-items: center;
-  margin-left: auto;
   gap: @space-1;
 
   &:disabled {
-    color: @grey-3;
-    cursor: default;
+    color: @grey-4;
   }
 }
 

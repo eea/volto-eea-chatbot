@@ -276,13 +276,13 @@ const HalloumiFeedback = ({
             {intl.formatMessage(messages.elapsed, { seconds: elapsed })}
           </span>
           {onCancelCheck && (
-            <button
-              className="fact-check-progress-cancel"
+            <Button
+              className="text fact-check-progress-cancel"
               type="button"
               onClick={onCancelCheck}
             >
               {intl.formatMessage(messages.cancel)}
-            </button>
+            </Button>
           )}
           {elapsed >= 60 && (
             <span className="fact-check-progress-note">
@@ -301,8 +301,8 @@ const HalloumiFeedback = ({
           {/* The action comes before the explanation: it belongs on the first
               line with the message, and the hint wraps below. */}
           {canRetry && error?.outcome !== 'no_sources' ? (
-            <button
-              className="fact-check-error-retry"
+            <Button
+              className="text fact-check-error-retry"
               type="button"
               onClick={retryHalloumi}
               disabled={cooldown > 0}
@@ -311,7 +311,7 @@ const HalloumiFeedback = ({
               {cooldown > 0
                 ? intl.formatMessage(messages.retryIn, { seconds: cooldown })
                 : intl.formatMessage(messages.retry)}
-            </button>
+            </Button>
           ) : (
             !canRetry && (
               <span className="fact-check-error-hint">

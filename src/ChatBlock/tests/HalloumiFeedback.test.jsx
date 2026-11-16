@@ -113,7 +113,7 @@ describe('HalloumiFeedback', () => {
       />,
     );
     // one spinner in the button, one in the strip
-    expect(screen.getAllByTestId('spinner').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('.fact-check-spinner').length).toBe(2);
     expect(
       screen.getByText('Gathering the cited documents…'),
     ).toBeInTheDocument();
@@ -254,7 +254,7 @@ describe('HalloumiFeedback', () => {
   it('renders nothing extra when idle with no markers', () => {
     render(<HalloumiFeedback {...defaultProps} markers={null} />);
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('spinner')).not.toBeInTheDocument();
+    expect(document.querySelectorAll('.fact-check-spinner')).toHaveLength(0);
   });
 
   describe('context quality', () => {

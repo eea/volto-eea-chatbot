@@ -3,7 +3,6 @@ import cx from 'classnames';
 import { Button, Message, MessageContent } from 'semantic-ui-react';
 import { defineMessages, useIntl } from 'react-intl';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
-import Spinner from './Spinner';
 import SVGIcon from './Icon';
 import { getVerdictBgColor } from './markdown/colors';
 
@@ -166,6 +165,17 @@ function errorCopy(intl, error) {
   }
 }
 
+/**
+ * The ring used wherever a fact-check is running.
+ *
+ * Not the shared `Spinner` component: that one is a 22px two-tone teal/blue
+ * disc, which is right for a page loader and far too heavy inside a button or a
+ * one-line status strip.
+ */
+function SpinnerRing() {
+  return <span aria-hidden="true" className="fact-check-spinner" />;
+}
+
 const HalloumiFeedback = ({
   halloumiMessage,
   markers,
@@ -235,7 +245,7 @@ const HalloumiFeedback = ({
             </span>
             {isChecking && (
               <span className="claims-btn-progress">
-                <Spinner /> {intl.formatMessage(messages.factCheckChecking)}
+                <SpinnerRing /> {intl.formatMessage(messages.factCheckChecking)}
               </span>
             )}
           </Button>
@@ -248,65 +258,69 @@ const HalloumiFeedback = ({
       )}
 
       {/* One strip for the whole check, including the document-resolution stage
-          that happens before the fact-checker is called at all. */}
+          that happens before the fact-checker is called at all. Built from
+          design-system tokens rather than a Semantic Message: the blue box, its
+          heavy border and the two-tone disc read as an alert, and a check that
+          is merely taking its time is not an alert. */}
       {isChecking && (
-        <Message color="blue" className="fact-check-progress">
-          <MessageContent>
-            <div className="verify-claims">
-              <Spinner />
-              <span role="status" aria-live="polite">
-                {stageCopy}
-              </span>
-              <span className="fact-check-elapsed">
-                {intl.formatMessage(messages.elapsed, { seconds: elapsed })}
-              </span>
-            </div>
-            {elapsed >= 60 && (
-              <div className="fact-check-taking-long">
-                {intl.formatMessage(messages.takingLong)}
-              </div>
-            )}
-            {onCancelCheck && (
-              <Button
-                basic
-                className="fact-check-cancel"
-                onClick={onCancelCheck}
-                aria-label={intl.formatMessage(messages.cancel)}
-              >
-                {intl.formatMessage(messages.cancel)}
-              </Button>
-            )}
-          </MessageContent>
-        </Message>
+        <div className="fact-check-progress">
+          <SpinnerRing />
+          <span
+            className="fact-check-progress-text"
+            role="status"
+            aria-live="polite"
+          >
+            {stageCopy}
+          </span>
+          <span className="fact-check-progress-elapsed">
+            {intl.formatMessage(messages.elapsed, { seconds: elapsed })}
+          </span>
+          {onCancelCheck && (
+            <button
+              className="fact-check-progress-cancel"
+              type="button"
+              onClick={onCancelCheck}
+            >
+              {intl.formatMessage(messages.cancel)}
+            </button>
+          )}
+          {elapsed >= 60 && (
+            <span className="fact-check-progress-note">
+              {intl.formatMessage(messages.takingLong)}
+            </span>
+          )}
+        </div>
       )}
 
       {failure && (
-        <div className="fact-check-error">
-          <Message color={error?.outcome === 'busy' ? 'yellow' : 'red'}>
-            <MessageContent>
-              <div>{failure.message}</div>
-              {failure.hint && (
-                <div className="fact-check-error-hint">{failure.hint}</div>
-              )}
-            </MessageContent>
-          </Message>
+        <div
+          className="fact-check-error"
+          data-outcome={error?.outcome || 'unreachable'}
+        >
+          <span className="fact-check-error-text">{failure.message}</span>
+          {/* The action comes before the explanation: it belongs on the first
+              line with the message, and the hint wraps below. */}
           {canRetry && error?.outcome !== 'no_sources' ? (
-            <Button
+            <button
+              className="fact-check-error-retry"
+              type="button"
               onClick={retryHalloumi}
-              className="icon fact-check-retry"
               disabled={cooldown > 0}
             >
               <SVGIcon name={RotateIcon} />{' '}
               {cooldown > 0
                 ? intl.formatMessage(messages.retryIn, { seconds: cooldown })
                 : intl.formatMessage(messages.retry)}
-            </Button>
+            </button>
           ) : (
             !canRetry && (
-              <div className="fact-check-error-hint">
+              <span className="fact-check-error-hint">
                 {intl.formatMessage(messages.retriesExhausted)}
-              </div>
+              </span>
             )
+          )}
+          {failure.hint && (
+            <span className="fact-check-error-hint">{failure.hint}</span>
           )}
         </div>
       )}

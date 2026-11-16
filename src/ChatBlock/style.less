@@ -1234,6 +1234,7 @@ mark {
 
 .verify-claims {
   display: flex;
+  align-items: center;
   gap: 0.5em;
 }
 
@@ -1608,6 +1609,70 @@ mark {
 .halloumi-feedback-button {
   margin-top: 1.5em;
   font-size: 15px;
+
+  // The Fact-check button keeps its footprint while a check runs. The label and
+  // the "Fact-checking…" label share one grid cell, so the button never resizes
+  // and the answer below it never jumps when the state changes.
+  .ui.button.claims-btn {
+    display: inline-grid;
+    grid-template-areas: 'label';
+  }
+
+  .claims-btn-label,
+  .claims-btn-progress {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    grid-area: label;
+  }
+
+  .claims-btn-progress {
+    // The global .spinner is a 22px two-tone disc - far too heavy inside a
+    // button. Same treatment as .feedback-submit-spinner.
+    .spinner {
+      width: 1em;
+      height: 1em;
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      border-right-color: transparent;
+      animation: spin-rotate 0.75s linear infinite;
+      animation-delay: 0s;
+    }
+  }
+
+  .claims-btn-label[aria-hidden='true'] {
+    visibility: hidden;
+  }
+}
+
+.fact-check-progress {
+  .fact-check-elapsed {
+    color: @grey;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fact-check-taking-long {
+    margin-top: 0.5em;
+  }
+
+  .fact-check-cancel {
+    padding: 0.35em 0.9em;
+    margin-top: 0.75em;
+  }
+}
+
+.fact-check-error {
+  .fact-check-error-hint {
+    margin-top: 0.5em;
+    color: @grey;
+  }
+
+  .fact-check-retry {
+    margin-top: 0.5em;
+  }
 }
 
 .spinner {

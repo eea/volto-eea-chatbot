@@ -15,6 +15,7 @@ import {
   useDeepCompareMemoize,
   useQualityMarkers,
   useScrollonStream,
+  useSingleFlight,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 import { CHUNK_EVIDENCE_WINDOW } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chunkEvidence';
 import {
@@ -46,7 +47,13 @@ const HalloumiFeedback: any = loadable(
     import('@eeacms/volto-eea-chatbot/ChatBlock/components/HalloumiFeedback'),
 );
 
-function visit(node: any, type: string, visitor: (node: any, idx?: number, parent?: any) => void, idx?: number, parent?: any) {
+function visit(
+  node: any,
+  type: string,
+  visitor: (node: any, idx?: number, parent?: any) => void,
+  idx?: number,
+  parent?: any,
+) {
   if (node.type === type) {
     visitor(node, idx, parent);
   }
@@ -379,13 +386,58 @@ export function AIMessage({
   // Don't spend a fact-check call on blurbs while the real text is in flight.
   const doQualityControl = qualityControlRequested && evidenceSettled;
 
-  const { markers, isLoadingHalloumi, retryHalloumi }: any = useQualityMarkers(
+  const {
+    markers,
+    isLoadingHalloumi,
+    retryHalloumi,
+    startHalloumi,
+    cancelHalloumi,
+    error: qualityError,
+    status: qualityStatus,
+    canRetry,
+  }: any = useQualityMarkers(
     doQualityControl,
     addCitations(message.message, message),
     stableContextSources,
     maxContextSegments,
     batchSize,
   );
+
+  /**
+   * One state machine for the whole fact-check, so the UI can cover every
+   * stage. The evidence fetch used to be invisible: clicking Fact-check hid the
+   * button (it is part of `isFetching`) while the loading strip was gated on
+   * `isLoadingHalloumi`, leaving seconds of nothing on screen.
+   *
+   * `resolving_evidence` is deliberately driven by `qualityControlRequested &&
+   * !evidenceSettled` rather than by `isFetchingEvidence` - the hook flips that
+   * flag in an effect, one commit after the click, so gating on it would put the
+   * dead air back.
+   */
+  const factCheckPhase = markers
+    ? 'verdict'
+    : qualityStatus === 'cancelled'
+      ? 'cancelled'
+      : qualityControlRequested && !evidenceSettled
+        ? 'resolving_evidence'
+        : isLoadingHalloumi
+          ? 'checking'
+          : qualityError
+            ? 'failed'
+            : 'idle';
+
+  const isFactChecking =
+    factCheckPhase === 'resolving_evidence' || factCheckPhase === 'checking';
+
+  // Guards the click itself. `disabled` is rendered a commit later than the
+  // click, so state alone is not a double-submit guard - same reasoning as
+  // FeedbackModal.submitFeedback.
+  const factCheckFlight = useSingleFlight();
+  useEffect(() => {
+    if (!isFactChecking) {
+      factCheckFlight.release();
+    }
+  }, [isFactChecking, factCheckFlight]);
 
   const claims = markers?.claims || [];
   const emptyClaims = markers?.empty || false;
@@ -398,11 +450,15 @@ export function AIMessage({
   const halloumiMessage =
     isMessageVerified || doQualityControl ? scoreStage?.label : '';
 
+  // The button stays on screen while a check runs and changes state instead of
+  // disappearing: removing it made the click look like it did nothing, and it
+  // moved the rest of the answer around. It does step aside once a check has
+  // failed - the error block owns the retry affordance there.
   const showVerifyClaimsButton =
     messageDisplayed &&
     sources.length > 0 &&
-    !isFetching &&
     !markers &&
+    factCheckPhase !== 'failed' &&
     (qualityCheck === 'ondemand' ||
       (qualityCheck === 'ondemand_toggle' && !qualityCheckEnabled));
 
@@ -417,7 +473,9 @@ export function AIMessage({
       return;
     }
     if (isLastMessage && isComplete && onFetchRelatedQuestions) {
-      console.log(`[AIMessage] Triggering RQ: messageDisplayed=${messageDisplayed}, isComplete=${isComplete}, hasContent=${!!message.message}`);
+      console.log(
+        `[AIMessage] Triggering RQ: messageDisplayed=${messageDisplayed}, isComplete=${isComplete}, hasContent=${!!message.message}`,
+      );
       if (messageDisplayed) {
         onFetchRelatedQuestions();
       }
@@ -574,20 +632,25 @@ export function AIMessage({
       {/* Halloumi/Quality feedback */}
       {qualityCheck !== 'disabled' && !error && (
         <HalloumiFeedback
-          sources={sources}
           halloumiMessage={halloumiMessage}
-          isLoadingHalloumi={isLoadingHalloumi}
           markers={markers}
           score={score}
           scoreColor={scoreColor}
           onManualVerify={() => {
+            if (!factCheckFlight.claim()) return;
             setForceHallomi(true);
             setVerificationTriggered(true);
+            startHalloumi();
           }}
           showVerifyClaimsButton={showVerifyClaimsButton}
           retryHalloumi={retryHalloumi}
           emptyClaims={emptyClaims}
           contextQuality={markers?.context_quality}
+          phase={factCheckPhase}
+          sourceCount={dedupedSources.length}
+          error={qualityError}
+          canRetry={canRetry}
+          onCancelCheck={cancelHalloumi}
         />
       )}
 

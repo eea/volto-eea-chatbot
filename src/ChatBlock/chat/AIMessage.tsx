@@ -205,6 +205,42 @@ function getScoreDetails(rawClaims: any, qualityCheckStages: any) {
   return { score, scoreStage, isFirstScoreStage, scoreColor };
 }
 
+/**
+ * One state machine for the whole fact-check, so the UI can cover every stage.
+ * The evidence fetch used to be invisible: clicking Fact-check hid the button
+ * (it is part of `isFetching`) while the loading strip was gated on
+ * `isLoadingHalloumi`, leaving seconds of nothing on screen.
+ *
+ * `resolving_evidence` is deliberately driven by `requested && !evidenceSettled`
+ * rather than by `isFetchingEvidence` - the hook flips that flag in an effect,
+ * one commit after the click, so gating on it would put the dead air back.
+ */
+export function getFactCheckPhase({
+  markers,
+  qualityStatus,
+  requested,
+  evidenceSettled,
+  loading,
+  qualityError,
+}) {
+  if (markers) {
+    return 'verdict';
+  }
+  if (qualityStatus === 'cancelled') {
+    return 'cancelled';
+  }
+  if (requested && !evidenceSettled) {
+    return 'resolving_evidence';
+  }
+  if (loading) {
+    return 'checking';
+  }
+  if (qualityError) {
+    return 'failed';
+  }
+  return 'idle';
+}
+
 export function AIMessage({
   message,
   prevMessage,
@@ -403,28 +439,14 @@ export function AIMessage({
     batchSize,
   );
 
-  /**
-   * One state machine for the whole fact-check, so the UI can cover every
-   * stage. The evidence fetch used to be invisible: clicking Fact-check hid the
-   * button (it is part of `isFetching`) while the loading strip was gated on
-   * `isLoadingHalloumi`, leaving seconds of nothing on screen.
-   *
-   * `resolving_evidence` is deliberately driven by `qualityControlRequested &&
-   * !evidenceSettled` rather than by `isFetchingEvidence` - the hook flips that
-   * flag in an effect, one commit after the click, so gating on it would put the
-   * dead air back.
-   */
-  const factCheckPhase = markers
-    ? 'verdict'
-    : qualityStatus === 'cancelled'
-      ? 'cancelled'
-      : qualityControlRequested && !evidenceSettled
-        ? 'resolving_evidence'
-        : isLoadingHalloumi
-          ? 'checking'
-          : qualityError
-            ? 'failed'
-            : 'idle';
+  const factCheckPhase = getFactCheckPhase({
+    markers,
+    qualityStatus,
+    requested: qualityControlRequested,
+    evidenceSettled,
+    loading: isLoadingHalloumi,
+    qualityError,
+  });
 
   const isFactChecking =
     factCheckPhase === 'resolving_evidence' || factCheckPhase === 'checking';

@@ -81,7 +81,7 @@ async function readErrorEnvelope(response) {
   }
   try {
     const body = await response.json();
-    return { ...(body || {}), status: response.status };
+    return { ...body, status: response.status };
   } catch {
     return { nonJson: true, status: response.status };
   }
@@ -95,22 +95,20 @@ async function readErrorEnvelope(response) {
  * verify in time. That is a timeout, not an outage, and telling the user the
  * service is down would be a lie.
  */
-function classifyFailure(envelope, abortReason) {
-  if (abortReason === 'timeout') {
+function classifyFailure(envelope, timedOut = false) {
+  if (timedOut) {
+    return { outcome: QUALITY_CHECK_OUTCOME.timeout };
+  }
+
+  if (envelope?.nonJson) {
     return { outcome: QUALITY_CHECK_OUTCOME.timeout };
   }
 
   const status = envelope?.status;
   const code = envelope?.code;
+  const isBusy = code === 'busy' || status === 429 || status === 503;
 
-  if (envelope?.nonJson) {
-    // A non-JSON 503 is Varnish cutting the connection at first_byte_timeout:
-    // the checker was working, the answer was simply too big to verify in time.
-    // Our own "busy" rejection is always JSON with an explicit code.
-    return { outcome: QUALITY_CHECK_OUTCOME.timeout };
-  }
-
-  if (code === 'busy' || status === 429 || status === 503) {
+  if (isBusy) {
     return {
       outcome: QUALITY_CHECK_OUTCOME.busy,
       retryAfter: envelope?.retry_after ?? null,
@@ -118,6 +116,30 @@ function classifyFailure(envelope, abortReason) {
   }
 
   return { outcome: QUALITY_CHECK_OUTCOME.unreachable };
+}
+
+/**
+ * Read an upstream response into either a checker body or a failure, without
+ * touching React state - the caller decides whether the answer is still wanted.
+ */
+async function interpretResponse(response, timedOut) {
+  if (!response.ok) {
+    const envelope = await readErrorEnvelope(response);
+    return { failure: classifyFailure(envelope, timedOut), envelope };
+  }
+
+  const body = await response.json();
+
+  // The legacy proxy answers 200 with `{ error }` for its own misconfiguration;
+  // treat that as unreachable rather than as a verdict.
+  if (body?.error) {
+    return {
+      failure: { outcome: QUALITY_CHECK_OUTCOME.unreachable },
+      envelope: body,
+    };
+  }
+
+  return { body };
 }
 
 function reportToSentry(error, context) {
@@ -135,6 +157,17 @@ function reportToSentry(error, context) {
   } catch {
     // loadable not available (tests, SSR) - ignore.
   }
+}
+
+// The Onyx stream carries documents as search blurbs; prefer the structured
+// source objects the block builds when they are available.
+function toHalloumiSources(sources) {
+  const hasStructuredSources =
+    sources[0] && typeof sources[0].halloumiSource === 'object';
+
+  return hasStructuredSources
+    ? sources.map(({ halloumiSource }) => halloumiSource)
+    : sources.map(({ halloumiContext }) => halloumiContext);
 }
 
 /**
@@ -178,51 +211,49 @@ export function useQualityMarkers(
   // explicit transition back to 'idle' (a retry, or a user-requested start) may
   // launch a request.
   const statusRef = React.useRef('idle');
+
   const setPhase = React.useCallback((next) => {
     statusRef.current = next;
     setStatus(next);
   }, []);
 
   const abortInFlight = React.useCallback(() => {
-    if (abortRef.current) {
-      try {
-        abortRef.current.abort('superseded');
-      } catch {
-        // already settled
-      }
-      abortRef.current = null;
+    if (!abortRef.current) {
+      return;
     }
+    try {
+      abortRef.current.abort('superseded');
+    } catch {
+      // already settled
+    }
+    abortRef.current = null;
   }, []);
 
   React.useEffect(() => {
+    const commitFailure = (failure) => {
+      setError(failure);
+      setPhase('error');
+      setFailures((f) => f + 1);
+    };
+
     async function handler() {
-      // Prefer structured sources (with title metadata) over plain text.
-      // Fall back to halloumiContext strings for backward compatibility.
-      const firstSource = sources[0];
-      const hasStructuredSources =
-        firstSource && typeof firstSource.halloumiSource === 'object';
-
-      const halloumiSources = hasStructuredSources
-        ? sources.map(({ halloumiSource }) => halloumiSource)
-        : sources.map(({ halloumiContext }) => halloumiContext);
-
       if (sources.length === 0) {
         setError({ outcome: QUALITY_CHECK_OUTCOME.no_sources });
         setPhase('error');
         return;
       }
 
+      const halloumiSources = toHalloumiSources(sources);
       const seq = ++requestSeq.current;
       const controller = createController();
       abortRef.current = controller;
 
-      // Why this request ended up in the catch block. Only the timer sets it:
-      // every other abort is a supersede or a cancel, and those are already
-      // handled by the sequence-number check below.
-      let abortReason = null;
-
+      // Whether *this* request ran out of budget. Every other way an abort can
+      // happen is a supersede or a cancel, and those are already handled by the
+      // sequence-number check below.
+      let timedOut = false;
       const timer = setTimeout(() => {
-        abortReason = 'timeout';
+        timedOut = true;
         try {
           controller.abort('timeout');
         } catch {
@@ -231,6 +262,11 @@ export function useQualityMarkers(
       }, timeoutMs);
 
       const started = Date.now();
+      const context = () => ({
+        latencyMs: Date.now() - started,
+        sources: halloumiSources.length,
+      });
+
       setPhase('loading');
       setError(null);
 
@@ -242,77 +278,36 @@ export function useQualityMarkers(
           batchSize,
           controller.signal,
         );
+        const result = await interpretResponse(response, timedOut);
 
-        if (!response.ok) {
-          const envelope = await readErrorEnvelope(response);
-          const failure = classifyFailure(envelope, abortReason);
-          if (seq !== requestSeq.current) return;
+        if (seq !== requestSeq.current) {
+          return;
+        }
+
+        if (result.failure) {
           reportToSentry(
-            envelope?.error || `Fact-check failed: HTTP ${response.status}`,
-            {
-              outcome: failure.outcome,
-              status: response.status,
-              latencyMs: Date.now() - started,
-              sources: halloumiSources.length,
-            },
+            result.envelope?.error ||
+              `Fact-check failed: HTTP ${response.status}`,
+            { ...context(), outcome: result.failure.outcome },
           );
-          setError(failure);
-          setPhase('error');
-          setFailures((f) => f + 1);
+          commitFailure(result.failure);
           return;
         }
 
-        const body = await response.json();
-
-        // The legacy proxy answers 200 with `{ error }` for its own
-        // misconfiguration; treat that as unreachable rather than as a verdict.
-        if (body?.error) {
-          if (seq !== requestSeq.current) return;
-          reportToSentry(body.error, {
-            outcome: QUALITY_CHECK_OUTCOME.unreachable,
-            latencyMs: Date.now() - started,
-            sources: halloumiSources.length,
-          });
-          setError({ outcome: QUALITY_CHECK_OUTCOME.unreachable });
-          setPhase('error');
-          setFailures((f) => f + 1);
-          return;
-        }
-
-        if (seq !== requestSeq.current) return;
-        setMarkers(body);
+        setMarkers(result.body);
         setError(null);
         setPhase('done');
       } catch (err) {
-        if (seq !== requestSeq.current) return;
-
-        if (abortReason === 'superseded') {
-          // A newer request owns the UI now; say nothing.
+        if (seq !== requestSeq.current) {
           return;
         }
 
-        const failure = classifyFailure(
-          abortReason === 'timeout' ? { status: 504 } : {},
-          abortReason,
+        const failure = classifyFailure({ status: 504 }, timedOut);
+        reportToSentry(
+          timedOut ? new Error('Fact-check timed out in the browser') : err,
+          { ...context(), outcome: failure.outcome, timeoutMs },
         );
-
-        if (failure.outcome === QUALITY_CHECK_OUTCOME.timeout) {
-          reportToSentry(new Error('Fact-check timed out in the browser'), {
-            latencyMs: Date.now() - started,
-            timeoutMs,
-            sources: halloumiSources.length,
-          });
-        } else {
-          reportToSentry(err, {
-            outcome: failure.outcome,
-            latencyMs: Date.now() - started,
-            sources: halloumiSources.length,
-          });
-        }
-
-        setError(failure);
-        setPhase('error');
-        setFailures((f) => f + 1);
+        commitFailure(failure);
       } finally {
         clearTimeout(timer);
         if (abortRef.current === controller) {
@@ -343,7 +338,9 @@ export function useQualityMarkers(
 
   /** Re-run after a failure. Bounded, because each attempt is a real LLM run. */
   const retryHalloumi = React.useCallback(() => {
-    if (failures >= MAX_QUALITY_CHECK_ATTEMPTS) return;
+    if (failures >= MAX_QUALITY_CHECK_ATTEMPTS) {
+      return;
+    }
     abortInFlight();
     setMarkers(null);
     setError(null);

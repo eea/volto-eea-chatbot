@@ -42,6 +42,98 @@ const MAX_CONCURRENT_CHECKS = 2;
 
 let inFlight = 0;
 
+function isTimeoutError(error) {
+  return (
+    error?.name === 'FetchError' &&
+    (error?.type === 'request-timeout' || /timeout/i.test(error?.message || ''))
+  );
+}
+
+/**
+ * Health is a cheap GET and must not be gated by the fact-check concurrency
+ * cap - a busy checker is still a live checker.
+ */
+async function proxyHealth(res) {
+  try {
+    const response = await fetch(`${RAG_FACT_CHECKER_URL}/health`, {
+      method: 'GET',
+      timeout: 5000,
+    });
+    const result = await response.json().catch(() => ({}));
+    res.status(response.ok ? 200 : 503).send({
+      ...result,
+      status: response.ok ? 'ok' : 'unavailable',
+    });
+  } catch (error) {
+    log('Halloumi health error', error);
+    res.status(503).send({
+      error: `Fact-checker unavailable: ${error.message || 'connection failed'}`,
+      code: 'unreachable',
+    });
+  }
+}
+
+async function proxyGenerate(req, res) {
+  const { sources, answer, batch_size } = req.body;
+
+  log('Halloumi request body', {
+    answer,
+    sources: sources?.length,
+  });
+
+  try {
+    const response = await fetch(`${RAG_FACT_CHECKER_URL}/halloumi/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        answer,
+        sources,
+        max_context_segments: 0,
+        ...(batch_size != null && { batch_size }),
+      }),
+      timeout: UPSTREAM_TIMEOUT_MS,
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      log('Halloumi response', result);
+      res.send(result);
+      return;
+    }
+
+    log('Halloumi error response', result);
+    const isBusy = response.status === 429 || response.status === 503;
+    res.status(response.status).send({
+      error: `Fact-checker error: ${
+        result.detail || result.error || 'unknown error'
+      }`,
+      code: isBusy ? 'busy' : 'upstream_error',
+      ...(isBusy && { retry_after: result.retry_after ?? 30 }),
+    });
+  } catch (error) {
+    log('Halloumi fetch error', error);
+
+    if (isTimeoutError(error)) {
+      // Distinct from "unreachable": the service is up, this particular answer
+      // simply could not be verified inside the budget. The UI says so, instead
+      // of telling the user the service is down.
+      res.status(504).send({
+        error: 'Fact-checker timed out',
+        code: 'timeout',
+      });
+      return;
+    }
+
+    res.status(502).send({
+      error: `Fact-checker unavailable: ${error.message || 'connection failed'}`,
+      code: 'unreachable',
+    });
+  }
+}
+
 export default async function middleware(req, res, next) {
   const path = req.url.replace('/_ha/', '/');
 
@@ -63,26 +155,8 @@ export default async function middleware(req, res, next) {
 
   res.set('Content-Type', 'application/json');
 
-  // Health is a cheap GET and must not be gated by the fact-check concurrency
-  // cap - a busy checker is still a live checker.
   if (path === '/health') {
-    try {
-      const response = await fetch(`${RAG_FACT_CHECKER_URL}/health`, {
-        method: 'GET',
-        timeout: 5000,
-      });
-      const result = await response.json().catch(() => ({}));
-      res.status(response.ok ? 200 : 503).send({
-        ...result,
-        status: response.ok ? 'ok' : 'unavailable',
-      });
-    } catch (error) {
-      log('Halloumi health error', error);
-      res.status(503).send({
-        error: `Fact-checker unavailable: ${error.message || 'connection failed'}`,
-        code: 'unreachable',
-      });
-    }
+    await proxyHealth(res);
     return;
   }
 
@@ -96,69 +170,9 @@ export default async function middleware(req, res, next) {
     return;
   }
 
-  const body = req.body;
-  const { sources, answer, batch_size } = body;
-
-  log('Halloumi request body', {
-    answer,
-    sources: sources?.length,
-  });
-
   inFlight += 1;
   try {
-    const response = await fetch(`${RAG_FACT_CHECKER_URL}/halloumi/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        answer,
-        sources,
-        max_context_segments: 0,
-        ...(batch_size != null && { batch_size }),
-      }),
-      timeout: UPSTREAM_TIMEOUT_MS,
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      log('Halloumi error response', result);
-      const isBusy = response.status === 429 || response.status === 503;
-      res.status(response.status).send({
-        error: `Fact-checker error: ${
-          result.detail || result.error || 'unknown error'
-        }`,
-        code: isBusy ? 'busy' : 'upstream_error',
-        ...(isBusy && { retry_after: result.retry_after ?? 30 }),
-      });
-      return;
-    }
-
-    log('Halloumi response', result);
-    res.send(result);
-  } catch (error) {
-    const isTimeout =
-      error?.name === 'FetchError' &&
-      (error?.type === 'request-timeout' ||
-        /timeout/i.test(error?.message || ''));
-    log('Halloumi fetch error', error);
-
-    if (isTimeout) {
-      // Distinct from "unreachable": the service is up, this particular answer
-      // simply could not be verified inside the budget. The UI says so, instead
-      // of telling the user the service is down.
-      res.status(504).send({
-        error: 'Fact-checker timed out',
-        code: 'timeout',
-      });
-      return;
-    }
-
-    res.status(502).send({
-      error: `Fact-checker unavailable: ${error.message || 'connection failed'}`,
-      code: 'unreachable',
-    });
+    await proxyGenerate(req, res);
   } finally {
     inFlight -= 1;
   }

@@ -302,7 +302,11 @@ describe('halloumi middleware', () => {
     );
 
     const running = middleware(req, res, next);
-    await Promise.resolve();
+    // The proxy reaches the upstream call synchronously, before its first
+    // await, so the request exists by the time middleware() hands back a
+    // promise. Asserted rather than assumed, so a regression reads as a failed
+    // expectation instead of a TypeError on undefined.
+    expect(mockedFetch).toHaveBeenCalledTimes(1);
 
     req.emit('close');
     await running;

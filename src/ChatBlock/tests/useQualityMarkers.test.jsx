@@ -334,7 +334,15 @@ describe('useQualityMarkers', () => {
 });
 
 describe('useQualityMarkers cancel/restart cycles', () => {
-  const abortableFetch = () =>
+  /**
+   * A fetch that stays in flight until it is aborted.
+   *
+   * The first version resolved on a 5ms timer, and the assertion then raced it:
+   * locally the status was still 'loading', in CI the response had already
+   * landed and it was 'done'. A request that only settles when cancelled or
+   * answered makes the state under test deterministic.
+   */
+  const pendingFetch = () =>
     jest.fn((url, opts) => {
       return new Promise((resolve, reject) => {
         if (opts?.signal) {
@@ -344,12 +352,11 @@ describe('useQualityMarkers cancel/restart cycles', () => {
             reject(err);
           });
         }
-        setTimeout(() => resolve(jsonResponse(okBody)), 5);
       });
     });
 
   beforeEach(() => {
-    global.fetch = abortableFetch();
+    global.fetch = pendingFetch();
   });
 
   it('keeps working across repeated cancel then restart cycles', async () => {
@@ -359,6 +366,7 @@ describe('useQualityMarkers cancel/restart cycles', () => {
       await tick();
     });
     expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(result.current.status).toBe('loading');
 
     for (let cycle = 1; cycle <= 4; cycle++) {
       act(() => result.current.cancelHalloumi());

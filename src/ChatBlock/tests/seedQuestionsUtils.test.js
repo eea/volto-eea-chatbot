@@ -7,6 +7,7 @@ import {
   saveCachedSeedQuestions,
   normalizeTopics,
   sanitizeQuestionText,
+  stripCitations,
   DEFAULT_SEED_QUESTIONS_COUNT,
   DEFAULT_SEED_QUESTIONS_CACHE_MINUTES,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/seedQuestions';
@@ -89,6 +90,75 @@ describe('seedQuestions utilities', () => {
         'First question?',
         'Second question?',
       ]);
+    });
+
+    it('strips markdown citation links and URLs from extracted questions', () => {
+      const input = [
+        'What sectors contributed the largest share of EU greenhouse gas emissions in 2020? [[2]](https://www.eea.europa.eu/en/analysis/publications/zero-pollution)  ',
+        'What percentage of European bathing waters met quality requirements in 2021? [[3]](https://www.eea.europa.eu/en/analysis/publications/zero-pollution/health/water-pollution-and-health)',
+        'What proportion of EU water abstraction is allocated to water reuse? [[6]](https://www.eea.europa.eu/en/newsroom/editorial/water-for-people-nature-and-the-economy)',
+      ].join('\n');
+
+      expect(extractQuestions(input)).toEqual([
+        'What sectors contributed the largest share of EU greenhouse gas emissions in 2020?',
+        'What percentage of European bathing waters met quality requirements in 2021?',
+        'What proportion of EU water abstraction is allocated to water reuse?',
+      ]);
+    });
+
+    it('strips citations when a persona name is also provided', () => {
+      const input = 'What is climate change? [[1]](https://example.org/a) [2]';
+      expect(extractQuestions(input, 'EEA Assistant')).toEqual([
+        'What is climate change?',
+      ]);
+    });
+  });
+
+  describe('stripCitations', () => {
+    it('returns empty string for invalid input', () => {
+      expect(stripCitations('')).toBe('');
+      expect(stripCitations(null)).toBe('');
+      expect(stripCitations(undefined)).toBe('');
+    });
+
+    it('removes markdown citation links entirely', () => {
+      expect(
+        stripCitations(
+          'Which pollutant matters most? [[2]](https://www.eea.europa.eu/x)',
+        ),
+      ).toBe('Which pollutant matters most?');
+    });
+
+    it('removes bracketed reference numbers', () => {
+      expect(stripCitations('How is air quality measured? [1]')).toBe(
+        'How is air quality measured?',
+      );
+      expect(stripCitations('How is air quality measured? [[1]] [2]')).toBe(
+        'How is air quality measured?',
+      );
+      expect(stripCitations('How is air quality measured? [1, 2]')).toBe(
+        'How is air quality measured?',
+      );
+    });
+
+    it('removes bare URLs', () => {
+      expect(
+        stripCitations(
+          'What is the target? https://www.eea.europa.eu/en/analysis/target',
+        ),
+      ).toBe('What is the target?');
+    });
+
+    it('keeps the label of non-citation markdown links', () => {
+      expect(
+        stripCitations('What is the [EU Green Deal](https://example.org)?'),
+      ).toBe('What is the EU Green Deal?');
+    });
+
+    it('leaves plain questions untouched', () => {
+      expect(stripCitations('How are wetlands protected?')).toBe(
+        'How are wetlands protected?',
+      );
     });
   });
 

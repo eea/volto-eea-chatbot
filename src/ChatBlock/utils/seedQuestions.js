@@ -9,6 +9,44 @@ export const DEFAULT_SEED_QUESTIONS_CACHE_MINUTES = 10;
  */
 
 /**
+ * Remove citation markers and URLs emitted by the LLM.
+ * Handles markdown citation links ([[1]](https://...)), bracketed reference
+ * numbers ([1], [[2]], [1, 2]), plain markdown links and bare URLs.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+export function stripCitations(text) {
+  if (!text || typeof text !== 'string') return '';
+
+  let cleaned = text;
+
+  // Citation links: [[1]](https://...) or [1](https://...)
+  cleaned = cleaned.replace(
+    /\[{1,2}\s*\d+(?:\s*[,;\u2013-]\s*\d+)*\s*\]{1,2}\(\s*https?:\/\/[^)\s]*\s*\)/g,
+    '',
+  );
+
+  // Any remaining markdown link: keep the visible label only
+  cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+
+  // Bracketed reference numbers: [1], [[2]], [1, 2], [1][2]
+  cleaned = cleaned.replace(
+    /\[{1,2}\s*\d+(?:\s*[,;\u2013-]\s*\d+)*\s*\]{1,2}/g,
+    '',
+  );
+
+  // Bare URLs
+  cleaned = cleaned.replace(/<?\bhttps?:\/\/[^\s)>\]}'"]+>?/g, '');
+
+  cleaned = cleaned.replace(/[ \t]{2,}/g, ' ');
+  // Remove whitespace left before punctuation (e.g. "question ?")
+  cleaned = cleaned.replace(/\s+([?.!,;:])/g, '$1');
+
+  return cleaned.trim();
+}
+
+/**
  * Sanitize question text to remove unwanted references to the assistant name.
  *
  * @param {string} question
@@ -119,13 +157,14 @@ export function extractQuestions(str, personaName) {
       .filter((q) => Boolean(q));
   }
 
-  if (personaName) {
+  if (personaName && typeof personaName === 'string') {
     return rawQuestions
       .map((q) => sanitizeQuestionText(q, personaName))
+      .map((q) => stripCitations(q))
       .filter(Boolean);
   }
 
-  return rawQuestions;
+  return rawQuestions.map((q) => stripCitations(q)).filter(Boolean);
 }
 
 /**

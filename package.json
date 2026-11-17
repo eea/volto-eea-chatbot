@@ -1,6 +1,7 @@
 {
   "name": "@eeacms/volto-eea-chatbot-dev",
-  "version": "1.0.0-alpha.0",
+  "private": true,
+  "version": "5.0.0",
   "description": "@eeacms/volto-eea-chatbot: Volto add-on",
   "author": "European Environment Agency: IDM2 A-Team",
   "homepage": "https://github.com/eea/volto-eea-chatbot",

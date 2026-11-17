@@ -48,3 +48,7 @@ acceptance/node_modules
 /core
 results
 /public
+
+# local links to sibling add-ons, created while developing them together
+/packages/*
+!/packages/volto-eea-chatbot/

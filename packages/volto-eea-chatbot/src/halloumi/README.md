@@ -111,6 +111,113 @@ without the other breaks highlighting.
 | ---------------------- | ----------------------- | ---------------------------------------- |
 | `RAG_FACT_CHECKER_URL` | `http://localhost:8000` | Base URL of the rag-fact-checker service |
 
+## Timeout budget — and the discrepancies in it
+
+A fact-check request travels a long proxy chain before it reaches this service.
+The limits below were read out of `helm-charts/sources/cca-frontend` (chart
+`cca-frontend`) and `eeacms/plone-varnish`, on 2026-11-13. They are **not**
+configured together anywhere, which is the problem: each hop was set on its own,
+and nobody owns the chain. Verify them again before relying on any number here.
+
+| hop                                       | limit                                              | where it is set                                                    |
+| ----------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------ |
+| browser → ingress-nginx                   | read **480s**, send 120s                           | `values.yaml` → `ingress.annotations`                              |
+| ingress-nginx → edge nginx                | —                                                  | `templates/ingress.yaml`                                           |
+| edge nginx → `varnish_frontend`           | connect 60s, read/send 600s                        | `templates/nginx-configmap.yaml`                                   |
+| **varnish → Volto SSR**                   | connect 2s, **first_byte 300s**, between_bytes 60s | `eeacms/plone-varnish` `Dockerfile` (`-p first_byte_timeout=300s`) |
+| Volto SSR → rag-fact-checker (this proxy) | **none**                                           | `middleware.js` — `node-fetch` without `timeout`                   |
+| rag-fact-checker → LLM gateway            | **120s per judge call**                            | `values.yaml` → `ragFactsCheck.environment.LLM_TIMEOUT`            |
+
+The four discrepancies that matter:
+
+1. **The binding limit is Varnish's `first_byte_timeout=300s`, and it is the only
+   hop nobody chose.** `/_ha/generate` is a long, non-cacheable POST, but it
+   rides `location /` → `varnish_frontend` — the same route as page HTML.
+   Varnish cannot cache anything on it, so in this path it contributes only a
+   300s ceiling, pressure on `thread_pools=8 / thread_pool_timeout=120`, and
+   HTML error pages. The ingress above it allows 480s, which is unreachable in
+   practice. (Bypassing Varnish for `/_ha` would fix the class of problem, but
+   **nginx is deliberately left alone** — so the 300s ceiling is a fixed
+   constraint the add-on has to design around, not a knob to turn.)
+2. **`LLM_TIMEOUT=120` is per judge call, not per request.** The chart comment
+   next to it says "keep the whole request well under" Varnish's 300s, but the
+   value does not enforce that. rag-fact-check does claim extraction plus one
+   judge call **per claim**, so N claims can legitimately need up to N × 120s.
+   A typical answer finishes in well under a minute; a 3+ claim answer behind a
+   slow gateway can exceed 300s on its own. "A minute per generate" is a
+   per-call expectation, not a per-request one.
+3. **This proxy has no timeout at all.** A hung upstream pins an Express request
+   (and a browser connection, and a Varnish worker) until Varnish gives up at
+   300s. `volto.replicaCount: 1` with `autoscaling.enabled: false` (2Gi) and
+   `ragFactsCheck.replicaCount: 1` (1Gi, no HPA) mean a handful of concurrent
+   slow checks degrades the whole site, not just the chat.
+4. **When Varnish wins, the client gets HTML, not JSON.** A check past 300s is
+   cut off by Varnish with a 503 HTML page. `useQualityMarkers` calls
+   `response.json()` without checking `ok` or `content-type`, so it throws, and
+   the user is told "Halloumi service is unreachable or timed out" — which is
+   wrong: the service was working, the answer just had too much in it to check in
+   time. This is the most likely slow-service failure in production.
+
+The ordering the add-on must therefore keep:
+
+```
+client abort          240s   → the user sees our message
+this proxy's timeout  270s   → the SSR returns a JSON 504 envelope
+Varnish first_byte    300s   → fixed ceiling, nginx is not being changed
+ingress read          480s   → unreachable in practice
+```
+
+Each layer must give up before the one above it, otherwise the browser receives
+someone else's HTML error page instead of a message we wrote.
+
+Two more things worth knowing from the same chart:
+
+- `ragFactsCheck.enabled: true` wires `/health` into liveness, readiness and
+  startup probes on `rag-facts-check:8000`. The service is **cluster-internal and
+  unauthenticated**, so a UI health probe must go through this proxy's allowlist,
+  never straight from the browser.
+- An empty `RAG_FACT_CHECKER_URL` with the service disabled falls back to
+  `http://localhost:8000`, so every check fails with "Fact-checker unavailable".
+  In the UI today that is indistinguishable from a transient outage.
+
+## Failure envelope
+
+Every non-success from this proxy is JSON with a `code`, so the browser can say
+something specific instead of one generic message:
+
+| HTTP | `code`        | when                                                                                           |
+| ---- | ------------- | ---------------------------------------------------------------------------------------------- |
+| 502  | `unreachable` | connection to the checker failed                                                               |
+| 503  | `busy`        | the proxy's own concurrency cap was hit, or the checker rate-limited us; carries `retry_after` |
+| 504  | `timeout`     | the checker did not answer inside `UPSTREAM_TIMEOUT_MS`                                        |
+| 200  | `error`       | legacy shape, kept: a 200 carrying `{ error }` is treated as unreachable by the client         |
+
+The client (`ChatBlock/hooks/useQualityMarkers`) maps these to
+`QUALITY_CHECK_OUTCOME` — `unreachable`, `busy`, `timeout`, `no_sources` — and
+renders different copy for each. Two rules worth preserving:
+
+- **A non-JSON 503 is a timeout, not an outage.** That is Varnish cutting the
+  connection, meaning the checker was working and the answer was simply too big
+  to verify in one pass. Telling the user the service is down would be wrong.
+- **`cancelled` is not a failure.** The user pressing Cancel returns the answer
+  to its unverified state with the button re-enabled; it must never render an
+  error message.
+
+The proxy also caps concurrent checks (`MAX_CONCURRENT_CHECKS`) rather than
+queueing them: one replica, no HPA, and each check is a chain of LLM judge
+calls, so queueing turns one chatty user into a multi-minute wait for everyone.
+`/health` is deliberately exempt from the cap — a busy checker is still a live
+checker.
+
+**The cap only holds if a cancel reaches upstream.** The browser aborting its
+fetch says nothing to the checker, which by then is several LLM calls deep, and
+the abandoned request keeps holding one of the two slots until it finishes. Two
+cancels are then enough to wedge the service: every later check is rejected as
+`busy`, and the client-side retry cap turns that into a message with no working
+affordance at all. So `proxyGenerate` wires `req.on('close')` to an
+`AbortController` on the upstream fetch, and a request the client walked away
+from is logged as abandoned rather than answered or reported as an outage.
+
 ## Original Halloumi
 
 The original implementation was based on Apache2 licensed https://github.com/oumi-ai/halloumi-demo/tree/d088e1f25e7785326a53bc120113e226ee2f54b7

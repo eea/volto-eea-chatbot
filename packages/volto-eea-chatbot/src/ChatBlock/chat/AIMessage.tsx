@@ -15,6 +15,7 @@ import {
   useDeepCompareMemoize,
   useQualityMarkers,
   useScrollonStream,
+  useSingleFlight,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 import { CHUNK_EVIDENCE_WINDOW } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chunkEvidence';
 import {
@@ -204,6 +205,75 @@ function getScoreDetails(rawClaims: any, qualityCheckStages: any) {
   return { score, scoreStage, isFirstScoreStage, scoreColor };
 }
 
+/**
+ * One state machine for the whole fact-check, so the UI can cover every stage.
+ * The evidence fetch used to be invisible: clicking Fact-check hid the button
+ * (it is part of `isFetching`) while the loading strip was gated on
+ * `isLoadingHalloumi`, leaving seconds of nothing on screen.
+ *
+ * `resolving_evidence` is deliberately driven by `requested && !evidenceSettled`
+ * rather than by `isFetchingEvidence` - the hook flips that flag in an effect,
+ * one commit after the click, so gating on it would put the dead air back.
+ */
+export function getFactCheckPhase({
+  markers,
+  qualityStatus,
+  requested,
+  evidenceSettled,
+  loading,
+  qualityError,
+}) {
+  if (markers) {
+    return 'verdict';
+  }
+  if (qualityStatus === 'cancelled') {
+    return 'cancelled';
+  }
+  if (requested && !evidenceSettled) {
+    return 'resolving_evidence';
+  }
+  if (loading) {
+    return 'checking';
+  }
+  if (qualityError) {
+    return 'failed';
+  }
+  return 'idle';
+}
+
+/**
+ * Whether the Fact-check button is on screen.
+ *
+ * It steps aside while a check runs - the progress strip already says the same
+ * thing - and after a failure, where the error block owns the retry. The one
+ * exception is a spent retry budget: the capped Retry in the error block is
+ * gone by then, and hiding the button would leave the message with no way to
+ * try again.
+ */
+export function shouldShowVerifyClaimsButton({
+  messageDisplayed,
+  sourceCount,
+  markers,
+  phase,
+  canRetry,
+  qualityCheck,
+  qualityCheckEnabled,
+}) {
+  const onDemand =
+    qualityCheck === 'ondemand' ||
+    (qualityCheck === 'ondemand_toggle' && !qualityCheckEnabled);
+
+  return (
+    messageDisplayed &&
+    sourceCount > 0 &&
+    !markers &&
+    onDemand &&
+    phase !== 'resolving_evidence' &&
+    phase !== 'checking' &&
+    (phase !== 'failed' || !canRetry)
+  );
+}
+
 export function AIMessage({
   message,
   prevMessage,
@@ -385,13 +455,44 @@ export function AIMessage({
   // Don't spend a fact-check call on blurbs while the real text is in flight.
   const doQualityControl = qualityControlRequested && evidenceSettled;
 
-  const { markers, isLoadingHalloumi, retryHalloumi }: any = useQualityMarkers(
+  const {
+    markers,
+    isLoadingHalloumi,
+    retryHalloumi,
+    startHalloumi,
+    cancelHalloumi,
+    error: qualityError,
+    status: qualityStatus,
+    canRetry,
+  }: any = useQualityMarkers(
     doQualityControl,
     addCitations(message.message, message),
     stableContextSources,
     maxContextSegments,
     batchSize,
   );
+
+  const factCheckPhase = getFactCheckPhase({
+    markers,
+    qualityStatus,
+    requested: qualityControlRequested,
+    evidenceSettled,
+    loading: isLoadingHalloumi,
+    qualityError,
+  });
+
+  const isFactChecking =
+    factCheckPhase === 'resolving_evidence' || factCheckPhase === 'checking';
+
+  // Guards the click itself. `disabled` is rendered a commit later than the
+  // click, so state alone is not a double-submit guard - same reasoning as
+  // FeedbackModal.submitFeedback.
+  const factCheckFlight = useSingleFlight();
+  useEffect(() => {
+    if (!isFactChecking) {
+      factCheckFlight.release();
+    }
+  }, [isFactChecking, factCheckFlight]);
 
   const claims = markers?.claims || [];
   const emptyClaims = markers?.empty || false;
@@ -404,13 +505,15 @@ export function AIMessage({
   const halloumiMessage =
     isMessageVerified || doQualityControl ? scoreStage?.label : '';
 
-  const showVerifyClaimsButton =
-    messageDisplayed &&
-    sources.length > 0 &&
-    !isFetching &&
-    !markers &&
-    (qualityCheck === 'ondemand' ||
-      (qualityCheck === 'ondemand_toggle' && !qualityCheckEnabled));
+  const showVerifyClaimsButton = shouldShowVerifyClaimsButton({
+    messageDisplayed,
+    sourceCount: sources.length,
+    markers,
+    phase: factCheckPhase,
+    canRetry,
+    qualityCheck,
+    qualityCheckEnabled,
+  });
 
   const showTotalFailMessage =
     messageDisplayed &&
@@ -582,20 +685,25 @@ export function AIMessage({
       {/* Halloumi/Quality feedback */}
       {qualityCheck !== 'disabled' && !error && (
         <HalloumiFeedback
-          sources={sources}
           halloumiMessage={halloumiMessage}
-          isLoadingHalloumi={isLoadingHalloumi}
           markers={markers}
           score={score}
           scoreColor={scoreColor}
           onManualVerify={() => {
+            if (!factCheckFlight.claim()) return;
             setForceHallomi(true);
             setVerificationTriggered(true);
+            startHalloumi();
           }}
           showVerifyClaimsButton={showVerifyClaimsButton}
           retryHalloumi={retryHalloumi}
           emptyClaims={emptyClaims}
           contextQuality={markers?.context_quality}
+          phase={factCheckPhase}
+          sourceCount={dedupedSources.length}
+          error={qualityError}
+          canRetry={canRetry}
+          onCancelCheck={cancelHalloumi}
         />
       )}
 

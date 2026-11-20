@@ -8,6 +8,8 @@
 
 **1.0.0 (Breaking)** - This release introduces breaking changes to the chatbot configuration and API endpoints, making it compatible with Onyx v2.
 
+**5.0.0** - Volto 19 support, published from `packages/volto-eea-chatbot`. Node.js 22 and React 18 are now peers. Fact-checking is bounded: a 240 s client budget, a `503 busy` answer once two checks run in one server process, and at most three attempts before the button asks for a page reload. `HalloumiFeedback` no longer takes `isLoadingHalloumi`. The new interface strings ship untranslated in `de`, `it` and `ro` and fall back to English.
+
 ## Features
 
 ![Volto Chatbot](https://raw.githubusercontent.com/eea/volto-eea-chatbot/master/docs/volto-eea-chatbot.gif)

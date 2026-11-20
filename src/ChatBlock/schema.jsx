@@ -148,6 +148,8 @@ export function ChatBlockSchema({ assistants, data = {} }) {
           ...(data.enableFeedback ? ['feedbackReasons'] : []),
           'enableDownload',
           'enableShare',
+          'enableSpeechInput',
+          'enableTextToSpeech',
           'enableToolSelection',
           ...(data.enableToolSelection
             ? ['allowedTools', 'defaultEnabledTools']
@@ -489,6 +491,20 @@ range is from 0 to 100`,
         default: true,
         description:
           'Allow users to share conversations via a public shareable link.',
+      },
+      enableSpeechInput: {
+        title: 'Enable voice input',
+        type: 'boolean',
+        default: true,
+        description:
+          'Allow users to dictate their questions with the microphone. Uses the browser speech recognition API and is hidden when the browser does not support it.',
+      },
+      enableTextToSpeech: {
+        title: 'Enable read aloud',
+        type: 'boolean',
+        default: true,
+        description:
+          'Allow users to listen to the assistant answers using the browser speech synthesis.',
       },
       enableToolSelection: {
         title: 'Enable tool selection',

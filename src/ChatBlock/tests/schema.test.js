@@ -230,6 +230,26 @@ describe('ChatBlockSchema', () => {
     expect(schema.properties.enableShare.type).toBe('boolean');
   });
 
+  it('includes enableSpeechInput in default fields with default true', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: {},
+    });
+    expect(schema.fieldsets[0].fields).toContain('enableSpeechInput');
+    expect(schema.properties.enableSpeechInput.default).toBe(true);
+    expect(schema.properties.enableSpeechInput.type).toBe('boolean');
+  });
+
+  it('includes enableTextToSpeech in default fields with default true', () => {
+    const schema = ChatBlockSchema({
+      assistants: mockAssistants,
+      data: {},
+    });
+    expect(schema.fieldsets[0].fields).toContain('enableTextToSpeech');
+    expect(schema.properties.enableTextToSpeech.default).toBe(true);
+    expect(schema.properties.enableTextToSpeech.type).toBe('boolean');
+  });
+
   it('includes enableToolSelection in default fields', () => {
     const schema = ChatBlockSchema({
       assistants: mockAssistants,

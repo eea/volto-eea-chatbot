@@ -6,3 +6,5 @@ export { useQualityMarkers } from './useQualityMarkers';
 export { useDeepCompareMemoize } from './useDeepCompareMemoize';
 export { useScrollonStream } from './useScrollonStream';
 export { useChunkEvidence } from './useChunkEvidence';
+export { useSpeechRecognition } from './useSpeechRecognition';
+export { useSpeechSynthesis } from './useSpeechSynthesis';

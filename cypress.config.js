@@ -9,8 +9,6 @@ module.exports = defineConfig({
   retries: {
     runMode: 3,
   },
-  // JUnit reporter so the EEA Jenkinsfile can publish Cypress results
-  // (it copies cypress/reports/*.xml via `junit testResults: 'cypress-results-current/**/*.xml'`).
   reporter: 'junit',
   reporterOptions: {
     mochaFile: 'cypress/reports/cypress-[hash].xml',

@@ -234,6 +234,7 @@ export function AIMessage({
   onNewChat,
   enableDownload,
   enableShare,
+  enableTextToSpeech,
   allMessages,
 }: ChatMessageProps) {
   const [allToolsDisplayed, setAllToolsDisplayed] = useState(false);
@@ -603,6 +604,7 @@ export function AIMessage({
           onNewChat={onNewChat}
           enableDownload={enableDownload}
           enableShare={enableShare}
+          enableTextToSpeech={enableTextToSpeech}
           enableFeedback={enableFeedback}
           feedbackReasons={feedbackReasons}
           enableMatomoTracking={enableMatomoTracking}

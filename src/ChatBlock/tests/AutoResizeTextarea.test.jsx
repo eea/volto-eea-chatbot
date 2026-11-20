@@ -58,6 +58,42 @@ describe('AutoResizeTextarea', () => {
     expect(textarea.value).toBe('Line 1\n');
   });
 
+  it('reports typed text through onChange when controlled', () => {
+    const onChange = jest.fn();
+    const { getByRole } = render(
+      <AutoResizeTextarea onSubmit={jest.fn()} value="" onChange={onChange} />,
+    );
+
+    fireEvent.change(getByRole('textbox'), { target: { value: 'Hi' } });
+    expect(onChange).toHaveBeenCalledWith('Hi');
+  });
+
+  it('renders the controlled value and clears it through onChange on submit', () => {
+    const onChange = jest.fn();
+    const mockSubmit = jest.fn();
+    const { getByRole } = render(
+      <AutoResizeTextarea
+        onSubmit={mockSubmit}
+        value="Hello"
+        onChange={onChange}
+      />,
+    );
+
+    expect(getByRole('textbox')).toHaveValue('Hello');
+
+    fireEvent.keyDown(getByRole('textbox'), { key: 'Enter', code: 'Enter' });
+    expect(mockSubmit).toHaveBeenCalledWith({ message: 'Hello' });
+    expect(onChange).toHaveBeenCalledWith('');
+  });
+
+  it('keeps its own state when uncontrolled', () => {
+    const { getByRole } = render(<AutoResizeTextarea onSubmit={jest.fn()} />);
+    const textarea = getByRole('textbox');
+
+    fireEvent.change(textarea, { target: { value: 'Uncontrolled' } });
+    expect(textarea).toHaveValue('Uncontrolled');
+  });
+
   it('renders stop button during streaming when stopButton is input', () => {
     const mockCancel = jest.fn();
     const { getByLabelText, queryByLabelText } = render(

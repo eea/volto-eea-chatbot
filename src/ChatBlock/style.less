@@ -1401,6 +1401,11 @@ mark {
     stroke: none;
   }
 
+  .chat-speak-btn.speaking svg {
+    animation: pulse 1.6s ease-in-out infinite;
+    stroke: #004b87;
+  }
+
   .chat-export-dropdown {
     .chat-export-menu {
       top: calc(100% + 6px);
@@ -2846,6 +2851,132 @@ body > textarea {
 
   &.always-on {
     cursor: default;
+  }
+}
+
+// Voice input (speech-to-text) button, sits next to the send button
+.mic-btn {
+  position: relative;
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  .mic-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+  }
+
+  &:hover:not(:disabled) {
+    background: #f1f5f9;
+    color: #334155;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #004b87;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  &.listening {
+    background: #b91c1c;
+    color: #fff;
+  }
+}
+
+// Radar-style halo while recording, drawn outside the button
+.mic-halo {
+  position: absolute;
+  border: 2px solid #b91c1c;
+  border-radius: 50%;
+  animation: pulseRing 1.6s ease-out infinite;
+  inset: 0;
+  pointer-events: none;
+}
+
+// Recording state of the composer: only a barely-there warm border, the mic
+// button and the live transcript carry the state. Focus keeps its usual style.
+.chat-form.is-listening .chat-composer:not(:focus-within) {
+  border-color: #f0d4d4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mic-btn,
+  .mic-halo,
+  .chat-speak-btn.speaking svg {
+    animation: none;
+    transition: none;
+  }
+}
+
+// Voice input feedback (permission errors, one-time mic disclosure)
+.speech-notices {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  flex-direction: column;
+  margin: 1.5em auto 0 auto;
+  gap: 6px;
+}
+
+.speech-notice {
+  display: flex;
+  align-items: center;
+  padding: 5px 6px 5px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12.5px;
+  gap: 6px;
+  line-height: 1.3;
+
+  &.is-error {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+}
+
+.speech-notice-text {
+  flex: 1;
+}
+
+.speech-notice-dismiss {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
   }
 }
 

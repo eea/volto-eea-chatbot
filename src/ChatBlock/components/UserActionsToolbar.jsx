@@ -11,6 +11,8 @@ import {
 import SVGIcon from './Icon';
 import ChatMessageFeedback from './ChatMessageFeedback';
 import { ChatExportDropdown } from './ChatExportDropdown';
+import SpeakButton from './SpeakButton';
+import { toSpeechLanguage } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/speechLanguages';
 
 import CopyIcon from '@eeacms/volto-eea-chatbot/icons/copy.svg';
 import CheckIcon from '@eeacms/volto-eea-chatbot/icons/check.svg';
@@ -53,6 +55,7 @@ const UserActionsToolbar = ({
   persona,
   enableDownload = true,
   enableShare = true,
+  enableTextToSpeech = true,
   isLoading = false,
 }) => {
   const [copied, handleCopy] = useCopyToClipboard(message?.message || '');
@@ -142,6 +145,14 @@ const UserActionsToolbar = ({
         >
           {copied ? <SVGIcon name={CheckIcon} /> : <SVGIcon name={CopyIcon} />}
         </Button>
+
+        {enableTextToSpeech && (
+          <SpeakButton
+            text={message?.message || ''}
+            lang={toSpeechLanguage(intl.locale)}
+            disabled={isLoading}
+          />
+        )}
 
         {enableShare && chatSessionId && (
           <Button

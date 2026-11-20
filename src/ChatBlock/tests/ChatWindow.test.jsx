@@ -1,5 +1,12 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  within,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the unwrapped ChatWindow (before injectLazyLibs wraps it)
@@ -73,9 +80,17 @@ jest.mock(
       toolbarLeft,
       toolbarRight,
       onSubmit,
+      value,
+      onChange,
     }) => (
       <div>
-        <textarea data-testid="autoresize-textarea" placeholder={placeholder} />
+        <textarea
+          data-testid="autoresize-textarea"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange && onChange(e.target.value)}
+        />
+        <span data-testid="mock-textarea-value">{value}</span>
         {toolbarLeft && (
           <div data-testid="mock-toolbar-left">{toolbarLeft}</div>
         )}
@@ -984,5 +999,168 @@ describe('ChatWindow', () => {
       name: /start a new conversation/i,
     });
     expect(newConvBtn).toBeInTheDocument();
+  });
+});
+
+describe('ChatWindow voice input', () => {
+  class FakeSpeechRecognition {
+    static instances = [];
+
+    lang = '';
+    continuous = false;
+    interimResults = false;
+    onstart = null;
+    onend = null;
+    onresult = null;
+    onerror = null;
+    start = () => this.onstart?.();
+    stop = () => this.onend?.();
+    abort = () => {};
+
+    constructor() {
+      FakeSpeechRecognition.instances.push(this);
+    }
+
+    emitResult(chunks) {
+      const results = chunks.map((chunk) => {
+        const result = [{ transcript: chunk.transcript }];
+        result.isFinal = chunk.isFinal;
+        return result;
+      });
+      this.onresult?.({ resultIndex: 0, results });
+    }
+  }
+
+  beforeEach(() => {
+    FakeSpeechRecognition.instances = [];
+    Object.defineProperty(window, 'SpeechRecognition', {
+      configurable: true,
+      writable: true,
+      value: FakeSpeechRecognition,
+    });
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      chatSessionId: null,
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      cancelStreaming: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      toggleTool: jest.fn(),
+      enableTool: jest.fn(),
+    });
+  });
+
+  afterEach(() => {
+    delete window.SpeechRecognition;
+  });
+
+  it('renders the microphone button when voice input is enabled', () => {
+    render(<ChatWindowWrapped persona={mockPersona} />);
+    expect(
+      screen.getByRole('button', { name: 'Start voice input' }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders the microphone next to the send button', () => {
+    render(<ChatWindowWrapped persona={mockPersona} />);
+
+    expect(
+      within(screen.getByTestId('mock-toolbar-right')).getByRole('button', {
+        name: 'Start voice input',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('hides the microphone button when enableSpeechInput is false', () => {
+    render(
+      <ChatWindowWrapped persona={mockPersona} enableSpeechInput={false} />,
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Start voice input' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the microphone button when the browser has no support', () => {
+    delete window.SpeechRecognition;
+    render(<ChatWindowWrapped persona={mockPersona} />);
+    expect(
+      screen.queryByRole('button', { name: 'Start voice input' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('previews the interim transcript directly in the composer', () => {
+    render(<ChatWindowWrapped persona={mockPersona} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start voice input' }));
+    act(() =>
+      FakeSpeechRecognition.instances[0].emitResult([
+        { transcript: 'air qual', isFinal: false },
+      ]),
+    );
+
+    expect(screen.getByTestId('mock-textarea-value')).toHaveTextContent(
+      'air qual',
+    );
+
+    act(() =>
+      FakeSpeechRecognition.instances[0].emitResult([
+        { transcript: 'air quality in 2023', isFinal: true },
+      ]),
+    );
+    expect(screen.getByTestId('mock-textarea-value')).toHaveTextContent(
+      'air quality in 2023',
+    );
+  });
+
+  it('keeps text typed before dictation and appends the transcript', () => {
+    render(<ChatWindowWrapped persona={mockPersona} />);
+
+    fireEvent.change(screen.getByTestId('autoresize-textarea'), {
+      target: { value: 'About air quality:' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start voice input' }));
+    act(() =>
+      FakeSpeechRecognition.instances[0].emitResult([
+        { transcript: 'and water quality', isFinal: true },
+      ]),
+    );
+
+    expect(screen.getByTestId('mock-textarea-value')).toHaveTextContent(
+      'About air quality: and water quality',
+    );
+  });
+
+  it('appends the recognised transcript to the composer', () => {
+    render(<ChatWindowWrapped persona={mockPersona} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start voice input' }));
+    act(() =>
+      FakeSpeechRecognition.instances[0].emitResult([
+        { transcript: 'air quality in 2023', isFinal: true },
+      ]),
+    );
+
+    expect(screen.getByTestId('mock-textarea-value')).toHaveTextContent(
+      'air quality in 2023',
+    );
+  });
+
+  it('shows the microphone usage disclosure once voice input starts', () => {
+    render(<ChatWindowWrapped persona={mockPersona} />);
+
+    expect(screen.queryByText(/not stored by EEA/i)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start voice input' }));
+    expect(screen.getByText(/not stored by EEA/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(screen.queryByText(/not stored by EEA/i)).not.toBeInTheDocument();
   });
 });

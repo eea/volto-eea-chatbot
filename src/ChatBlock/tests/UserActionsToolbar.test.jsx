@@ -362,4 +362,83 @@ describe('UserActionsToolbar', () => {
       name: 'Message actions',
     });
   });
+
+  describe('text to speech', () => {
+    class FakeUtterance {
+      constructor(text) {
+        this.text = text;
+      }
+    }
+
+    const installSpeechSynthesis = () => {
+      const synthesis = {
+        spoken: [],
+        cancel: jest.fn(),
+        pause: jest.fn(),
+        resume: jest.fn(),
+        getVoices: jest.fn(() => []),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        speak: jest.fn(function (utterance) {
+          synthesis.spoken.push(utterance);
+        }),
+      };
+      Object.defineProperty(window, 'speechSynthesis', {
+        configurable: true,
+        writable: true,
+        value: synthesis,
+      });
+      Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+        configurable: true,
+        writable: true,
+        value: FakeUtterance,
+      });
+      return synthesis;
+    };
+
+    afterEach(() => {
+      delete window.speechSynthesis;
+      delete window.SpeechSynthesisUtterance;
+    });
+
+    it('renders a read aloud button when enabled', () => {
+      const synthesis = installSpeechSynthesis();
+      renderWithRTL({
+        message: { messageId: 1, message: 'Test message content' },
+        enableFeedback: false,
+      });
+
+      const speakBtn = screen.getByRole('button', {
+        name: /read answer aloud/i,
+      });
+      expect(speakBtn).toBeInTheDocument();
+
+      fireEvent.click(speakBtn);
+      expect(synthesis.spoken[0].text).toBe('Test message content');
+    });
+
+    it('does not render the read aloud button when disabled', () => {
+      installSpeechSynthesis();
+      renderWithRTL({
+        message: { messageId: 1, message: 'Test message content' },
+        enableFeedback: false,
+        enableTextToSpeech: false,
+      });
+
+      expect(
+        screen.queryByRole('button', { name: /read answer aloud/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('does not render the read aloud button without browser support', () => {
+      renderWithRTL({
+        message: { messageId: 1, message: 'Test message content' },
+        enableFeedback: false,
+      });
+
+      expect(
+        screen.queryByRole('button', { name: /read answer aloud/i }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });

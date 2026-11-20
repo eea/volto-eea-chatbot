@@ -37,6 +37,8 @@ function hasValidChildren(children) {
 export default React.forwardRef(function AutoResizeTextarea(props, ref) {
   const {
     onSubmit,
+    value: valueProp,
+    onChange: onChangeProp,
     isStreaming,
     stopButton,
     enableStopButton = true,
@@ -51,7 +53,21 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
     ...rest
   } = props;
   const intl = useIntl();
-  const [input, setInput] = React.useState('');
+  const [localInput, setLocalInput] = React.useState('');
+  const isControlled = typeof valueProp === 'string';
+  const input = isControlled ? valueProp : localInput;
+  const setInput = React.useCallback(
+    (next) => {
+      const resolved = typeof next === 'function' ? next(input) : next;
+      if (!isControlled) {
+        setLocalInput(resolved);
+      }
+      if (onChangeProp) {
+        onChangeProp(resolved);
+      }
+    },
+    [input, isControlled, onChangeProp],
+  );
   const [dismissedToolIds, setDismissedToolIds] = React.useState(
     () => new Set(),
   );

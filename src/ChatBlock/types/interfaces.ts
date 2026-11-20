@@ -182,6 +182,7 @@ export interface ChatMessageProps {
   onNewChat?: () => void;
   enableDownload?: boolean;
   enableShare?: boolean;
+  enableTextToSpeech?: boolean;
   allMessages?: Message[];
 }
 

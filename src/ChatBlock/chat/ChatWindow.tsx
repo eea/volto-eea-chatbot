@@ -19,6 +19,11 @@ import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyStat
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 import McpToolSelector from '@eeacms/volto-eea-chatbot/ChatBlock/components/McpToolSelector';
 import DeepResearchButton from '@eeacms/volto-eea-chatbot/ChatBlock/components/DeepResearchButton';
+import MicButton from '@eeacms/volto-eea-chatbot/ChatBlock/components/MicButton';
+import SpeechNotice from '@eeacms/volto-eea-chatbot/ChatBlock/components/SpeechNotice';
+import { useSpeechRecognition } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useSpeechRecognition';
+import { stopSpeaking } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useSpeechSynthesis';
+import { toSpeechLanguage } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/speechLanguages';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
 import StopIcon from '@eeacms/volto-eea-chatbot/icons/stop.svg';
@@ -64,6 +69,8 @@ interface ChatWindowProps {
   enableDownload?: boolean;
   enableExport?: boolean;
   enableShare?: boolean;
+  enableSpeechInput?: boolean;
+  enableTextToSpeech?: boolean;
   enableToolSelection?: boolean;
   allowedTools?: (number | string)[];
   defaultEnabledTools?: (number | string)[];
@@ -112,6 +119,8 @@ function ChatWindow({
     batchSize,
     chunkEvidenceWindow,
     onyxVersion = '3',
+    enableSpeechInput = true,
+    enableTextToSpeech = true,
     enableToolSelection = true,
     allowedTools,
     defaultEnabledTools,
@@ -198,6 +207,55 @@ function ChatWindow({
   const chatWindowEndRef = useRef(null);
   const hasTrackedContinuationRef = useRef(false);
 
+  const [composerValue, setComposerValue] = useState('');
+  const [hasStartedSpeech, setHasStartedSpeech] = useState(false);
+  const [isSpeechPrivacyNoteDismissed, setIsSpeechPrivacyNoteDismissed] =
+    useState(false);
+  // Text present when dictation started plus the finalised dictation chunks.
+  // The interim transcript is previewed after them, directly in the input.
+  const speechDraftRef = useRef({ base: '', committed: '' });
+
+  const composeSpeechValue = useCallback((interim = '') => {
+    const { base, committed } = speechDraftRef.current;
+    return [base, committed, interim]
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .join(' ');
+  }, []);
+
+  const {
+    isSupported: isSpeechInputSupported,
+    isListening,
+    error: speechError,
+    start: startSpeech,
+    stop: stopSpeech,
+    clearError: clearSpeechError,
+  } = useSpeechRecognition({
+    lang: toSpeechLanguage(intl.locale),
+    onInterimTranscript: (transcript: string) => {
+      setComposerValue(composeSpeechValue(transcript));
+    },
+    onFinalTranscript: (transcript: string) => {
+      const draft = speechDraftRef.current;
+      draft.committed = [draft.committed, transcript].filter(Boolean).join(' ');
+      setComposerValue(composeSpeechValue());
+      textareaRef.current?.focus();
+    },
+  });
+
+  const handleSpeechStart = useCallback(() => {
+    speechDraftRef.current = { base: composerValue.trim(), committed: '' };
+    setHasStartedSpeech(true);
+    startSpeech();
+  }, [composerValue, startSpeech]);
+
+  // Playback must not outlive the answer it belongs to.
+  useEffect(() => {
+    if (isStreaming) {
+      stopSpeaking();
+    }
+  }, [isStreaming]);
+
   // Load shared session from URL parameter on mount
   useEffect(() => {
     let isMounted = true;
@@ -249,6 +307,8 @@ function ChatWindow({
 
   const handleClearChat = useCallback(() => {
     hasTrackedContinuationRef.current = false;
+    stopSpeech();
+    speechDraftRef.current = { base: '', committed: '' };
     if (enableMatomoTracking) {
       trackEvent({
         category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
@@ -267,10 +327,14 @@ function ChatWindow({
     ) {
       history.replace(window.location.pathname);
     }
-  }, [clearChat, history]);
+  }, [clearChat, history, stopSpeech]);
 
   const handleFormSubmit = useCallback(
     ({ message }: { message: string }) => {
+      if (isListening) {
+        stopSpeech();
+      }
+      speechDraftRef.current = { base: '', committed: '' };
       if (
         isSharedView &&
         !hasTrackedContinuationRef.current &&
@@ -292,6 +356,8 @@ function ChatWindow({
       enableMatomoTracking,
       persona,
       initialChatSessionId,
+      isListening,
+      stopSpeech,
     ],
   );
 
@@ -410,6 +476,7 @@ function ChatWindow({
                     onNewChat={handleClearChat}
                     enableDownload={isDownloadEnabled}
                     enableShare={isShareEnabled}
+                    enableTextToSpeech={enableTextToSpeech}
                     allMessages={messages}
                     isDeepResearchEnabled={isDeepResearchEnabled}
                     libs={libs}
@@ -507,7 +574,7 @@ function ChatWindow({
         )}
       </div>
 
-      <div className="chat-form">
+      <div className={`chat-form${isListening ? ' is-listening' : ''}`}>
         {stopButtonSetting === 'floating' && isStreaming && (
           <div className="chat-floating-stop">
             <Button
@@ -555,14 +622,31 @@ function ChatWindow({
                 </span>
               </div>
             )}
+            <SpeechNotice
+              error={speechError}
+              showPrivacyNote={
+                hasStartedSpeech && !isSpeechPrivacyNoteDismissed
+              }
+              onDismissError={clearSpeechError}
+              onDismissPrivacyNote={() => setIsSpeechPrivacyNoteDismissed(true)}
+            />
             <Form>
               <AutoResizeTextarea
                 // @ts-ignore TODO: convert AutoResizeTextarea to TypeScript
                 maxRows={8}
                 minRows={1}
                 ref={textareaRef}
+                value={composerValue}
+                onChange={setComposerValue}
                 placeholder={
-                  messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
+                  isListening
+                    ? intl.formatMessage({
+                        id: 'Listening…',
+                        defaultMessage: 'Listening…',
+                      })
+                    : messages.length > 0
+                      ? 'Ask follow-up...'
+                      : placeholderPrompt
                 }
                 isStreaming={isStreaming}
                 stopButton={stopButtonSetting}
@@ -573,6 +657,16 @@ function ChatWindow({
                 availableTools={availableTools}
                 selectedToolIds={selectedToolIds}
                 onEnableTool={enableTool}
+                toolbarRight={
+                  enableSpeechInput && isSpeechInputSupported ? (
+                    <MicButton
+                      isListening={isListening}
+                      onStart={handleSpeechStart}
+                      onStop={stopSpeech}
+                      disabled={isStreaming}
+                    />
+                  ) : undefined
+                }
                 toolbarLeft={
                   <>
                     {enableToolSelection && availableTools?.length > 0 && (

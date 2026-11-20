@@ -1,0 +1,160 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language: \n"
+"Language-Team: \n"
+"Content-Type: \n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. Default: "AI Search Input"
+#: AISearchInput/messages
+msgid "AI Search Input"
+msgstr ""
+
+#. Default: "Ask your question..."
+#: AISearchInput/components/SearchInput
+#: AISearchInput/messages
+msgid "Ask your question..."
+msgstr ""
+
+#. Default: "Assistant page is not configured. Please contact the site administrator."
+#: AISearchInput/AISearchInputView
+#: AISearchInput/messages
+msgid "Assistant page is not configured. Please contact the site administrator."
+msgstr ""
+
+#. Default: "Cancel"
+#: ChatBlock/components/HalloumiFeedback
+msgid "Cancel"
+msgstr ""
+
+#. Default: "Checking this answer against {count, plural, one {# source} other {# sources}}…"
+#: ChatBlock/components/HalloumiFeedback
+msgid "Checking this answer against {count, plural, one {# source} other {# sources}}…"
+msgstr ""
+
+#. Default: "Deep research"
+#: AISearchInput/components/DeepResearchToggle
+#: AISearchInput/messages
+msgid "Deep research"
+msgstr ""
+
+#. Default: "Deep research on"
+#: AISearchInput/components/DeepResearchToggle
+#: AISearchInput/messages
+msgid "Deep research on"
+msgstr ""
+
+#. Default: "Fact-check AI answer"
+#: ChatBlock/components/HalloumiFeedback
+msgid "Fact-check AI answer"
+msgstr ""
+
+#. Default: "Fact-checking is busy right now."
+#: ChatBlock/components/HalloumiFeedback
+msgid "Fact-checking is busy right now."
+msgstr ""
+
+#. Default: "Fact-checking is temporarily unavailable."
+#: ChatBlock/components/HalloumiFeedback
+msgid "Fact-checking is temporarily unavailable."
+msgstr ""
+
+#. Default: "Fact-checking is unavailable right now. Please try again later."
+#: ChatBlock/components/HalloumiFeedback
+msgid "Fact-checking is unavailable right now. Please try again later."
+msgstr ""
+
+#. Default: "Fact-checking took too long for this answer."
+#: ChatBlock/components/HalloumiFeedback
+msgid "Fact-checking took too long for this answer."
+msgstr ""
+
+#. Default: "Gathering the cited documents…"
+#: ChatBlock/components/HalloumiFeedback
+msgid "Gathering the cited documents…"
+msgstr ""
+
+#. Default: "Invalid assistant page URL."
+#: AISearchInput/AISearchInputView
+#: AISearchInput/messages
+msgid "Invalid assistant page URL."
+msgstr ""
+
+#. Default: "Please allow a few minutes for claim verification when many references are involved."
+#: ChatBlock/components/HalloumiFeedback
+msgid "Please allow a few minutes for claim verification when many references are involved."
+msgstr ""
+
+#. Default: "Retry Fact-check AI answer"
+#: ChatBlock/components/HalloumiFeedback
+msgid "Retry Fact-check AI answer"
+msgstr ""
+
+#. Default: "Retry available in {seconds}s"
+#: ChatBlock/components/HalloumiFeedback
+msgid "Retry available in {seconds}s"
+msgstr ""
+
+#. Default: "Send"
+#: ChatBlock/components/AutoResizeTextarea
+msgid "Send"
+msgstr ""
+
+#. Default: "Stop generating"
+#: ChatBlock/chat/AIMessage
+#: ChatBlock/chat/ChatWindow
+#: ChatBlock/components/AutoResizeTextarea
+msgid "Stop generating"
+msgstr ""
+
+#. Default: "Submit Feedback"
+#: ChatBlock/components/FeedbackModal
+msgid "Submit Feedback"
+msgstr ""
+
+#. Default: "Submit question"
+#: AISearchInput/components/SearchInput
+#: AISearchInput/messages
+msgid "Submit question"
+msgstr ""
+
+#. Default: "Submitting..."
+#: ChatBlock/components/FeedbackModal
+msgid "Submitting..."
+msgstr ""
+
+#. Default: "The answer is unchanged - only the verification failed."
+#: ChatBlock/components/HalloumiFeedback
+msgid "The answer is unchanged - only the verification failed."
+msgstr ""
+
+#. Default: "The answer may cite more text than can be verified in one pass. Nothing is wrong with the answer itself."
+#: ChatBlock/components/HalloumiFeedback
+msgid "The answer may cite more text than can be verified in one pass. Nothing is wrong with the answer itself."
+msgstr ""
+
+#. Default: "There are no sources to check this answer against."
+#: ChatBlock/components/HalloumiFeedback
+msgid "There are no sources to check this answer against."
+msgstr ""
+
+#. Default: "This assistant uses AI. Responses may contain inaccuracies."
+#: AISearchInput/messages
+msgid "This assistant uses AI. Responses may contain inaccuracies."
+msgstr ""
+
+#. Default: "This is taking longer than usual. You can cancel, or let it keep running."
+#: ChatBlock/components/HalloumiFeedback
+msgid "This is taking longer than usual. You can cancel, or let it keep running."
+msgstr ""
+
+#. Default: "{seconds}s elapsed"
+#: ChatBlock/components/HalloumiFeedback
+msgid "{seconds}s elapsed"
+msgstr ""

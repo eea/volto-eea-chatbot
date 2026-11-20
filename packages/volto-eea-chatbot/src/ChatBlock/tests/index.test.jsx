@@ -1,0 +1,55 @@
+import '@testing-library/jest-dom';
+
+import installChatBlock from '@eeacms/volto-eea-chatbot/ChatBlock/index';
+
+// Mock @plone/volto/components
+vi.mock('@plone/volto/components', () => ({
+  SidebarPortal: () => null,
+}));
+
+// Mock other dependencies
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockView', () => ({
+  default: () => <div>ChatBlockView</div>,
+}));
+vi.mock('@eeacms/volto-eea-chatbot/ChatBlock/ChatBlockEdit', () => ({
+  default: () => <div>ChatBlockEdit</div>,
+}));
+
+describe('ChatBlock installation', () => {
+  let mockConfig;
+
+  beforeEach(() => {
+    mockConfig = {
+      blocks: {
+        blocksConfig: {},
+      },
+      settings: {},
+    };
+  });
+
+  it('should register eeaChatbot block', () => {
+    installChatBlock(mockConfig);
+
+    expect(mockConfig.blocks.blocksConfig.eeaChatbot).toBeDefined();
+  });
+
+  it('should set correct block properties', () => {
+    installChatBlock(mockConfig);
+
+    const blockConfig = mockConfig.blocks.blocksConfig.eeaChatbot;
+    expect(blockConfig.id).toBe('eeaChatbot');
+    expect(blockConfig.title).toBe('AI Chatbot');
+    expect(blockConfig.group).toBe('common');
+    expect(blockConfig.restricted({ user: null })).toBe(false);
+    expect(blockConfig.mostUsed).toBe(false);
+    expect(blockConfig.sidebarTab).toBe(1);
+  });
+
+  it('should set view and edit components', () => {
+    installChatBlock(mockConfig);
+
+    const blockConfig = mockConfig.blocks.blocksConfig.eeaChatbot;
+    expect(blockConfig.view).toBeDefined();
+    expect(blockConfig.edit).toBeDefined();
+  });
+});

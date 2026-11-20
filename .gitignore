@@ -25,10 +25,8 @@ videos
 .env.production.local
 *~
 .gemini*
-
 .gemini/
 gha-creds-*.json
-
 # Python chatbot tests
 chatbot_tests/reports/
 chatbot_tests/__pycache__/
@@ -41,3 +39,16 @@ htmlcov/
 .coverage
 reference/
 specs/
+.*project
+.settings/
+.vscode
+acceptance/cypress/videos/
+acceptance/node_modules
+.storybook-build
+/core
+results
+/public
+
+# local links to sibling add-ons, created while developing them together
+/packages/*
+!/packages/volto-eea-chatbot/

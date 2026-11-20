@@ -1,0 +1,38 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Citation > should render the component with link 1`] = `
+<a
+  href="https://www.example.com"
+  onClick={[Function]}
+  tabIndex="-1"
+>
+  <span
+    className="chat-citation"
+  >
+    1
+  </span>
+</a>
+`;
+
+exports[`Citation > should render the component without link 1`] = `
+<div
+  className="popup"
+>
+  <div
+    className="trigger"
+  >
+    <span
+      className="chat-citation"
+    >
+      1
+    </span>
+  </div>
+  <div
+    className="content"
+  >
+    <div>
+      This doc doesn't have a link.
+    </div>
+  </div>
+</div>
+`;

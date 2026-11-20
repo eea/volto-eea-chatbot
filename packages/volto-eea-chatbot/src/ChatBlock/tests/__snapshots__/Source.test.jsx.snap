@@ -1,0 +1,107 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SourceDetails > should render the component with doc type 1`] = `
+<div
+  className="source"
+>
+  <div
+    className="source-header"
+  >
+    <div
+      className="popup"
+    >
+      <div
+        className="trigger"
+      >
+        <span
+          className="chat-citation"
+        >
+          2
+        </span>
+      </div>
+      <div
+        className="content"
+      >
+        This doc doesn't have a link.
+      </div>
+    </div>
+    <div
+      className="source-title"
+      title="Nam at tortor in tellus"
+    >
+      Nam at tortor in tellus
+    </div>
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        {
+          "__html": "<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>",
+        }
+      }
+      fill="none"
+      height="16"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    />
+  </div>
+  <div
+    className="source-desc"
+  >
+    <span>
+      Vestibulum purus quam scelerisque ut
+    </span>
+  </div>
+</div>
+`;
+
+exports[`SourceDetails > should render the component with link type 1`] = `
+<a
+  className="source source-link"
+  href="https://www.example.com"
+  rel="noreferrer"
+  target="_blank"
+>
+  <div
+    className="source-header"
+  >
+    <span
+      className="chat-citation"
+    >
+      1
+    </span>
+    <div
+      className="source-title"
+      title="Nam at tortor in tellus"
+    >
+      Nam at tortor in tellus
+    </div>
+    <svg
+      className="icon"
+      dangerouslySetInnerHTML={
+        {
+          "__html": "<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>",
+        }
+      }
+      fill="none"
+      height="16"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    />
+  </div>
+  <div
+    className="source-desc"
+  >
+    <span>
+      Vestibulum purus quam scelerisque ut
+    </span>
+  </div>
+</a>
+`;

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Plone\n"
-"POT-Creation-Date: 2026-11-04T12:26:08.115Z\n"
+"POT-Creation-Date: 2026-11-16T17:26:11.879Z\n"
 "Last-Translator: Plone i18n <plone-i18n@lists.sourceforge.net>\n"
 "Language-Team: Plone i18n <plone-i18n@lists.sourceforge.net>\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -30,6 +30,21 @@ msgstr ""
 msgid "Assistant page is not configured. Please contact the site administrator."
 msgstr ""
 
+#. Default: "Audio is processed by your browser’s speech service and is not stored by EEA."
+#: ChatBlock/components/SpeechNotice
+msgid "Audio is processed by your browser’s speech service and is not stored by EEA."
+msgstr ""
+
+#. Default: "Copied!"
+#: ChatBlock/components/UserActionsToolbar
+msgid "Copied!"
+msgstr ""
+
+#. Default: "Copy"
+#: ChatBlock/components/UserActionsToolbar
+msgid "Copy"
+msgstr ""
+
 #. Default: "Deep research"
 #: AISearchInput/components/DeepResearchToggle
 #: AISearchInput/messages
@@ -44,9 +59,24 @@ msgstr ""
 msgid "Deep research on"
 msgstr ""
 
+#. Default: "Dismiss"
+#: ChatBlock/components/SpeechNotice
+msgid "Dismiss"
+msgstr ""
+
+#. Default: "Export conversation"
+#: ChatBlock/components/ChatExportDropdown
+msgid "Export conversation"
+msgstr ""
+
 #. Default: "Generating..."
 #: ChatBlock/components/ChatExportDropdown
 msgid "Generating..."
+msgstr ""
+
+#. Default: "Internal Search is always active"
+#: ChatBlock/components/McpToolSelector
+msgid "Internal Search is always active"
 msgstr ""
 
 #. Default: "Invalid assistant page URL."
@@ -55,9 +85,50 @@ msgstr ""
 msgid "Invalid assistant page URL."
 msgstr ""
 
+#. Default: "Link copied!"
+#: ChatBlock/components/UserActionsToolbar
+msgid "Link copied!"
+msgstr ""
+
+#. Default: "Loading shared conversation..."
+#: ChatBlock/chat/ChatWindow
+msgid "Loading shared conversation..."
+msgstr ""
+
+#. Default: "Microphone access was blocked. Allow the microphone in your browser settings and try again."
+#: ChatBlock/components/SpeechNotice
+msgid "Microphone access was blocked. Allow the microphone in your browser settings and try again."
+msgstr ""
+
+#. Default: "No microphone was found. Connect a microphone and try again."
+#: ChatBlock/components/SpeechNotice
+msgid "No microphone was found. Connect a microphone and try again."
+msgstr ""
+
+#. Default: "Read answer aloud"
+#: ChatBlock/components/SpeakButton
+msgid "Read answer aloud"
+msgstr ""
+
 #. Default: "Send"
 #: ChatBlock/components/AutoResizeTextarea
 msgid "Send"
+msgstr ""
+
+#. Default: "Share conversation"
+#: ChatBlock/components/UserActionsToolbar
+msgid "Share conversation"
+msgstr ""
+
+#. Default: "Start a new conversation"
+#: ChatBlock/chat/ChatWindow
+#: ChatBlock/components/UserActionsToolbar
+msgid "Start a new conversation"
+msgstr ""
+
+#. Default: "Start voice input"
+#: ChatBlock/components/MicButton
+msgid "Start voice input"
 msgstr ""
 
 #. Default: "Stop generating"
@@ -65,6 +136,16 @@ msgstr ""
 #: ChatBlock/chat/ChatWindow
 #: ChatBlock/components/AutoResizeTextarea
 msgid "Stop generating"
+msgstr ""
+
+#. Default: "Stop reading"
+#: ChatBlock/components/SpeakButton
+msgid "Stop reading"
+msgstr ""
+
+#. Default: "Stop voice input"
+#: ChatBlock/components/MicButton
+msgid "Stop voice input"
 msgstr ""
 
 #. Default: "Submit Feedback"
@@ -88,6 +169,11 @@ msgstr ""
 msgid "This assistant uses AI. Responses may contain inaccuracies."
 msgstr ""
 
+#. Default: "This shared conversation could not be found or is private."
+#: ChatBlock/chat/ChatWindow
+msgid "This shared conversation could not be found or is private."
+msgstr ""
+
 #. Default: "Tools & MCP Connectors"
 #: ChatBlock/components/McpToolSelector
 msgid "Tools & MCP Connectors"
@@ -96,4 +182,44 @@ msgstr ""
 #. Default: "Tools ({count})"
 #: ChatBlock/components/McpToolSelector
 msgid "Tools ({count})"
+msgstr ""
+
+#. Default: "Use"
+#: ChatBlock/components/McpToolProposal
+msgid "Use"
+msgstr ""
+
+#. Default: "Voice input does not support the current language."
+#: ChatBlock/components/SpeechNotice
+msgid "Voice input does not support the current language."
+msgstr ""
+
+#. Default: "Voice input failed. Please try again or type your question."
+#: ChatBlock/components/SpeechNotice
+msgid "Voice input failed. Please try again or type your question."
+msgstr ""
+
+#. Default: "Voice input is not allowed on this device."
+#: ChatBlock/components/SpeechNotice
+msgid "Voice input is not allowed on this device."
+msgstr ""
+
+#. Default: "Voice input is not available in this browser."
+#: ChatBlock/components/SpeechNotice
+msgid "Voice input is not available in this browser."
+msgstr ""
+
+#. Default: "Voice input needs a network connection. Check your connection and try again."
+#: ChatBlock/components/SpeechNotice
+msgid "Voice input needs a network connection. Check your connection and try again."
+msgstr ""
+
+#. Default: "Voice input requires a secure (HTTPS) connection."
+#: ChatBlock/components/SpeechNotice
+msgid "Voice input requires a secure (HTTPS) connection."
+msgstr ""
+
+#. Default: "You are viewing a shared conversation. Ask a follow-up to continue in your own chat."
+#: ChatBlock/chat/ChatWindow
+msgid "You are viewing a shared conversation. Ask a follow-up to continue in your own chat."
 msgstr ""

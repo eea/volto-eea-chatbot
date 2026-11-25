@@ -57,6 +57,8 @@ const UserActionsToolbar = ({
 }) => {
   const [copied, handleCopy] = useCopyToClipboard(message?.message || '');
   const [isCopiedShareLink, setIsCopiedShareLink] = useState(false);
+  const [shareError, setShareError] = useState(false);
+  const [sharePartial, setSharePartial] = useState(false);
   const [isShared, setIsShared] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const shareTimeoutRef = useRef(null);
@@ -76,15 +78,21 @@ const UserActionsToolbar = ({
     if (!chatSessionId || isSharing) return;
 
     if (!isShared) {
+      setShareError(false);
+      setSharePartial(false);
       setIsSharing(true);
       try {
-        const sharedOk = await shareChatSession(chatSessionId);
-        if (!sharedOk) {
+        const result = await shareChatSession(chatSessionId);
+        if (!result.ok) {
+          // No link was produced: tell the visitor.
+          setShareError(true);
           setIsSharing(false);
           return;
         }
+        setSharePartial(result.partial);
         setIsShared(true);
       } catch {
+        setShareError(true);
         setIsSharing(false);
         return;
       } finally {
@@ -187,6 +195,24 @@ const UserActionsToolbar = ({
             matomoCategory={matomoCategory}
             persona={persona}
           />
+        )}
+
+        {shareError && (
+          <span className="chat-share-error" role="alert">
+            <FormattedMessage
+              id="Could not share the conversation. Please try again."
+              defaultMessage="Could not share the conversation. Please try again."
+            />
+          </span>
+        )}
+
+        {sharePartial && (
+          <span className="chat-share-warning" role="status">
+            <FormattedMessage
+              id="Some earlier messages of this conversation could not be included in the link."
+              defaultMessage="Some earlier messages of this conversation could not be included in the link."
+            />
+          </span>
         )}
       </div>
 

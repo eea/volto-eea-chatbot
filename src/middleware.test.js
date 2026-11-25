@@ -367,6 +367,183 @@ describe('src/middleware', () => {
     );
   });
 
+  it('publishes the whole fork chain oldest first, the linked session last', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    const root = '11111111-1111-1111-1111-111111111111';
+    const middle = '22222222-2222-2222-2222-222222222222';
+    const tail = '33333333-3333-3333-3333-333333333333';
+
+    req.url = `/_da/chat/share-chat-session/${tail}`;
+    req.method = 'POST';
+    req.body = undefined;
+
+    const published = [];
+    const descriptions = {
+      [tail]: `Follow-up question [parent:${middle}]`,
+      [middle]: `Hello there [parent:${root}]`,
+      [root]: 'Chat session',
+    };
+
+    nodeFetch.mockImplementation(async (url, opts = {}) => {
+      if ((opts.method || 'GET') === 'PATCH') {
+        published.push(url.split('/chat-session/')[1]);
+        return { ok: true, status: 200 };
+      }
+      const id = url.split('/get-chat-session/')[1];
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          description: descriptions[id],
+          shared_status: 'private',
+        }),
+      };
+    });
+
+    await middleware(req, res, next);
+
+    expect(published).toEqual([root, middle, tail]);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      JSON.stringify({ success: true, chat_session_id: tail }),
+    );
+  });
+
+  it('does not re-publish an ancestor that is already public', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    const parent = '22222222-2222-2222-2222-222222222222';
+    const tail = '33333333-3333-3333-3333-333333333333';
+
+    req.url = `/_da/chat/share-chat-session/${tail}`;
+    req.method = 'POST';
+    req.body = undefined;
+
+    const published = [];
+    nodeFetch.mockImplementation(async (url, opts = {}) => {
+      if ((opts.method || 'GET') === 'PATCH') {
+        published.push(url.split('/chat-session/')[1]);
+        return { ok: true, status: 200 };
+      }
+      const id = url.split('/get-chat-session/')[1];
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          description: id === tail ? `Hi [parent:${parent}]` : 'Chat session',
+          shared_status: id === parent ? 'public' : 'private',
+        }),
+      };
+    });
+
+    await middleware(req, res, next);
+
+    expect(published).toEqual([tail]);
+  });
+
+  it('shares only the linked session when its own metadata is unreadable', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    const tail = '33333333-3333-3333-3333-333333333333';
+    req.url = `/_da/chat/share-chat-session/${tail}`;
+    req.method = 'POST';
+    req.body = undefined;
+
+    const published = [];
+    nodeFetch.mockImplementation(async (url, opts = {}) => {
+      if ((opts.method || 'GET') === 'PATCH') {
+        published.push(url.split('/chat-session/')[1]);
+        return { ok: true, status: 200 };
+      }
+      return { ok: false, status: 404, statusText: 'Not Found' };
+    });
+
+    await middleware(req, res, next);
+
+    expect(published).toEqual([tail]);
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it('shares what it can and reports a partial conversation when an ancestor is gone', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    const parent = '22222222-2222-2222-2222-222222222222';
+    const tail = '33333333-3333-3333-3333-333333333333';
+
+    req.url = `/_da/chat/share-chat-session/${tail}`;
+    req.method = 'POST';
+    req.body = undefined;
+
+    const published = [];
+    nodeFetch.mockImplementation(async (url, opts = {}) => {
+      if ((opts.method || 'GET') === 'PATCH') {
+        published.push(url.split('/chat-session/')[1]);
+        return { ok: true, status: 200 };
+      }
+      if (url.includes(tail)) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ description: `Hi [parent:${parent}]` }),
+        };
+      }
+      return { ok: false, status: 403, statusText: 'Forbidden' };
+    });
+
+    await middleware(req, res, next);
+
+    // Share what we can, and say that it is partial.
+    expect(published).toEqual([tail]);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      JSON.stringify({
+        success: true,
+        chat_session_id: tail,
+        partial: true,
+      }),
+    );
+  });
+
+  it('refuses to report success when publishing the linked session fails', async () => {
+    delete process.env.MOCK_LLM_FILE_PATH;
+    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
+    process.env.ONYX_URL = 'http://onyx.test';
+
+    const tail = '33333333-3333-3333-3333-333333333333';
+    req.url = `/_da/chat/share-chat-session/${tail}`;
+    req.method = 'POST';
+    req.body = undefined;
+
+    nodeFetch.mockImplementation(async (url, opts = {}) => {
+      if ((opts.method || 'GET') === 'PATCH') {
+        return { ok: false, status: 500, statusText: 'Server Error' };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ description: 'Chat session' }),
+      };
+    });
+
+    await middleware(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(502);
+    expect(res.send).toHaveBeenCalledWith(
+      JSON.stringify({
+        error: 'Failed to share conversation: Server Error',
+      }),
+    );
+  });
+
   it('enforces ?is_shared=true and returns sanitized public chat session', async () => {
     delete process.env.MOCK_LLM_FILE_PATH;
     process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow

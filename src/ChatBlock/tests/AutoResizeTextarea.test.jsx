@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AutoResizeTextarea from '@eeacms/volto-eea-chatbot/ChatBlock/components/AutoResizeTextarea';
 import { trackEvent } from '@eeacms/volto-matomo/utils';
@@ -283,5 +283,51 @@ describe('AutoResizeTextarea', () => {
     fireEvent.click(dismissBtn);
 
     expect(queryByText('@EEA Data Connector')).not.toBeInTheDocument();
+  });
+  it('clears the draft as soon as the question is handed over', () => {
+    const mockSubmit = jest.fn(() => new Promise(() => {}));
+    const { getByRole } = render(<AutoResizeTextarea onSubmit={mockSubmit} />);
+    const textarea = getByRole('textbox');
+
+    fireEvent.change(textarea, { target: { value: 'hello' } });
+    fireEvent.click(getByRole('button'));
+
+    expect(mockSubmit).toHaveBeenCalledWith({ message: 'hello' });
+    expect(textarea.value).toBe('');
+  });
+
+  it('gives the draft back when the submit was rejected', async () => {
+    const mockSubmit = jest.fn().mockResolvedValue({ accepted: false });
+    const { getByRole } = render(<AutoResizeTextarea onSubmit={mockSubmit} />);
+    const textarea = getByRole('textbox');
+
+    fireEvent.change(textarea, { target: { value: 'keep me' } });
+    fireEvent.click(getByRole('button'));
+
+    expect(textarea.value).toBe('');
+    await waitFor(() => expect(textarea.value).toBe('keep me'));
+  });
+
+  it('does not overwrite something the visitor typed meanwhile', async () => {
+    let rejectSubmit;
+    const mockSubmit = jest.fn(
+      () =>
+        new Promise((resolve) => {
+          rejectSubmit = resolve;
+        }),
+    );
+    const { getByRole } = render(<AutoResizeTextarea onSubmit={mockSubmit} />);
+    const textarea = getByRole('textbox');
+
+    fireEvent.change(textarea, { target: { value: 'first' } });
+    fireEvent.click(getByRole('button'));
+    fireEvent.change(textarea, { target: { value: 'second' } });
+
+    await act(async () => {
+      rejectSubmit({ accepted: false });
+      await Promise.resolve();
+    });
+
+    expect(textarea.value).toBe('second');
   });
 });

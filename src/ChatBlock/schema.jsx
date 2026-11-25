@@ -72,24 +72,39 @@ export function ChatBlockSchema({ assistants, data = {} }) {
     ? assistants.find((a) => a.id?.toString() === data.assistant?.toString())
     : null;
 
+  const switchableAssistantIds = () =>
+    Array.isArray(data.switchableAssistants) ? data.switchableAssistants : [];
+
+  const findAssistant = (id) =>
+    Array.isArray(assistants)
+      ? assistants.find((a) => a.id?.toString() === String(id))
+      : null;
+
+  // Default plus switchable assistants, so their tools can be exposed.
   const getAvailableTools = () => {
-    if (selectedAssistant?.tools && Array.isArray(selectedAssistant.tools)) {
-      return selectedAssistant.tools.filter((t) => t.chat_selectable !== false);
-    }
-    if (Array.isArray(assistants)) {
-      const seen = new Set();
-      const tools = [];
-      assistants.forEach((a) => {
-        (a.tools || []).forEach((t) => {
-          if (t.chat_selectable !== false && !seen.has(t.id)) {
-            seen.add(t.id);
-            tools.push(t);
-          }
-        });
+    const configured = [
+      selectedAssistant,
+      ...switchableAssistantIds().map(findAssistant),
+    ].filter(Boolean);
+    // No tool data configured: keep the pre-existing fallback.
+    const hasToolInfo = configured.some((a) => Array.isArray(a.tools));
+    const source =
+      configured.length > 0 && hasToolInfo
+        ? configured
+        : Array.isArray(assistants)
+          ? assistants
+          : [];
+    const seen = new Set();
+    const tools = [];
+    source.forEach((a) => {
+      (a.tools || []).forEach((t) => {
+        if (t.chat_selectable !== false && !seen.has(t.id)) {
+          seen.add(t.id);
+          tools.push(t);
+        }
       });
-      return tools;
-    }
-    return [];
+    });
+    return tools;
   };
 
   const toolChoices = () =>
@@ -109,6 +124,7 @@ export function ChatBlockSchema({ assistants, data = {} }) {
         fields: [
           'chatTitle',
           'assistant',
+          'switchableAssistants',
           'qgenAsistantId',
           'placeholderPrompt',
           'height',
@@ -211,6 +227,17 @@ export function ChatBlockSchema({ assistants, data = {} }) {
       assistant: {
         title: 'Assistant',
         choices: assistantChoices(),
+      },
+      switchableAssistants: {
+        title: 'Switchable assistants',
+        type: 'array',
+        isMulti: true,
+        choices: assistantChoices(),
+        default: [],
+        description:
+          'Additional assistants visitors can switch to from the chat input. ' +
+          'The assistant above is always offered, first in the list, so visitors ' +
+          'can always switch back to it. Leave empty to hide the selector.',
       },
       qgenAsistantId: {
         title: 'QAssistant',

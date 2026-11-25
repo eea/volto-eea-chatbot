@@ -305,4 +305,49 @@ describe('ChatBlockSchema', () => {
       ['20', 'EEA Indicators (MCP)'],
     ]);
   });
+  it('offers a multi-select of switchable assistants with an empty default, right after the assistant', () => {
+    const schema = ChatBlockSchema({ assistants: mockAssistants, data: {} });
+
+    expect(schema.properties.switchableAssistants).toEqual(
+      expect.objectContaining({
+        type: 'array',
+        isMulti: true,
+        default: [],
+        choices: [
+          ['1', 'Assistant 1'],
+          ['2', 'Assistant 2'],
+        ],
+      }),
+    );
+
+    const fields = schema.fieldsets[0].fields;
+    expect(fields.indexOf('switchableAssistants')).toBe(
+      fields.indexOf('assistant') + 1,
+    );
+  });
+
+  it('covers the tools of the switchable assistants in the tool choices', () => {
+    const assistantsWithTools = [
+      {
+        id: 1,
+        name: 'Default',
+        tools: [{ id: 10, name: 'internal_search', display_name: 'Search' }],
+      },
+      {
+        id: 2,
+        name: 'Alternative',
+        tools: [{ id: 20, name: 'web_search', display_name: 'Web Search' }],
+      },
+    ];
+
+    const schema = ChatBlockSchema({
+      assistants: assistantsWithTools,
+      data: { assistant: '1', switchableAssistants: ['2'] },
+    });
+
+    expect(schema.properties.allowedTools.choices).toEqual([
+      ['10', 'Search'],
+      ['20', 'Web Search'],
+    ]);
+  });
 });

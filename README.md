@@ -27,6 +27,7 @@ The **Volto Chatbot** block allows the integration of an AI-powered chatbot into
 | **Property**                 | **Description**                                                                 | **Type** | **Default**                      |
 | ---------------------------- | ------------------------------------------------------------------------------- | -------- | -------------------------------- |
 | `assistant`                  | Choose from the list of available assistants configured in the application.     | Dropdown | -                                |
+| `switchableAssistants`       | Additional assistants visitors can switch to from the chat input. The `assistant` above is always offered, first in the list. Leave empty to hide the selector. | Multi-select | `[]` |
 | `qgenAsistantId`             | Select an assistant for generating related questions.                           | Dropdown | -                                |
 | `enableQgen`                 | Toggle the generation of related questions.                                     | Boolean  | `false`                          |
 | `enableFeedback`             | Enable or disable thumbs up/down feedback for assistant responses.              | Boolean  | `true`                           |
@@ -50,6 +51,71 @@ The **Volto Chatbot** block allows the integration of an AI-powered chatbot into
 | `height`                     | Set the height of the chat window using CSS dimensions (e.g., `500px`, `70vh`). | String   | -                                |
 
 ---
+
+## Switching between assistants
+
+`switchableAssistants` adds a drop-down to the right of the chat input that lets
+the visitor move between the block's assistants without leaving the page. The
+assistant configured in `assistant` is always part of the list and is pinned to
+the top, so a visitor can always come back to it. The remaining entries follow
+the order in which they were selected. With the setting left empty the block
+behaves exactly as before: one assistant, one persona request on load, no
+drop-down.
+
+A session in Onyx belongs to exactly one assistant and cannot be re-pointed
+later, so switching forks the conversation: a new chat session is created for
+the newly chosen assistant and the conversation so far is handed over as
+`additional_context`. The visitor keeps every message they already had. Nothing
+is created until the next question is asked, so exploring the drop-down leaves
+no empty conversations behind, and switching away and back before asking
+anything needs no new session at all.
+
+The exposed-tools (`allowedTools`) and default-tools (`defaultEnabledTools`)
+settings stay block-level and are re-evaluated against the active assistant. On
+a switch the selection becomes the intersection of what was active and what the
+new assistant offers — a tool that was not active before is never enabled
+automatically, and internal search stays on whenever the new assistant has it.
+
+### Opening the chatbot on a specific assistant
+
+`?assistant=<id>` opens the block on that assistant instead of the configured
+default, provided the editor made it available (the default, or one of the
+`switchableAssistants`). A link naming any other assistant is ignored rather
+than honoured, because the configured list is an editorial decision about which
+assistants a page offers. Only the `query` parameter is removed from the address
+bar once a `?query=` question has been submitted; every other parameter,
+including `assistant`, survives a reload.
+
+The global AI Search Input block can target a specific assistant without any new
+setting by carrying the parameter on its existing target URL, e.g.
+`/ask-ai?assistant=25`.
+
+### Sharing a conversation that switched assistants
+
+A switched conversation is a chain of chat sessions, each tagged with its
+parent. The share endpoint walks that chain and publishes every session, oldest
+first and the linked one last, so a link shows the whole conversation — and
+after a reload, when the page no longer knows the chain, sharing still publishes
+all of it. Sessions that are already public are left alone. Intermediate sessions become
+individually public and there is no unshare.
+
+If one of the earlier sessions has been deleted or cannot be read, the rest is
+still shared and the toolbar tells the visitor that the link starts part-way
+through, rather than handing out a truncated link silently. A failure while
+publishing aborts the share with a visible error.
+
+**Trust model.** A chat session UUID is a bearer capability: this endpoint (like
+the single-session share it replaces) publishes whatever session the caller
+names, and Onyx exposes no owner on a session to check against. Walking the
+parent tags therefore grants nothing that posting the same UUID would not
+already grant. Per-user sharing controls would need identity data the API does
+not return; treat a session UUID as a secret.
+
+Two consequences of the wire format are known and accepted: a shared or exported
+multi-assistant conversation is attributed to the last assistant in the chain,
+because a session's `persona_name` is immutable; and export headers and
+analytics use whichever assistant is active at the moment of the action, not the
+one that produced each message.
 
 ## Copy and related-question analytics
 
@@ -162,7 +228,9 @@ The variation `view` receives the block's fields as **top-level props** (there i
 
 ```
 <View
-  persona={assistantData}   // the selected assistant
+  persona={assistantData}   // the active assistant
+  personaOptions            // every assistant the block offers, default first
+  initialAssistantId        // the assistant the block opens on (?assistant= or default)
   block_id                  // the block's internal id
   isEditMode
   isPlaywrightTest          // ?playwright=yes query flag

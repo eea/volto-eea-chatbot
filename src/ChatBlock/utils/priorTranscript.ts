@@ -1,6 +1,8 @@
 import type { Message } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 
-export const MAX_TRANSCRIPT_CHARS = 8000;
+// The context is re-sent on every turn and Onyx injects it ahead of the newest
+// question, so it competes with the session's own history for the model budget.
+export const MAX_TRANSCRIPT_CHARS = 32000;
 
 const TRUNCATION_MARKER = '[Earlier conversation truncated]';
 

@@ -833,8 +833,8 @@ describe('useChatController', () => {
         { initialProps: { personaId: 1, persona: personaA } },
       );
 
-      await submit(result, 'A'.repeat(6000));
-      await submit(result, 'B'.repeat(6000));
+      await submit(result, 'A'.repeat(20000));
+      await submit(result, 'B'.repeat(20000));
 
       createChatSession.mockResolvedValue('session-B');
       rerender({ personaId: 2, persona: personaB });
@@ -931,7 +931,7 @@ describe('useChatController', () => {
         { initialProps: { personaId: 1, persona: personaA } },
       );
 
-      await submit(result, 'X'.repeat(9000));
+      await submit(result, 'X'.repeat(40000));
 
       createChatSession.mockResolvedValue('session-B');
       rerender({ personaId: 2, persona: personaB });
@@ -941,7 +941,7 @@ describe('useChatController', () => {
       expect(
         additionalContext.startsWith('[Earlier conversation truncated]'),
       ).toBe(true);
-      expect(additionalContext.length).toBeLessThanOrEqual(8100);
+      expect(additionalContext.length).toBeLessThanOrEqual(32100);
       expect(additionalContext).toContain('XXXX');
     });
 

@@ -187,6 +187,14 @@ function ChatWindow({
     [personaOptions, activeAssistantId, persona],
   );
 
+  // If the selected assistant never loaded (its fetch failed), fall back
+  // instead of leaving the composer unusable.
+  useEffect(() => {
+    if (!personaOptionsLoading && !isActivePersonaResolved) {
+      setActiveAssistantId(String(persona.id));
+    }
+  }, [personaOptionsLoading, isActivePersonaResolved, persona.id]);
+
   // Configured, not resolved: an assistant still loading is still offered.
   const offeredAssistantIdsRef = useRef<string[]>([]);
   offeredAssistantIdsRef.current = offeredAssistantIds.length
@@ -232,6 +240,7 @@ function ChatWindow({
   const chatWindowRef = useRef(null);
   const chatWindowEndRef = useRef(null);
   const hasTrackedContinuationRef = useRef(false);
+  const hasAutoSubmittedRef = useRef(false);
 
   // Load shared session from URL parameter on mount
   useEffect(() => {
@@ -372,28 +381,32 @@ function ChatWindow({
 
   // Auto-submit query from URL parameter on mount
   useEffect(() => {
-    // A shared conversation owns the first action.
+    if (hasAutoSubmittedRef.current) return;
+    // A shared conversation owns the first action; otherwise wait until the
+    // active assistant is known, which may be after this render.
     if (
-      initialQuery &&
-      messages.length === 0 &&
-      !isStreaming &&
-      !initialChatSessionId &&
-      !personaOptionsLoading
+      !initialQuery ||
+      messages.length > 0 ||
+      isStreaming ||
+      initialChatSessionId ||
+      !isActivePersonaResolved
     ) {
-      // Same path as a typed question.
-      Promise.resolve(handleFormSubmit({ message: initialQuery }))
-        .then((outcome: any) => {
-          // Keep a rejected question in the address bar for a retry.
-          if (outcome && outcome.accepted === false) return;
-          history.replace(
-            `${window.location.pathname}${withoutQueryParam(
-              window.location.search,
-            )}`,
-          );
-        })
-        .catch(() => {});
+      return;
     }
-  }, []);
+    hasAutoSubmittedRef.current = true;
+    // Same path as a typed question.
+    Promise.resolve(handleFormSubmit({ message: initialQuery }))
+      .then((outcome: any) => {
+        // Keep a rejected question in the address bar for a retry.
+        if (outcome && outcome.accepted === false) return;
+        history.replace(
+          `${window.location.pathname}${withoutQueryParam(
+            window.location.search,
+          )}`,
+        );
+      })
+      .catch(() => {});
+  }, [initialQuery, isActivePersonaResolved, messages.length, isStreaming]);
 
   const handleAssistantSelect = useCallback(
     (nextPersona: Persona) => {

@@ -445,7 +445,7 @@ describe('ChatWindow', () => {
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
-  it('does not auto-submit while the other assistants are still loading', () => {
+  it('auto-submits once the active assistant is resolved, even if the alternatives load later', () => {
     const mockOnSubmit = jest.fn().mockResolvedValue({ accepted: true });
     useChatController.mockReturnValue({
       onSubmit: mockOnSubmit,
@@ -460,15 +460,64 @@ describe('ChatWindow', () => {
       availableTools: [],
     });
 
-    render(
+    const { rerender } = render(
       <ChatWindowWrapped
         persona={mockPersona}
+        personaOptions={[mockPersona]}
         personaOptionsLoading
-        initialQuery="wait for me"
+        initialAssistantId="1"
+        initialQuery="deep link question"
       />,
     );
 
-    expect(mockOnSubmit).not.toHaveBeenCalled();
+    // The active assistant is already known: the question must not wait for
+    // the alternatives, and it must not be lost if they settle later.
+    expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        personaOptions={[
+          mockPersona,
+          { id: 2, name: 'Climate Assistant', description: '' },
+        ]}
+        personaOptionsLoading={false}
+        initialAssistantId="1"
+        initialQuery="deep link question"
+      />,
+    );
+
+    expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to the block default when the selected assistant never loads', () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        personaOptions={[mockPersona]}
+        personaOptionsLoading={false}
+        offeredAssistantIds={['1', '2']}
+        initialAssistantId="2"
+      />,
+    );
+
+    // Assistant 2 was offered but its record never arrived.
+    expect(useChatController).toHaveBeenLastCalledWith(
+      expect.objectContaining({ personaId: 1 }),
+    );
   });
 
   it('keeps the question in the url when the submit was rejected', async () => {

@@ -19,6 +19,7 @@ import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyStat
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 import McpToolSelector from '@eeacms/volto-eea-chatbot/ChatBlock/components/McpToolSelector';
 import AssistantSelector from '@eeacms/volto-eea-chatbot/ChatBlock/components/AssistantSelector';
+import { useActivePersona } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useActivePersona';
 import DeepResearchButton from '@eeacms/volto-eea-chatbot/ChatBlock/components/DeepResearchButton';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
@@ -167,39 +168,27 @@ function ChatWindow({
     [rehypePrism, remarkGfm],
   );
 
-  const [activeAssistantId, setActiveAssistantId] = useState<string>(() =>
-    String(initialAssistantId || persona.id),
-  );
-
-  const isActivePersonaResolved = useMemo(() => {
-    const wanted = String(activeAssistantId);
-    return (
-      personaOptions.some((option) => String(option.id) === wanted) ||
-      String(persona.id) === wanted
-    );
-  }, [personaOptions, persona, activeAssistantId]);
-
-  const activePersona = useMemo(
+  const offeredIds = useMemo(
     () =>
-      personaOptions.find(
-        (option) => String(option.id) === String(activeAssistantId),
-      ) || persona,
-    [personaOptions, activeAssistantId, persona],
+      offeredAssistantIds.length
+        ? offeredAssistantIds
+        : personaOptions.map((option) => String(option.id)),
+    [offeredAssistantIds, personaOptions],
   );
 
-  // If the selected assistant never loaded (its fetch failed), fall back
-  // instead of leaving the composer unusable.
-  useEffect(() => {
-    if (!personaOptionsLoading && !isActivePersonaResolved) {
-      setActiveAssistantId(String(persona.id));
-    }
-  }, [personaOptionsLoading, isActivePersonaResolved, persona.id]);
-
-  // Configured, not resolved: an assistant still loading is still offered.
-  const offeredAssistantIdsRef = useRef<string[]>([]);
-  offeredAssistantIdsRef.current = offeredAssistantIds.length
-    ? offeredAssistantIds
-    : personaOptions.map((option) => String(option.id));
+  const {
+    activeId: activeAssistantId,
+    persona: activePersona,
+    isResolved: isActivePersonaResolved,
+    select: selectAssistant,
+    adopt: adoptAssistant,
+  } = useActivePersona({
+    primary: persona,
+    options: personaOptions,
+    loading: personaOptionsLoading,
+    offeredIds,
+    initialId: initialAssistantId,
+  });
 
   const {
     onSubmit,
@@ -259,13 +248,7 @@ function ChatWindow({
             detail?.persona_id !== null && detail?.persona_id !== undefined
               ? String(detail.persona_id)
               : null;
-          const configured = offeredAssistantIdsRef.current;
-          if (sharedPersonaId && configured.includes(sharedPersonaId)) {
-            setActiveAssistantId(sharedPersonaId);
-          } else if (configured.length > 0) {
-            // Not offered here: fall back to the block default.
-            setActiveAssistantId(configured[0]);
-          }
+          adoptAssistant(sharedPersonaId);
           loadChatSession(initialChatSessionId, deserialized);
           setIsSharedView(true);
           setSharedSessionLoading(false);
@@ -282,7 +265,7 @@ function ChatWindow({
     return () => {
       isMounted = false;
     };
-  }, [initialChatSessionId, loadChatSession]);
+  }, [initialChatSessionId, loadChatSession, adoptAssistant]);
 
   // Track when a shared session is continued into a new session
   useEffect(() => {
@@ -406,7 +389,13 @@ function ChatWindow({
         );
       })
       .catch(() => {});
-  }, [initialQuery, isActivePersonaResolved, messages.length, isStreaming]);
+  }, [
+    initialQuery,
+    isActivePersonaResolved,
+    initialChatSessionId,
+    messages.length,
+    isStreaming,
+  ]);
 
   const handleAssistantSelect = useCallback(
     (nextPersona: Persona) => {
@@ -419,10 +408,10 @@ function ChatWindow({
           name: nextPersona?.name || '',
         });
       }
-      setActiveAssistantId(String(nextPersona.id));
+      selectAssistant(nextPersona);
       textareaRef.current?.focus();
     },
-    [activePersona, enableMatomoTracking],
+    [activePersona, enableMatomoTracking, selectAssistant],
   );
 
   const handleStarterPromptChoice = useCallback(

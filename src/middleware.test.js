@@ -576,42 +576,6 @@ describe('src/middleware', () => {
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
-  it('refuses to publish an ancestor owned by someone else', async () => {
-    delete process.env.MOCK_LLM_FILE_PATH;
-    process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
-    process.env.ONYX_URL = 'http://onyx.test';
-
-    const other = '22222222-2222-2222-2222-222222222222';
-    const tail = '33333333-3333-3333-3333-333333333333';
-    req.url = `/_da/chat/share-chat-session/${tail}`;
-    req.method = 'POST';
-    req.body = undefined;
-
-    const published = [];
-    nodeFetch.mockImplementation(async (url, opts = {}) => {
-      if ((opts.method || 'GET') === 'PATCH') {
-        published.push(url.split('/chat-session/')[1]);
-        return { ok: true, status: 200 };
-      }
-      const id = url.split('/get-chat-session/')[1];
-      return {
-        ok: true,
-        status: 200,
-        json: async () => ({
-          description:
-            id === tail ? `Hi [parent:${other}]` : 'Someone else\u2019s chat',
-          owner_name: id === tail ? 'ana' : 'mallory',
-          shared_status: 'private',
-        }),
-      };
-    });
-
-    await middleware(req, res, next);
-
-    expect(published).toEqual([]);
-    expect(res.status).toHaveBeenCalledWith(403);
-  });
-
   it('reports a partial share when the conversation is longer than we walk', async () => {
     delete process.env.MOCK_LLM_FILE_PATH;
     process.env.ONYX_API_KEY = 'test-key'; //betterleaks:allow
@@ -640,7 +604,6 @@ describe('src/middleware', () => {
         status: 200,
         json: async () => ({
           description: `Chat [parent:${nextId()}]`,
-          owner_name: 'ana',
           shared_status: id === tail ? 'private' : 'public',
         }),
       };

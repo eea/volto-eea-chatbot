@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import withOnyxData from '@eeacms/volto-eea-chatbot/ChatBlock/hocs/withOnyxData';
 
@@ -74,6 +74,43 @@ describe('withOnyxData', () => {
 
     rerender(<WrappedComponent depKey="key2" />);
 
+    await waitFor(() => {
+      expect(screen.getByText('Data: value-key2')).toBeInTheDocument();
+    });
+  });
+  it('does not render stale data while the new key is loading', async () => {
+    const TestComponent = ({ testData }) => <div>Data: {testData}</div>;
+    let resolveSecond;
+    const callback = (props) => {
+      const fetcher =
+        props.depKey === 'key1'
+          ? Promise.resolve({ body: 'value-key1' })
+          : new Promise((resolve) => {
+              // The callback runs on every render; keep the resolver of the
+              // promise the effect actually awaits.
+              if (!resolveSecond) {
+                resolveSecond = () => resolve({ body: 'value-key2' });
+              }
+            });
+      return ['testData', fetcher, props.depKey];
+    };
+    const WrappedComponent = withOnyxData(callback)(TestComponent);
+
+    const { rerender } = render(<WrappedComponent depKey="key1" />);
+    await waitFor(() => {
+      expect(screen.getByText('Data: value-key1')).toBeInTheDocument();
+    });
+
+    rerender(<WrappedComponent depKey="key2" />);
+
+    // Old data for a superseded key must not stay on screen.
+    await waitFor(() => {
+      expect(screen.queryByText('Data: value-key1')).not.toBeInTheDocument();
+    });
+
+    await act(async () => {
+      resolveSecond();
+    });
     await waitFor(() => {
       expect(screen.getByText('Data: value-key2')).toBeInTheDocument();
     });

@@ -23,6 +23,8 @@ export default function withOnyxData(callback) {
       const [name, fetcher, depKey] = callback(props);
 
       React.useEffect(() => {
+        // Data must never outlive the key it was fetched for.
+        setState(null);
         let cancelled = false;
 
         async function handler() {

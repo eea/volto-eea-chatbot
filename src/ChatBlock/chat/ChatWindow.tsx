@@ -206,6 +206,7 @@ function ChatWindow({
     toggleTool,
     enableTool,
     availableTools,
+    isContextTruncated,
   } = useChatController({
     personaId: activePersona.id,
     persona: activePersona,
@@ -220,7 +221,9 @@ function ChatWindow({
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [submitError, setSubmitError] = useState(false);
   const [isSharedView, setIsSharedView] = useState(false);
-  const [sharedSessionLoading, setSharedSessionLoading] = useState(false);
+  const [sharedSessionLoading, setSharedSessionLoading] = useState(
+    Boolean(initialChatSessionId),
+  );
   const [sharedSessionError, setSharedSessionError] = useState(false);
 
   const history = useHistory();
@@ -312,6 +315,9 @@ function ChatWindow({
 
   const handleFormSubmit = useCallback(
     ({ message }: { message: string }) => {
+      // Nothing may be sent before the shared transcript and its assistant
+      // are known; the composer and the starter prompts are both reachable.
+      if (sharedSessionLoading) return { accepted: false };
       setSubmitError(false);
       if (
         isSharedView &&
@@ -347,6 +353,7 @@ function ChatWindow({
       enableMatomoTracking,
       activePersona,
       initialChatSessionId,
+      sharedSessionLoading,
     ],
   );
 
@@ -653,6 +660,14 @@ function ChatWindow({
                     defaultMessage="You are viewing a shared conversation. Ask a follow-up to continue in your own chat."
                   />
                 </span>
+              </div>
+            )}
+            {isContextTruncated && (
+              <div className="chat-context-warning" role="status">
+                <FormattedMessage
+                  id="Earlier messages of this conversation could not be carried over to this assistant."
+                  defaultMessage="Earlier messages of this conversation could not be carried over to this assistant."
+                />
               </div>
             )}
             {submitError && (

@@ -490,6 +490,45 @@ describe('ChatWindow', () => {
     expect(mockOnSubmit).toHaveBeenCalledTimes(1);
   });
 
+  it('does not submit a starter prompt before the shared transcript arrives', async () => {
+    const mockOnSubmit = jest.fn().mockResolvedValue({ accepted: true });
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      loadChatSession: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+    getSharedChatSession.mockResolvedValue({
+      chat_session_id: 'shared-1',
+      persona_id: 1,
+      messages: [],
+    });
+    deserializeChatSession.mockReturnValue([]);
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialChatSessionId="shared-1"
+      />,
+    );
+
+    // The composer is not rendered while loading, so submit straight through
+    // the same handler the bottom starter prompts use.
+    expect(screen.queryByTestId('mock-submit-button')).not.toBeInTheDocument();
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('mock-submit-button')).toBeInTheDocument();
+    });
+  });
+
   it('falls back to the block default when the selected assistant never loads', () => {
     useChatController.mockReturnValue({
       onSubmit: jest.fn(),
@@ -577,6 +616,28 @@ describe('ChatWindow', () => {
     expect(mockOnSubmit).toHaveBeenCalledWith({ message: 'climate question' });
     expect(useChatController).toHaveBeenLastCalledWith(
       expect.objectContaining({ personaId: 2 }),
+    );
+  });
+
+  it('says when earlier messages could not be carried over', () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [{ messageId: 1, nodeId: 1, type: 'user', message: 'hello' }],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      isContextTruncated: true,
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} />);
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Earlier messages of this conversation could not be carried over to this assistant.',
     );
   });
 

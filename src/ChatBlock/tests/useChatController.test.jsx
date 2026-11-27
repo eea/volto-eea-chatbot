@@ -881,6 +881,24 @@ describe('useChatController', () => {
       expect(result.current.availableTools).toEqual([{ id: 30 }]);
     });
 
+    it('reports when the conversation handed over lost its beginning', async () => {
+      createChatSession.mockResolvedValue('session-A');
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      await submit(result, 'A'.repeat(20000));
+      await submit(result, 'B'.repeat(20000));
+      expect(result.current.isContextTruncated).toBe(false);
+
+      createChatSession.mockResolvedValue('session-B');
+      rerender({ personaId: 2, persona: personaB });
+      await submit(result, 'And now?');
+
+      expect(result.current.isContextTruncated).toBe(true);
+    });
+
     it('sends only the tools both assistants share', async () => {
       createChatSession.mockResolvedValue('session-A');
       const { result, rerender } = renderHook(

@@ -5,7 +5,10 @@ import type {
 } from '@eeacms/volto-eea-chatbot/ChatBlock/types/interfaces';
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useDeepCompareMemoize } from './useDeepCompareMemoize';
-import { flattenTranscript } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/priorTranscript';
+import {
+  flattenTranscript,
+  isTruncated,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/utils/priorTranscript';
 import { useChatStreaming } from './useChatStreaming';
 import { createChatSession } from '@eeacms/volto-eea-chatbot/ChatBlock/services/streamingService';
 import { PacketType } from '@eeacms/volto-eea-chatbot/ChatBlock/types/streamingModels';
@@ -229,6 +232,8 @@ export function useChatController({
     string | null
   >(null);
   const [chatSessionLoading, setChatSessionLoading] = useState(false);
+  // True when the conversation handed to the current session lost its start.
+  const [isContextTruncated, setIsContextTruncated] = useState(false);
   const [isDeepResearchEnabled, setIsDeepResearchEnabled] = useState(
     deepResearch === 'always_on' || deepResearch === 'user_on',
   );
@@ -367,6 +372,7 @@ export function useChatController({
         if (parentSessionId) {
           inheritedContextRef.current = flattenTranscript(messages);
           additionalContext = inheritedContextRef.current;
+          setIsContextTruncated(isTruncated(inheritedContextRef.current));
           parentMessageId = null;
           // Nodes from the previous session are not valid parents here.
           forkedSessionMessageIdsRef.current.clear();
@@ -384,15 +390,12 @@ export function useChatController({
 
         if (lastMessage && lastPacket?.obj?.type !== PacketType.ERROR) {
           parentNodeId = lastMessage.nodeId;
-          // Only when that message belongs to the active session.
-          if (
-            !inheritedContextRef.current ||
-            forkedSessionMessageIdsRef.current.has(lastMessage.nodeId)
-          ) {
-            parentMessageId = lastMessage.messageId || null;
-          } else {
-            parentMessageId = null;
-          }
+          // Only nodes of the session we are writing to may be its parent.
+          parentMessageId = forkedSessionMessageIdsRef.current.has(
+            lastMessage.nodeId,
+          )
+            ? lastMessage.messageId || null
+            : null;
         }
       }
 
@@ -522,6 +525,7 @@ export function useChatController({
 
   const clearChat = useCallback(() => {
     setMessages([]);
+    setIsContextTruncated(false);
     setChatSessionId(null);
     setSessionPersonaId(null);
     setSharedParentSessionId(null);
@@ -546,6 +550,7 @@ export function useChatController({
       isShared: boolean = true,
     ) => {
       setChatSessionId(sessionId);
+      setIsContextTruncated(false);
       // Unknown until the first fork.
       setSessionPersonaId(null);
       if (isShared) {
@@ -585,6 +590,7 @@ export function useChatController({
     isDeepResearchEnabled,
     setIsDeepResearchEnabled,
     chatSessionId,
+    isContextTruncated,
     selectedToolIds,
     setSelectedToolIds,
     sessionPersonaId,

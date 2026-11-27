@@ -1,4 +1,7 @@
-import { flattenTranscript } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/priorTranscript';
+import {
+  flattenTranscript,
+  isTruncated,
+} from '@eeacms/volto-eea-chatbot/ChatBlock/utils/priorTranscript';
 
 const user = (message, nodeId = 1) => ({ type: 'user', message, nodeId });
 const assistant = (message, nodeId = 2) => ({
@@ -72,5 +75,16 @@ describe('flattenTranscript', () => {
     );
     expect(transcript.length).toBeLessThanOrEqual(100);
     expect(transcript.endsWith('X')).toBe(true);
+  });
+  it('keeps the whole result inside the cap, marker included', () => {
+    const transcript = flattenTranscript(
+      [user('A'.repeat(80)), user('B'.repeat(80))],
+      100,
+    );
+    const whole = flattenTranscript([user('short')], 100);
+
+    expect(transcript.length).toBeLessThanOrEqual(100);
+    expect(isTruncated(transcript)).toBe(true);
+    expect(isTruncated(whole)).toBe(false);
   });
 });

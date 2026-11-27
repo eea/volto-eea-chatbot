@@ -305,11 +305,17 @@ async function send_onyx_request(
       const chain = [];
       let partial = false;
 
+      // Owners are compared by name only when the API reports one on both
+      // sides: never publish an ancestor that belongs to someone else.
+      const ownerName = (session) => session?.owner_name ?? null;
+
       const tail = await readSession(chatSessionId);
       let description = tail?.description || '';
       const visited = new Set([String(chatSessionId).toLowerCase()]);
+      const tailOwner = ownerName(tail);
+      let depth = 0;
 
-      for (let depth = 0; depth < MAX_ANCESTOR_DEPTH; depth += 1) {
+      for (; depth < MAX_ANCESTOR_DEPTH; depth += 1) {
         const match = description.match(PARENT_SESSION_TAG_REGEX);
         if (!match) break;
 
@@ -327,13 +333,31 @@ async function send_onyx_request(
           break;
         }
 
-        if (parent?.shared_status !== 'public') {
+        const parentOwner = ownerName(parent);
+        if (
+          tailOwner &&
+          parentOwner &&
+          String(parentOwner) !== String(tailOwner)
+        ) {
+          fail(403, 'Cannot share a conversation that includes another user.');
+          return;
+        }
+
+        if (parent.shared_status !== 'public') {
           chain.unshift(parentId);
         }
-        description = parent?.description || '';
+        description = parent.description || '';
       }
 
-      chain.push(chatSessionId);
+      // Still a tag left when the walk ran out of budget: the conversation is
+      // longer than we publish, and the sharer should hear about it.
+      if (depth === MAX_ANCESTOR_DEPTH) {
+        partial = true;
+      }
+
+      if (tail?.shared_status !== 'public') {
+        chain.push(chatSessionId);
+      }
 
       for (const id of chain) {
         const patchRes = await fetch(publishUrl(id), {

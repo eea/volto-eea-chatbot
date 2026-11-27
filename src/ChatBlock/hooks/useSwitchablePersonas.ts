@@ -57,34 +57,48 @@ export function useSwitchablePersonas(
       typeof AbortController !== 'undefined' ? new AbortController() : null;
     setState({ personas: [], isLoading: true });
 
-    Promise.allSettled(
-      list.map((id) =>
-        fetch(personaUrl(id), {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller?.signal,
-        }).then((response) => {
+    // Each record is usable as soon as it arrives: one slow or hung request
+    // must not hold back the rest.
+    const arrived = new Map<number, Persona>();
+    let pending = list.length;
+
+    const publish = () => {
+      if (cancelled) return;
+      setState({
+        personas: list
+          .map((_, index) => arrived.get(index))
+          .filter((persona): persona is Persona => Boolean(persona)),
+        isLoading: pending > 0,
+      });
+    };
+
+    list.forEach((id, index) => {
+      fetch(personaUrl(id), {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller?.signal,
+      })
+        .then((response) => {
           if (!response.ok) {
             throw new Error(`${response.status} ${response.statusText}`);
           }
           return response.json();
-        }),
-      ),
-    ).then((results) => {
-      if (cancelled) return;
-      const personas: Persona[] = [];
-      results.forEach((result, index) => {
-        if (result.status === 'fulfilled') {
-          personas.push(result.value as Persona);
-        } else {
+        })
+        .then((persona: Persona) => {
+          arrived.set(index, persona);
+        })
+        .catch((reason) => {
+          if (cancelled) return;
           // eslint-disable-next-line no-console
           console.warn(
-            `Assistant ${list[index]} could not be loaded and was dropped from the selector`,
-            result.reason?.message || result.reason,
+            `Assistant ${id} could not be loaded and was dropped from the selector`,
+            reason?.message || reason,
           );
-        }
-      });
-      setState({ personas, isLoading: false });
+        })
+        .finally(() => {
+          pending -= 1;
+          publish();
+        });
     });
 
     return () => {

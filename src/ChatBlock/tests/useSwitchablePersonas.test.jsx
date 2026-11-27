@@ -124,4 +124,20 @@ describe('useSwitchablePersonas', () => {
     expect(mockSignals).toHaveLength(1);
     expect(mockSignals[0].aborted).toBe(true);
   });
+  it('uses the records that arrived while another request is still pending', async () => {
+    const never = new Promise(() => {});
+    global.fetch = jest.fn((url) =>
+      url.endsWith('/34')
+        ? never
+        : Promise.resolve(okResponse(url.split('/').pop())),
+    );
+
+    const { result } = renderHook(() => useSwitchablePersonas([29, 34]));
+
+    await flush();
+
+    expect(result.current.personas.map((p) => p.id)).toEqual([29]);
+    // Still loading, because one record has not arrived.
+    expect(result.current.isLoading).toBe(true);
+  });
 });

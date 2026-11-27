@@ -196,18 +196,19 @@ describe('chatSessionService', () => {
   });
 
   describe('shareChatSession', () => {
-    it('calls /_da/chat/share-chat-session/:id with POST and returns true on success', async () => {
+    it('calls /_da/chat/share-chat-session/:id with POST and reports success', async () => {
       const mockFetch = jest.fn().mockResolvedValue({
         ok: true,
         status: 200,
+        json: () => Promise.resolve({ success: true }),
       });
 
-      const success = await shareChatSession(
+      const result = await shareChatSession(
         '46277749-db60-44f2-9de1-c5dca2eb68fa',
         mockFetch as any,
       );
 
-      expect(success).toBe(true);
+      expect(result).toEqual({ ok: true, partial: false });
       expect(mockFetch).toHaveBeenCalledWith(
         '/_da/chat/share-chat-session/46277749-db60-44f2-9de1-c5dca2eb68fa',
         expect.objectContaining({
@@ -223,17 +224,14 @@ describe('chatSessionService', () => {
         status: 404,
       });
 
-      const success = await shareChatSession(
-        'uuid-not-found',
-        mockFetch as any,
-      );
-      expect(success).toBe(false);
+      const result = await shareChatSession('uuid-not-found', mockFetch as any);
+      expect(result).toEqual({ ok: false, partial: false });
     });
 
     it('returns false on network error', async () => {
       const mockFetch = jest.fn().mockRejectedValue(new Error('Network error'));
-      const success = await shareChatSession('uuid-err', mockFetch as any);
-      expect(success).toBe(false);
+      const result = await shareChatSession('uuid-err', mockFetch as any);
+      expect(result).toEqual({ ok: false, partial: false });
     });
   });
 

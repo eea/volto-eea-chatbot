@@ -26,7 +26,9 @@ jest.mock(
     );
     return {
       ...actual,
-      shareChatSession: jest.fn().mockResolvedValue(true),
+      shareChatSession: jest
+        .fn()
+        .mockResolvedValue({ ok: true, partial: false }),
     };
   },
 );
@@ -361,5 +363,51 @@ describe('UserActionsToolbar', () => {
       action: 'Start new conversation',
       name: 'Message actions',
     });
+  });
+  it('tells the visitor when the conversation could not be shared', async () => {
+    shareChatSession.mockResolvedValueOnce({ ok: false, partial: false });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <UserActionsToolbar
+            message={{ message: 'an answer' }}
+            chatSessionId="session-1"
+          />
+        </MemoryRouter>
+      </Provider>,
+    );
+
+    fireEvent.click(screen.getByLabelText('Share conversation'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'Could not share the conversation. Please try again.',
+      );
+    });
+    expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
+  });
+  it('warns when only part of the conversation could be shared', async () => {
+    shareChatSession.mockResolvedValueOnce({ ok: true, partial: true });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <UserActionsToolbar
+            message={{ message: 'an answer' }}
+            chatSessionId="session-1"
+          />
+        </MemoryRouter>
+      </Provider>,
+    );
+
+    fireEvent.click(screen.getByLabelText('Share conversation'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'Some earlier messages of this conversation could not be included in the link.',
+      );
+    });
+    expect(navigator.clipboard.writeText).toHaveBeenCalled();
   });
 });

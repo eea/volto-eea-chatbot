@@ -186,11 +186,17 @@ export function getShareableLink(
 /**
  * Promotes a chat session to 'public' in Onyx via the backend middleware share endpoint.
  */
+export interface ShareResult {
+  ok: boolean;
+  /** Part of the conversation could not be published. */
+  partial: boolean;
+}
+
 export async function shareChatSession(
   chatSessionId: string,
   fetchImpl: typeof fetch = fetch,
-): Promise<boolean> {
-  if (!chatSessionId) return false;
+): Promise<ShareResult> {
+  if (!chatSessionId) return { ok: false, partial: false };
   try {
     const url = `/_da/chat/share-chat-session/${encodeURIComponent(chatSessionId)}`;
     const response = await fetchImpl(url, {
@@ -199,11 +205,20 @@ export async function shareChatSession(
         'Content-Type': 'application/json',
       },
     });
-    return response.ok;
+    if (!response.ok) return { ok: false, partial: false };
+
+    let partial = false;
+    try {
+      const body = await response.json();
+      partial = Boolean(body?.partial);
+    } catch {
+      // A response without a body simply means "nothing to report".
+    }
+    return { ok: true, partial };
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('Failed to share chat session:', err);
-    return false;
+    return { ok: false, partial: false };
   }
 }
 

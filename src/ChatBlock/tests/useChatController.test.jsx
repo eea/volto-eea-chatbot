@@ -734,4 +734,263 @@ describe('useChatController', () => {
     expect(result.current.chatSessionId).toBe('shared-session-123');
     expect(result.current.sharedParentSessionId).toBe('shared-session-123');
   });
+  describe('assistant switching', () => {
+    const searchTool = {
+      id: 10,
+      in_code_tool_id: 'SearchTool',
+      name: 'internal_search',
+    };
+    const personaA = {
+      id: 1,
+      name: 'Assistant A',
+      tools: [searchTool, { id: 20, name: 'code_interpreter' }],
+    };
+    const personaB = {
+      id: 2,
+      name: 'Assistant B',
+      tools: [
+        { id: 40, in_code_tool_id: 'SearchTool', name: 'internal_search' },
+        { id: 30, name: 'web_search' },
+      ],
+    };
+
+    const submit = async (result, message) => {
+      let outcome;
+      await act(async () => {
+        outcome = await result.current.onSubmit({ message });
+      });
+      return outcome;
+    };
+
+    it('forks into a new session for the new assistant, with the conversation as context', async () => {
+      createChatSession.mockResolvedValue('session-A');
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      await submit(result, 'Hello there');
+      expect(createChatSession).toHaveBeenLastCalledWith(1, 'Chat session');
+
+      createChatSession.mockClear();
+      createChatSession.mockResolvedValue('session-B');
+      rerender({ personaId: 2, persona: personaB });
+      await submit(result, 'Follow-up question');
+
+      expect(createChatSession).toHaveBeenCalledTimes(1);
+      const [personaId, description] = createChatSession.mock.calls[0];
+      expect(personaId).toBe(2);
+      expect(description).toMatch(/\[parent:session-A\]$/);
+      expect(result.current.chatSessionId).toBe('session-B');
+      expect(mockSendMessage).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          chatSessionId: 'session-B',
+          additionalContext: 'User: Hello there',
+          parentMessageId: null,
+        }),
+      );
+    });
+
+    it('creates a plain session when the assistant is chosen before the first message', async () => {
+      createChatSession.mockResolvedValue('session-B');
+      const { result } = renderHook(() =>
+        useChatController({ personaId: 2, persona: personaB }),
+      );
+
+      await submit(result, 'First question');
+
+      expect(createChatSession).toHaveBeenCalledWith(2, 'Chat session');
+      expect(mockSendMessage).toHaveBeenLastCalledWith(
+        expect.objectContaining({ additionalContext: null }),
+      );
+    });
+
+    it('does not fork when the visitor switches away and back without sending', async () => {
+      createChatSession.mockResolvedValue('session-A');
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      await submit(result, 'Hello there');
+      createChatSession.mockClear();
+
+      rerender({ personaId: 2, persona: personaB });
+      rerender({ personaId: 1, persona: personaA });
+      await submit(result, 'Still here');
+
+      expect(createChatSession).not.toHaveBeenCalled();
+      expect(result.current.chatSessionId).toBe('session-A');
+      expect(mockSendMessage).toHaveBeenLastCalledWith(
+        expect.objectContaining({ additionalContext: null }),
+      );
+    });
+
+    it('truncates an over-long conversation before handing it over as context', async () => {
+      createChatSession.mockResolvedValue('session-A');
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      await submit(result, 'A'.repeat(20000));
+      await submit(result, 'B'.repeat(20000));
+
+      createChatSession.mockResolvedValue('session-B');
+      rerender({ personaId: 2, persona: personaB });
+      await submit(result, 'And now?');
+
+      const { additionalContext } = mockSendMessage.mock.calls.pop()[0];
+      expect(
+        additionalContext.startsWith('[Earlier conversation truncated]'),
+      ).toBe(true);
+      expect(additionalContext).toContain('B'.repeat(6000));
+      expect(additionalContext).not.toContain('A'.repeat(6000));
+    });
+
+    it('keeps shared tools, drops missing ones and never enables the new assistant defaults', async () => {
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      act(() => {
+        result.current.enableTool(20);
+      });
+      expect(result.current.selectedToolIds).toEqual([10, 20]);
+
+      rerender({ personaId: 2, persona: personaB });
+
+      expect(result.current.selectedToolIds).toEqual([40]);
+      expect(result.current.selectedToolIds).not.toContain(30);
+    });
+
+    it('sends no tools when the new assistant has none of the active ones', async () => {
+      const personaC = { id: 3, name: 'Assistant C', tools: [{ id: 30 }] };
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      act(() => {
+        result.current.enableTool(20);
+      });
+      rerender({ personaId: 3, persona: personaC });
+
+      expect(result.current.selectedToolIds).toEqual([]);
+      expect(result.current.availableTools).toEqual([{ id: 30 }]);
+    });
+
+    it('reports when the conversation handed over lost its beginning', async () => {
+      createChatSession.mockResolvedValue('session-A');
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      await submit(result, 'A'.repeat(20000));
+      await submit(result, 'B'.repeat(20000));
+      expect(result.current.isContextTruncated).toBe(false);
+
+      createChatSession.mockResolvedValue('session-B');
+      rerender({ personaId: 2, persona: personaB });
+      await submit(result, 'And now?');
+
+      expect(result.current.isContextTruncated).toBe(true);
+    });
+
+    it('sends only the tools both assistants share', async () => {
+      createChatSession.mockResolvedValue('session-A');
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      act(() => {
+        result.current.enableTool(20);
+      });
+
+      createChatSession.mockResolvedValue('session-B');
+      rerender({ personaId: 2, persona: personaB });
+      await submit(result, 'Follow-up');
+
+      expect(mockSendMessage).toHaveBeenLastCalledWith(
+        expect.objectContaining({ enabledToolIds: [40] }),
+      );
+    });
+
+    it('does not enable the new defaults when nothing was active before', async () => {
+      const personaWithoutTools = { id: 1, name: 'Bare', tools: [] };
+      const personaWithDefaults = {
+        id: 2,
+        name: 'Defaults',
+        tools: [
+          { id: 40, in_code_tool_id: 'SearchTool', name: 'internal_search' },
+          { id: 30, name: 'web_search', default_enabled: true },
+        ],
+      };
+
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaWithoutTools } },
+      );
+
+      expect(result.current.selectedToolIds).toEqual([]);
+
+      rerender({ personaId: 2, persona: personaWithDefaults });
+
+      expect(result.current.selectedToolIds).toEqual([40]);
+    });
+
+    it('keeps a truncated tail of an over-long single message', async () => {
+      createChatSession.mockResolvedValue('session-A');
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      await submit(result, 'X'.repeat(40000));
+
+      createChatSession.mockResolvedValue('session-B');
+      rerender({ personaId: 2, persona: personaB });
+      await submit(result, 'And now?');
+
+      const { additionalContext } = mockSendMessage.mock.calls.pop()[0];
+      expect(
+        additionalContext.startsWith('[Earlier conversation truncated]'),
+      ).toBe(true);
+      expect(additionalContext.length).toBeLessThanOrEqual(32100);
+      expect(additionalContext).toContain('XXXX');
+    });
+
+    it('drops a forced tool the new assistant does not have', async () => {
+      const { result, rerender } = renderHook(
+        ({ personaId, persona }) => useChatController({ personaId, persona }),
+        { initialProps: { personaId: 1, persona: personaA } },
+      );
+
+      act(() => {
+        result.current.setForcedToolId(20);
+      });
+      expect(result.current.forcedToolId).toBe(20);
+
+      rerender({ personaId: 2, persona: personaB });
+
+      expect(result.current.forcedToolId).toBeNull();
+    });
+
+    it('reports a rejected submit when the session cannot be created', async () => {
+      createChatSession.mockRejectedValue(new Error('session endpoint down'));
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const { result } = renderHook(() =>
+        useChatController({ personaId: 1, persona: personaA }),
+      );
+
+      const outcome = await submit(result, 'Will this survive?');
+
+      expect(outcome).toEqual({ accepted: false });
+      expect(result.current.messages).toEqual([]);
+    });
+  });
 });

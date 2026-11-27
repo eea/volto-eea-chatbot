@@ -18,6 +18,8 @@ import QualityCheckToggle from '@eeacms/volto-eea-chatbot/ChatBlock/components/Q
 import EmptyState from '@eeacms/volto-eea-chatbot/ChatBlock/components/EmptyState';
 import { useChatController } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks';
 import McpToolSelector from '@eeacms/volto-eea-chatbot/ChatBlock/components/McpToolSelector';
+import AssistantSelector from '@eeacms/volto-eea-chatbot/ChatBlock/components/AssistantSelector';
+import { useActivePersona } from '@eeacms/volto-eea-chatbot/ChatBlock/hooks/useActivePersona';
 import DeepResearchButton from '@eeacms/volto-eea-chatbot/ChatBlock/components/DeepResearchButton';
 import SVGIcon from '@eeacms/volto-eea-chatbot/ChatBlock/components/Icon';
 import PenIcon from '@eeacms/volto-eea-chatbot/icons/square-pen.svg';
@@ -27,12 +29,17 @@ import {
   getSharedChatSession,
   deserializeChatSession,
 } from '@eeacms/volto-eea-chatbot/ChatBlock/services/chatSessionService';
+import { withoutQueryParam } from '@eeacms/volto-eea-chatbot/ChatBlock/utils/assistantSelection';
 
 import '@eeacms/volto-eea-chatbot/ChatBlock/style.less';
 
 interface ChatWindowProps {
   block_id?: string;
   persona: Persona;
+  personaOptions?: Persona[];
+  personaOptionsLoading?: boolean;
+  offeredAssistantIds?: string[];
+  initialAssistantId?: string | number | null;
   rehypePrism?: any;
   remarkGfm?: any;
   placeholderPrompt?: string;
@@ -77,6 +84,10 @@ interface ChatWindowProps {
 function ChatWindow({
   block_id,
   persona,
+  personaOptions = [],
+  personaOptionsLoading = false,
+  offeredAssistantIds = [],
+  initialAssistantId,
   rehypePrism,
   remarkGfm,
   placeholderPrompt = 'Ask a question',
@@ -129,9 +140,7 @@ function ChatWindow({
         : true;
 
   const isShareEnabled =
-    typeof data.enableShare !== 'undefined'
-      ? Boolean(data.enableShare)
-      : true;
+    typeof data.enableShare !== 'undefined' ? Boolean(data.enableShare) : true;
 
   const stopButtonSetting:
     | 'disabled'
@@ -159,6 +168,28 @@ function ChatWindow({
     [rehypePrism, remarkGfm],
   );
 
+  const offeredIds = useMemo(
+    () =>
+      offeredAssistantIds.length
+        ? offeredAssistantIds
+        : personaOptions.map((option) => String(option.id)),
+    [offeredAssistantIds, personaOptions],
+  );
+
+  const {
+    activeId: activeAssistantId,
+    persona: activePersona,
+    isResolved: isActivePersonaResolved,
+    select: selectAssistant,
+    adopt: adoptAssistant,
+  } = useActivePersona({
+    primary: persona,
+    options: personaOptions,
+    loading: personaOptionsLoading,
+    offeredIds,
+    initialId: initialAssistantId,
+  });
+
   const {
     onSubmit,
     onFetchRelatedQuestions,
@@ -175,9 +206,10 @@ function ChatWindow({
     toggleTool,
     enableTool,
     availableTools,
+    isContextTruncated,
   } = useChatController({
-    personaId: persona.id,
-    persona,
+    personaId: activePersona.id,
+    persona: activePersona,
     qgenAsistantId,
     enableQgen,
     deepResearch,
@@ -187,8 +219,11 @@ function ChatWindow({
   });
 
   const [showLandingPage, setShowLandingPage] = useState(true);
+  const [submitError, setSubmitError] = useState(false);
   const [isSharedView, setIsSharedView] = useState(false);
-  const [sharedSessionLoading, setSharedSessionLoading] = useState(false);
+  const [sharedSessionLoading, setSharedSessionLoading] = useState(
+    Boolean(initialChatSessionId),
+  );
   const [sharedSessionError, setSharedSessionError] = useState(false);
 
   const history = useHistory();
@@ -197,6 +232,7 @@ function ChatWindow({
   const chatWindowRef = useRef(null);
   const chatWindowEndRef = useRef(null);
   const hasTrackedContinuationRef = useRef(false);
+  const hasAutoSubmittedRef = useRef(false);
 
   // Load shared session from URL parameter on mount
   useEffect(() => {
@@ -210,6 +246,12 @@ function ChatWindow({
         .then((detail) => {
           if (!isMounted) return;
           const deserialized = deserializeChatSession(detail);
+          // The assistant that answered wins over `?assistant=`.
+          const sharedPersonaId =
+            detail?.persona_id !== null && detail?.persona_id !== undefined
+              ? String(detail.persona_id)
+              : null;
+          adoptAssistant(sharedPersonaId);
           loadChatSession(initialChatSessionId, deserialized);
           setIsSharedView(true);
           setSharedSessionLoading(false);
@@ -226,7 +268,7 @@ function ChatWindow({
     return () => {
       isMounted = false;
     };
-  }, [initialChatSessionId, loadChatSession]);
+  }, [initialChatSessionId, loadChatSession, adoptAssistant]);
 
   // Track when a shared session is continued into a new session
   useEffect(() => {
@@ -251,7 +293,9 @@ function ChatWindow({
     hasTrackedContinuationRef.current = false;
     if (enableMatomoTracking) {
       trackEvent({
-        category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+        category: activePersona?.name
+          ? `Chatbot - ${activePersona.name}`
+          : 'Chatbot',
         action: 'Start new conversation',
         name: 'Top toolbar',
       });
@@ -267,10 +311,14 @@ function ChatWindow({
     ) {
       history.replace(window.location.pathname);
     }
-  }, [clearChat, history]);
+  }, [clearChat, history, activePersona, enableMatomoTracking]);
 
   const handleFormSubmit = useCallback(
     ({ message }: { message: string }) => {
+      // Nothing may be sent before the shared transcript and its assistant
+      // are known; the composer and the starter prompts are both reachable.
+      if (sharedSessionLoading) return { accepted: false };
+      setSubmitError(false);
       if (
         isSharedView &&
         !hasTrackedContinuationRef.current &&
@@ -278,20 +326,34 @@ function ChatWindow({
       ) {
         hasTrackedContinuationRef.current = true;
         trackEvent({
-          category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+          category: activePersona?.name
+            ? `Chatbot - ${activePersona.name}`
+            : 'Chatbot',
           action: 'Shared conversation continued',
           name: initialChatSessionId || 'Continuation',
         });
       }
-      onSubmit({ message });
-      setShowLandingPage(false);
+      const outcome = onSubmit({ message });
+      Promise.resolve(outcome)
+        .then((result: any) => {
+          if (result && result.accepted === false) {
+            // Nothing reached the transcript: keep the draft and say so.
+            setSubmitError(true);
+            return;
+          }
+          setSubmitError(false);
+          setShowLandingPage(false);
+        })
+        .catch(() => setSubmitError(true));
+      return outcome;
     },
     [
       onSubmit,
       isSharedView,
       enableMatomoTracking,
-      persona,
+      activePersona,
       initialChatSessionId,
+      sharedSessionLoading,
     ],
   );
 
@@ -309,18 +371,63 @@ function ChatWindow({
 
   // Auto-submit query from URL parameter on mount
   useEffect(() => {
-    if (initialQuery && messages.length === 0 && !isStreaming) {
-      onSubmit({ message: initialQuery });
-      setShowLandingPage(false);
-      history.replace(window.location.pathname);
+    if (hasAutoSubmittedRef.current) return;
+    // A shared conversation owns the first action; otherwise wait until the
+    // active assistant is known, which may be after this render.
+    if (
+      !initialQuery ||
+      messages.length > 0 ||
+      isStreaming ||
+      initialChatSessionId ||
+      !isActivePersonaResolved
+    ) {
+      return;
     }
-  }, []);
+    hasAutoSubmittedRef.current = true;
+    // Same path as a typed question.
+    Promise.resolve(handleFormSubmit({ message: initialQuery }))
+      .then((outcome: any) => {
+        // Keep a rejected question in the address bar for a retry.
+        if (outcome && outcome.accepted === false) return;
+        history.replace(
+          `${window.location.pathname}${withoutQueryParam(
+            window.location.search,
+          )}`,
+        );
+      })
+      .catch(() => {});
+  }, [
+    initialQuery,
+    isActivePersonaResolved,
+    initialChatSessionId,
+    messages.length,
+    isStreaming,
+  ]);
+
+  const handleAssistantSelect = useCallback(
+    (nextPersona: Persona) => {
+      if (enableMatomoTracking) {
+        trackEvent({
+          category: activePersona?.name
+            ? `Chatbot - ${activePersona.name}`
+            : 'Chatbot',
+          action: 'Assistant switched',
+          name: nextPersona?.name || '',
+        });
+      }
+      selectAssistant(nextPersona);
+      textareaRef.current?.focus();
+    },
+    [activePersona, enableMatomoTracking, selectAssistant],
+  );
 
   const handleStarterPromptChoice = useCallback(
     (message: string) => {
       if (enableMatomoTracking) {
         trackEvent({
-          category: persona?.name ? `Chatbot - ${persona.name}` : 'Chatbot',
+          category: activePersona?.name
+            ? `Chatbot - ${activePersona.name}`
+            : 'Chatbot',
           action: 'Chatbot: Starter prompt click',
           name: 'Message submitted',
         });
@@ -363,14 +470,14 @@ function ChatWindow({
           </div>
         ) : showLandingPage ? (
           <>
-            {showAssistantTitle && <h2>{persona.name}</h2>}
-            {showAssistantDescription && <p>{persona.description}</p>}
+            {showAssistantTitle && <h2>{activePersona.name}</h2>}
+            {showAssistantDescription && <p>{activePersona.description}</p>}
 
             {starterPromptsPosition === 'top' && (
               <EmptyState
                 {...data}
                 block_id={block_id}
-                persona={persona}
+                persona={activePersona}
                 onChoice={handleStarterPromptChoice}
               />
             )}
@@ -433,7 +540,7 @@ function ChatWindow({
                     isFetchingRelatedQuestions={isFetchingRelatedQuestions}
                     enableShowTotalFailMessage={enableShowTotalFailMessage}
                     enableMatomoTracking={enableMatomoTracking}
-                    persona={persona}
+                    persona={activePersona}
                     maxContextSegments={maxContextSegments}
                     batchSize={batchSize}
                     chunkEvidenceWindow={chunkEvidenceWindow}
@@ -470,8 +577,8 @@ function ChatWindow({
                               onClick={() => {
                                 if (enableMatomoTracking) {
                                   trackEvent({
-                                    category: persona?.name
-                                      ? `Chatbot - ${persona.name}`
+                                    category: activePersona?.name
+                                      ? `Chatbot - ${activePersona.name}`
                                       : 'Chatbot',
                                     action: 'Chatbot: Stop generating',
                                     name: 'Message generation stopped',
@@ -517,8 +624,8 @@ function ChatWindow({
               onClick={() => {
                 if (enableMatomoTracking) {
                   trackEvent({
-                    category: persona?.name
-                      ? `Chatbot - ${persona.name}`
+                    category: activePersona?.name
+                      ? `Chatbot - ${activePersona.name}`
                       : 'Chatbot',
                     action: 'Chatbot: Stop generating',
                     name: 'Message generation stopped',
@@ -555,6 +662,22 @@ function ChatWindow({
                 </span>
               </div>
             )}
+            {isContextTruncated && (
+              <div className="chat-context-warning" role="status">
+                <FormattedMessage
+                  id="Earlier messages of this conversation could not be carried over to this assistant."
+                  defaultMessage="Earlier messages of this conversation could not be carried over to this assistant."
+                />
+              </div>
+            )}
+            {submitError && (
+              <div className="chat-submit-error" role="alert">
+                <FormattedMessage
+                  id="We could not start the conversation. Please try again."
+                  defaultMessage="We could not start the conversation. Please try again."
+                />
+              </div>
+            )}
             <Form>
               <AutoResizeTextarea
                 // @ts-ignore TODO: convert AutoResizeTextarea to TypeScript
@@ -564,15 +687,26 @@ function ChatWindow({
                 placeholder={
                   messages.length > 0 ? 'Ask follow-up...' : placeholderPrompt
                 }
-                isStreaming={isStreaming}
+                isStreaming={isStreaming || !isActivePersonaResolved}
                 stopButton={stopButtonSetting}
                 onCancel={cancelStreaming}
                 enableMatomoTracking={enableMatomoTracking}
-                persona={persona}
+                persona={activePersona}
                 onSubmit={handleFormSubmit}
                 availableTools={availableTools}
                 selectedToolIds={selectedToolIds}
                 onEnableTool={enableTool}
+                toolbarRight={
+                  isEditMode ? null : (
+                    <AssistantSelector
+                      personas={personaOptions}
+                      activeId={activeAssistantId}
+                      onSelect={handleAssistantSelect}
+                      disabled={isStreaming}
+                      loading={personaOptionsLoading}
+                    />
+                  )
+                }
                 toolbarLeft={
                   <>
                     {enableToolSelection && availableTools?.length > 0 && (
@@ -582,14 +716,14 @@ function ChatWindow({
                         onToggleTool={(toolId: number) => {
                           if (enableMatomoTracking) {
                             const tool = availableTools.find(
-                              (t) => t.id === toolId,
+                              (t: any) => t.id === toolId,
                             );
                             const isCurrentlySelected =
                               selectedToolIds.includes(toolId);
                             if (tool) {
                               trackEvent({
-                                category: persona?.name
-                                  ? `Chatbot - ${persona.name}`
+                                category: activePersona?.name
+                                  ? `Chatbot - ${activePersona.name}`
                                   : 'Chatbot',
                                 action: isCurrentlySelected
                                   ? 'MCP tool disabled'
@@ -647,7 +781,7 @@ function ChatWindow({
         <EmptyState
           {...data}
           block_id={block_id}
-          persona={persona}
+          persona={activePersona}
           onChoice={handleStarterPromptChoice}
         />
       )}

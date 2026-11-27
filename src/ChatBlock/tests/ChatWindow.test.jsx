@@ -387,7 +387,7 @@ describe('ChatWindow', () => {
     expect(mockSetIsDeepResearchEnabled).toHaveBeenCalledWith(true);
   });
 
-  it('URL is cleaned after auto-submit via history.replace', () => {
+  it('URL is cleaned after auto-submit via history.replace', async () => {
     const mockOnSubmit = jest.fn();
     const mockSetIsDeepResearchEnabled = jest.fn();
     useChatController.mockReturnValue({
@@ -407,7 +407,291 @@ describe('ChatWindow', () => {
 
     render(<ChatWindowWrapped persona={mockPersona} initialQuery="clean me" />);
 
-    expect(mockHistory.replace).toHaveBeenCalledWith('/assistant-page');
+    await waitFor(() =>
+      expect(mockHistory.replace).toHaveBeenCalledWith('/assistant-page'),
+    );
+  });
+
+  it('does not auto-submit into a shared conversation', () => {
+    const mockOnSubmit = jest.fn().mockResolvedValue({ accepted: true });
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      loadChatSession: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+    getSharedChatSession.mockResolvedValue({
+      chat_session_id: 'shared-1',
+      persona_id: 1,
+      messages: [],
+    });
+    deserializeChatSession.mockReturnValue([]);
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialChatSessionId="shared-1"
+        initialQuery="should not be sent"
+      />,
+    );
+
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('auto-submits once the active assistant is resolved, even if the alternatives load later', () => {
+    const mockOnSubmit = jest.fn().mockResolvedValue({ accepted: true });
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+
+    const { rerender } = render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        personaOptions={[mockPersona]}
+        personaOptionsLoading
+        initialAssistantId="1"
+        initialQuery="deep link question"
+      />,
+    );
+
+    // The active assistant is already known: the question must not wait for
+    // the alternatives, and it must not be lost if they settle later.
+    expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        personaOptions={[
+          mockPersona,
+          { id: 2, name: 'Climate Assistant', description: '' },
+        ]}
+        personaOptionsLoading={false}
+        initialAssistantId="1"
+        initialQuery="deep link question"
+      />,
+    );
+
+    expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not submit a starter prompt before the shared transcript arrives', async () => {
+    const mockOnSubmit = jest.fn().mockResolvedValue({ accepted: true });
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      loadChatSession: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+    getSharedChatSession.mockResolvedValue({
+      chat_session_id: 'shared-1',
+      persona_id: 1,
+      messages: [],
+    });
+    deserializeChatSession.mockReturnValue([]);
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        initialChatSessionId="shared-1"
+      />,
+    );
+
+    // The composer is not rendered while loading, so submit straight through
+    // the same handler the bottom starter prompts use.
+    expect(screen.queryByTestId('mock-submit-button')).not.toBeInTheDocument();
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('mock-submit-button')).toBeInTheDocument();
+    });
+  });
+
+  it('falls back to the block default when the selected assistant never loads', () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        personaOptions={[mockPersona]}
+        personaOptionsLoading={false}
+        offeredAssistantIds={['1', '2']}
+        initialAssistantId="2"
+      />,
+    );
+
+    // Assistant 2 was offered but its record never arrived.
+    expect(useChatController).toHaveBeenLastCalledWith(
+      expect.objectContaining({ personaId: 1 }),
+    );
+  });
+
+  it('keeps the question in the url when the submit was rejected', async () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn().mockResolvedValue({ accepted: false }),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+
+    jest.spyOn(window, 'location', 'get').mockReturnValue({
+      pathname: '/ask-ai',
+      search: '?query=retry+me',
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} initialQuery="retry me" />);
+
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'We could not start the conversation. Please try again.',
+      ),
+    );
+    expect(mockHistory.replace).not.toHaveBeenCalled();
+  });
+
+  it('auto-submits a url question exactly once to the named assistant', () => {
+    const mockOnSubmit = jest.fn().mockResolvedValue({ accepted: true });
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+
+    render(
+      <ChatWindowWrapped
+        persona={mockPersona}
+        personaOptions={[mockPersona, { id: 2, name: 'Climate Assistant' }]}
+        initialAssistantId="2"
+        initialQuery="climate question"
+      />,
+    );
+
+    expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+    expect(mockOnSubmit).toHaveBeenCalledWith({ message: 'climate question' });
+    expect(useChatController).toHaveBeenLastCalledWith(
+      expect.objectContaining({ personaId: 2 }),
+    );
+  });
+
+  it('says when earlier messages could not be carried over', () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [{ messageId: 1, nodeId: 1, type: 'user', message: 'hello' }],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+      isContextTruncated: true,
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} />);
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Earlier messages of this conversation could not be carried over to this assistant.',
+    );
+  });
+
+  it('tells the visitor when the conversation could not be started', async () => {
+    const mockOnSubmit = jest.fn().mockResolvedValue({ accepted: false });
+    useChatController.mockReturnValue({
+      onSubmit: mockOnSubmit,
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+      selectedToolIds: [],
+      availableTools: [],
+    });
+
+    render(
+      <ChatWindowWrapped persona={mockPersona} initialQuery="hello there" />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'We could not start the conversation. Please try again.',
+      );
+    });
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+  });
+
+  it('keeps every other url parameter when the question is consumed', async () => {
+    useChatController.mockReturnValue({
+      onSubmit: jest.fn(),
+      onFetchRelatedQuestions: jest.fn(),
+      messages: [],
+      isStreaming: false,
+      isFetchingRelatedQuestions: false,
+      clearChat: jest.fn(),
+      setIsDeepResearchEnabled: jest.fn(),
+      isDeepResearchEnabled: false,
+    });
+
+    jest.spyOn(window, 'location', 'get').mockReturnValue({
+      pathname: '/ask-ai',
+      search: '?query=hello&assistant=2&deepResearch=true',
+    });
+
+    render(<ChatWindowWrapped persona={mockPersona} initialQuery="hello" />);
+
+    await waitFor(() =>
+      expect(mockHistory.replace).toHaveBeenCalledWith(
+        '/ask-ai?assistant=2&deepResearch=true',
+      ),
+    );
   });
 
   it('no auto-submit if messages already exist', () => {
@@ -984,5 +1268,126 @@ describe('ChatWindow', () => {
       name: /start a new conversation/i,
     });
     expect(newConvBtn).toBeInTheDocument();
+  });
+  describe('assistant selector', () => {
+    const otherPersona = {
+      id: 2,
+      name: 'Climate Assistant',
+      description: 'A climate assistant',
+    };
+    const selectablePersona = (props = {}) => (
+      <ChatWindowWrapped
+        persona={mockPersona}
+        personaOptions={[mockPersona, otherPersona]}
+        initialAssistantId="1"
+        {...props}
+      />
+    );
+
+    it('renders no selector when the block offers a single assistant', () => {
+      render(<ChatWindowWrapped persona={mockPersona} />);
+      expect(
+        screen.queryByRole('button', { name: /Assistant:/ }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders no selector when the editor previews the block', () => {
+      render(selectablePersona({ isEditMode: true }));
+      expect(
+        screen.queryByRole('button', { name: /Assistant:/ }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders the selector in the composer actions', () => {
+      render(selectablePersona());
+      const toolbarRight = screen.getByTestId('mock-toolbar-right');
+      expect(toolbarRight).toContainElement(
+        screen.getByRole('button', { name: /Assistant:/ }),
+      );
+    });
+
+    it('switches the assistant without asking for a new conversation', () => {
+      render(
+        selectablePersona({
+          showAssistantTitle: true,
+          showAssistantDescription: true,
+        }),
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /Assistant:/ }));
+      fireEvent.click(screen.getByText('Climate Assistant'));
+
+      expect(
+        screen.getByRole('heading', { name: 'Climate Assistant' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText('A climate assistant')).toBeInTheDocument();
+      expect(useChatController).toHaveBeenLastCalledWith(
+        expect.objectContaining({ personaId: 2 }),
+      );
+    });
+
+    it('reports the switch to analytics under the assistant being left', () => {
+      render(selectablePersona());
+      fireEvent.click(screen.getByRole('button', { name: /Assistant:/ }));
+      fireEvent.click(screen.getByText('Climate Assistant'));
+
+      expect(trackEvent).toHaveBeenCalledWith({
+        category: 'Chatbot - Test Assistant',
+        action: 'Assistant switched',
+        name: 'Climate Assistant',
+      });
+    });
+
+    it('cannot be switched while a response is streaming', () => {
+      useChatController.mockReturnValue({
+        onSubmit: jest.fn(),
+        onFetchRelatedQuestions: jest.fn(),
+        messages: [{ messageId: 1, nodeId: 1, type: 'user', message: 'hi' }],
+        isStreaming: true,
+        isFetchingRelatedQuestions: false,
+        clearChat: jest.fn(),
+        setIsDeepResearchEnabled: jest.fn(),
+        isDeepResearchEnabled: false,
+        selectedToolIds: [],
+        availableTools: [],
+      });
+
+      render(selectablePersona());
+
+      expect(screen.getByRole('button', { name: /Assistant:/ })).toBeDisabled();
+    });
+
+    it('adopts the assistant recorded on a shared conversation', async () => {
+      useChatController.mockReturnValue({
+        onSubmit: jest.fn(),
+        onFetchRelatedQuestions: jest.fn(),
+        messages: [],
+        isStreaming: false,
+        isFetchingRelatedQuestions: false,
+        clearChat: jest.fn(),
+        loadChatSession: jest.fn(),
+        setIsDeepResearchEnabled: jest.fn(),
+        isDeepResearchEnabled: false,
+        selectedToolIds: [],
+        availableTools: [],
+      });
+      getSharedChatSession.mockResolvedValue({
+        chat_session_id: 'shared-1',
+        persona_id: 2,
+        persona_name: 'Climate Assistant',
+        messages: [],
+      });
+      deserializeChatSession.mockReturnValue([
+        { messageId: 1, nodeId: 1, type: 'user', message: 'hello' },
+      ]);
+
+      render(selectablePersona({ initialChatSessionId: 'shared-1' }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('button', { name: /Assistant:/ }),
+        ).toHaveTextContent('Climate Assistant');
+      });
+    });
   });
 });

@@ -23,17 +23,28 @@ export default function withOnyxData(callback) {
       const [name, fetcher, depKey] = callback(props);
 
       React.useEffect(() => {
+        // Data must never outlive the key it was fetched for.
+        setState(null);
+        let cancelled = false;
+
         async function handler() {
           if (fetcher) {
             try {
               const response = await fetcher;
+              // Ignore a response for a superseded dependency.
+              if (cancelled) return;
               setState({ [name]: response.body });
             } catch (error) {
+              if (cancelled) return;
               setState({ [`${name}-error`]: error.message, [name]: null });
             }
           }
         }
         handler();
+
+        return () => {
+          cancelled = true;
+        };
         // the fetcher is not a stable function, but we depend on the relevant depKey
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [depKey, name]);

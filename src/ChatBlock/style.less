@@ -2749,6 +2749,151 @@ body > textarea {
 }
 
 // Deep Research Button
+.chat-context-warning {
+  padding: 0 4px 8px;
+  color: #92400e;
+  font-size: 12px;
+}
+
+.chat-share-warning {
+  color: #92400e;
+  font-size: 12px;
+}
+
+.chat-submit-error {
+  padding: 0 4px 8px;
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+.chat-share-error {
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+.assistant-selector {
+  position: relative;
+  display: inline-block;
+
+  .assistant-trigger {
+    display: inline-flex;
+    max-width: 12rem;
+    height: 32px;
+    align-items: center;
+    padding: 0 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    color: #475569;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    gap: 6px;
+    line-height: 1;
+    transition: all 0.15s ease-in-out;
+
+    &:hover:not(:disabled) {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .assistant-trigger-label {
+      overflow: hidden;
+      padding-right: 2px;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .assistant-trigger-chevron {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      color: #94a3b8;
+      transition: transform 0.2s ease;
+
+      &.expanded {
+        transform: rotate(180deg);
+      }
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .assistant-selector-menu {
+    position: absolute;
+    z-index: 100;
+    right: 0;
+    bottom: calc(100% + 8px);
+    left: auto;
+    min-width: 200px;
+    max-width: 320px;
+    max-height: 320px;
+    padding: 0.25rem 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+
+    .assistant-selector-item {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      border: none;
+      background: none;
+      color: #1e293b;
+      cursor: pointer;
+      font-size: 13px;
+      gap: 0.5rem;
+      text-align: left;
+      transition: background 0.15s;
+
+      &:hover {
+        background: #f9fafb;
+      }
+
+      &.active {
+        color: #004b87;
+        font-weight: 600;
+      }
+
+      .assistant-item-name {
+        display: block;
+        overflow: hidden;
+        padding-right: 0.5rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .assistant-item-check {
+        display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
+        color: #004b87;
+
+        svg {
+          width: 15px;
+          height: 15px;
+        }
+      }
+    }
+  }
+}
+
 .deep-research-btn {
   display: inline-flex;
   min-width: 32px;

@@ -273,31 +273,106 @@ async function send_onyx_request(
     }
 
     try {
-      const patchUrl = `${process.env.ONYX_URL || ''}/api/chat/chat-session/${chatSessionId}`;
-      const patchOptions = {
-        method: 'PATCH',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sharing_status: 'public' }),
-      };
-      const patchRes = await fetch(patchUrl, patchOptions);
+      const onyxUrl = process.env.ONYX_URL || '';
+      const publishUrl = (id) => `${onyxUrl}/api/chat/chat-session/${id}`;
+      const readUrl = (id) => `${onyxUrl}/api/chat/get-chat-session/${id}`;
+      const PARENT_SESSION_TAG_REGEX =
+        /\[parent:([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\]\s*$/;
+      const MAX_ANCESTOR_DEPTH = 10;
 
-      if (patchRes.ok) {
-        res.status(200);
+      // Publish the fork chain oldest-first, linked session last. Tags are
+      // client-written and Onyx exposes no owner, so a UUID stays a capability.
+      const fail = (status, message) => {
+        res.status(status);
         res.set('Content-Type', 'application/json');
-        res.send(
-          JSON.stringify({ success: true, chat_session_id: chatSessionId }),
-        );
-        return;
+        res.send(JSON.stringify({ error: message }));
+      };
+
+      const readSession = async (id) => {
+        try {
+          const detailRes = await fetch(readUrl(id), {
+            method: 'GET',
+            headers,
+          });
+          if (!detailRes.ok) return null;
+          return await detailRes.json();
+        } catch (readErr) {
+          log(`Error reading session ${id} while sharing:`, readErr);
+          return null;
+        }
+      };
+
+      const chain = [];
+      let partial = false;
+
+      const tail = await readSession(chatSessionId);
+      let description = tail?.description || '';
+      const visited = new Set([String(chatSessionId).toLowerCase()]);
+      let depth = 0;
+
+      for (; depth < MAX_ANCESTOR_DEPTH; depth += 1) {
+        const match = description.match(PARENT_SESSION_TAG_REGEX);
+        if (!match) break;
+
+        const parentId = match[1].toLowerCase();
+        if (visited.has(parentId)) break;
+        visited.add(parentId);
+
+        const parent = await readSession(parentId);
+        if (!parent) {
+          // Gone or unreachable: share the rest and flag it as partial.
+          log(
+            `Ancestor ${parentId} is unavailable while sharing ${chatSessionId}`,
+          );
+          partial = true;
+          break;
+        }
+
+        if (parent.shared_status !== 'public') {
+          chain.unshift(parentId);
+        }
+        description = parent.description || '';
       }
 
-      res.status(patchRes.status);
+      // Still a tag left when the walk ran out of budget: the conversation is
+      // longer than we publish, and the sharer should hear about it.
+      if (depth === MAX_ANCESTOR_DEPTH) {
+        partial = true;
+      }
+
+      if (tail?.shared_status !== 'public') {
+        chain.push(chatSessionId);
+      }
+
+      for (const id of chain) {
+        const patchRes = await fetch(publishUrl(id), {
+          method: 'PATCH',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ sharing_status: 'public' }),
+        });
+
+        if (!patchRes.ok) {
+          log(`Failed to publish session ${id} while sharing ${chatSessionId}`);
+          fail(
+            502,
+            `Failed to share conversation: ${
+              patchRes.statusText || patchRes.status
+            }`,
+          );
+          return;
+        }
+      }
+
+      res.status(200);
       res.set('Content-Type', 'application/json');
       res.send(
         JSON.stringify({
-          error: `Failed to share conversation: ${patchRes.statusText || patchRes.status}`,
+          success: true,
+          chat_session_id: chatSessionId,
+          ...(partial ? { partial: true } : {}),
         }),
       );
       return;

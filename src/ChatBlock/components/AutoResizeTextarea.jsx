@@ -112,8 +112,20 @@ export default React.forwardRef(function AutoResizeTextarea(props, ref) {
           name: 'Message submitted',
         });
       }
-      onSubmit({ message: input });
+      // onSubmit settles only after streaming, so clear now.
+      const draft = input;
+      const outcome = onSubmit({ message: input });
       setInput('');
+      // Rejected (no session): give the draft back.
+      Promise.resolve(outcome)
+        .then((result) => {
+          if (result && result.accepted === false) {
+            setInput((current) => (current === '' ? draft : current));
+          }
+        })
+        .catch(() => {
+          setInput((current) => (current === '' ? draft : current));
+        });
     }
   };
 
